@@ -1,0 +1,198 @@
+@import 'tailwindcss';
+
+/*
+ * the palette is named after the loom: the ground is the indigo warp, the weft
+ * is the undyed thread that reads on top of it. the semantic colours are the
+ * three classic natural dyes, so nothing in the system is a generic "green" or
+ * "red" that a later theme has to argue with.
+ */
+@theme {
+  --font-ui: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-data: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --color-ground: var(--p-ground);
+  --color-raised: var(--p-raised);
+  --color-sunken: var(--p-sunken);
+  --color-reed: var(--p-reed);
+  --color-reed-lit: var(--p-reed-lit);
+
+  --color-weft: var(--p-weft);
+  --color-weft-dim: var(--p-weft-dim);
+  --color-weft-faint: var(--p-weft-faint);
+
+  --color-indigo: var(--p-indigo);
+  --color-indigo-wash: var(--p-indigo-wash);
+  --color-jade: var(--p-jade);
+  --color-madder: var(--p-madder);
+  --color-weld: var(--p-weld);
+}
+
+:root {
+  --p-ground: #0b0d14;
+  --p-raised: #12151f;
+  --p-sunken: #070910;
+  --p-reed: #1c2030;
+  --p-reed-lit: #2b3145;
+
+  --p-weft: #e9e5db;
+  --p-weft-dim: #9b9789;
+  --p-weft-faint: #6a6759;
+
+  --p-indigo: #5f72ef;
+  --p-indigo-wash: #1a1f42;
+  --p-jade: #4fa88b;
+  --p-madder: #d2624f;
+  --p-weld: #c9a227;
+}
+
+:root[data-theme='light'] {
+  --p-ground: #f2f1ec;
+  --p-raised: #faf9f5;
+  --p-sunken: #e8e6df;
+  --p-reed: #dcd9d0;
+  --p-reed-lit: #c2beb2;
+
+  --p-weft: #14161d;
+  --p-weft-dim: #5c594f;
+  --p-weft-faint: #8a8779;
+
+  --p-indigo: #3a49c4;
+  --p-indigo-wash: #e4e5f7;
+  --p-jade: #2f7a61;
+  --p-madder: #b04430;
+  --p-weld: #8a6f12;
+}
+
+/*
+ * density is one knob, not fifty. every control that has a height, a horizontal
+ * pad or a label size reads these four values, so a single attribute on the root
+ * retunes the whole interface and nothing drifts out of step.
+ */
+:root,
+:root[data-density='compact'] {
+  --row-h: 32px;
+  --cell-x: 10px;
+  --ui-text: 13px;
+  --ctl-h: 28px;
+  --stack: 8px;
+}
+
+:root[data-density='comfortable'] {
+  --row-h: 40px;
+  --cell-x: 14px;
+  --ui-text: 14px;
+  --ctl-h: 34px;
+  --stack: 10px;
+}
+
+:root[data-density='dense'] {
+  --row-h: 25px;
+  --cell-x: 7px;
+  --ui-text: 12px;
+  --ctl-h: 23px;
+  --stack: 6px;
+}
+
+/*
+ * durations are named for what moves, not for how long, so the choice at a call
+ * site is about the kind of change rather than a number. the beat easing is the
+ * loom's own: it leaves fast and settles without a bounce.
+ */
+:root {
+  --dur-instant: 90ms;
+  --dur-local: 160ms;
+  --dur-overlay: 240ms;
+
+  --ease-beat: cubic-bezier(0.2, 0.9, 0.24, 1);
+  --ease-glide: cubic-bezier(0.33, 0, 0.15, 1);
+  --ease-exit: cubic-bezier(0.5, 0, 0.9, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 0ms;
+    --dur-local: 0ms;
+    --dur-overlay: 0ms;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-ground);
+    color: var(--color-weft);
+    font-family: var(--font-ui);
+    font-size: var(--ui-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-indigo);
+    outline-offset: 1px;
+  }
+
+  ::selection {
+    background-color: var(--color-indigo);
+    color: #fff;
+  }
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  /*
+   * the reed: the evenly spaced slots that hold the warp on a loom. it closes
+   * the table head, in place of the single rule that every other table uses.
+   */
+  .reed-edge {
+    position: relative;
+  }
+
+  .reed-edge::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-reed-lit) 0 1px,
+      transparent 1px 5px
+    );
+  }
+
+  .beat {
+    animation: beat 1.6s var(--ease-glide) infinite;
+  }
+}
+
+@keyframes beat {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* the beat-up: the reed drives the weft down into place and settles */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beat {
+    animation: none;
+  }
+}
