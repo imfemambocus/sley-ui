@@ -20,6 +20,8 @@ The npm package is `sley-ui`. Install it globally and the command is `sley`.
 
 Most component libraries target marketing pages. They look correct with eight elements on a screen, and they break down with two hundred. sley starts from the opposite case. Density is the design problem, and every component answers to it.
 
+One attribute on the root element moves every component between three densities: comfortable, compact and dense. Row height, control height, padding and label size all change together, so nothing drifts out of step. It is CSS custom properties, so it costs no JavaScript.
+
 sley uses Ark UI for behaviour and Tailwind CSS v4 for the token layer. Each component is readable TypeScript. There is no runtime style engine.
 
 ## Updates

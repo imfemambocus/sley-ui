@@ -87,8 +87,8 @@ export const CommandPalette = ({ open, onOpenChange, commands }: CommandPaletteP
   return (
     <Dialog.Root open={open} onOpenChange={(details) => onOpenChange(details.open)} unmountOnExit lazyMount>
       <Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)]" />
-        <Dialog.Positioner className="fixed inset-0 z-50 grid place-items-start justify-items-center pt-[12vh]">
+        <Dialog.Backdrop className="fixed inset-0 z-[var(--z-backdrop)] bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)]" />
+        <Dialog.Positioner className="fixed inset-0 z-[var(--z-modal)] grid place-items-start justify-items-center pt-[12vh]">
           <Dialog.Content className="w-[min(560px,92vw)] border border-reed-lit bg-raised shadow-2xl shadow-black/40 data-[state=open]:animate-[rise_var(--dur-overlay)_var(--ease-beat)]">
             <Dialog.Title className="sr-only">Command palette</Dialog.Title>
 

@@ -84,7 +84,7 @@ export const DataTable = ({ rows }: DataTableProps) => {
 
       <div className="max-h-[520px] overflow-auto">
         <table className="w-full table-fixed border-collapse text-left">
-          <thead className="sticky top-0 z-10">
+          <thead className="sticky top-0 z-[var(--z-sticky)]">
             <tr className="bg-raised">
               <th scope="col" className="reed-edge w-[34px] px-[var(--cell-x)]">
                 <Checkbox.Root

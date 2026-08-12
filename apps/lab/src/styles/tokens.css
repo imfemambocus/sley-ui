@@ -98,7 +98,17 @@
  * site is about the kind of change rather than a number. the beat easing is the
  * loom's own: it leaves fast and settles without a bounce.
  */
+/*
+ * every layer that leaves the flow declares its rank here. a sticky header makes
+ * a stacking context, so portalled content with no rank of its own falls behind
+ * it however late it enters the dom.
+ */
 :root {
+  --z-sticky: 10;
+  --z-popover: 30;
+  --z-backdrop: 40;
+  --z-modal: 50;
+
   --dur-instant: 90ms;
   --dur-local: 160ms;
   --dur-overlay: 240ms;
@@ -138,6 +148,17 @@
 
 @utility tnum {
   font-variant-numeric: tabular-nums;
+}
+
+/*
+ * ark positions its floating parts with an inline `z-index: var(--z-index)` and
+ * an inline `--z-index: auto` beside it. the declaration is the right seam, but
+ * an inline custom property outranks a stylesheet, so this has to be important to
+ * reach it. it feeds ark's own rule rather than fighting it. parts ark does not
+ * position, such as a dialog backdrop, take their rank from a class.
+ */
+[data-part='positioner']:not([data-scope='dialog']) {
+  --z-index: var(--z-popover) !important;
 }
 
 @layer components {
