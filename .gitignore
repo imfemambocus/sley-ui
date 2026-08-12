@@ -1,0 +1,21 @@
+# claude code files: the real ones live in the claude-config repo and are symlinked in,
+# so what sits here is a link pointing at a private repo plus machine-local permissions
+.claude
+CLAUDE.md
+
+# secrets and machine-local config
+.env
+.env.local
+
+# dependencies and build output
+node_modules/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# tooling
+.DS_Store
+*.bak
+.idea/
+.vscode/

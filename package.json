@@ -1,0 +1,11 @@
+{
+  "name": "sley-workspace",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Isfaaq M. F. Emambocus",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}
