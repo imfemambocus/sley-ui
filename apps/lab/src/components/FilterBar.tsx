@@ -38,9 +38,7 @@ const FilterSelect = ({ label, options, selected, onSelect }: FilterSelectProps)
       <Select.Control>
         <Select.Trigger className={`${CONTROL} h-[var(--ctl-h)] cursor-pointer`}>
           <span className={selected.length > 0 ? 'text-weft' : 'text-weft-dim'}>{label}</span>
-          {selected.length > 0 && (
-            <span className="tnum bg-indigo px-1 font-data text-[11px] text-ground">{selected.length}</span>
-          )}
+          {selected.length > 0 && <span className="tnum font-data text-indigo">{selected.length}</span>}
           <ChevronIcon className="size-3 text-weft-faint" />
         </Select.Trigger>
       </Select.Control>
@@ -69,6 +67,12 @@ const FilterSelect = ({ label, options, selected, onSelect }: FilterSelectProps)
 interface Chip {
   readonly group: keyof Omit<Filters, 'query'>
   readonly value: string
+}
+
+const GROUP_LABEL: Record<Chip['group'], string> = {
+  assays: 'assay',
+  statuses: 'status',
+  owners: 'owner',
 }
 
 interface FilterBarProps {
@@ -135,8 +139,10 @@ export const FilterBar = ({ filters, onChange, assays, statuses, owners }: Filte
                 onClick={() => removeChip(chip)}
                 className="inline-flex h-[var(--ctl-h)] cursor-pointer items-center gap-1.5 border border-indigo/40 bg-indigo-wash px-[var(--cell-x)] text-weft transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] hover:border-indigo"
               >
-                <span className="font-data text-weft-dim">{chip.group.slice(0, -1)}</span>
-                {chip.value}
+                <span className="inline-flex items-baseline gap-1.5">
+                  <span className="font-data text-weft-dim">{GROUP_LABEL[chip.group]}</span>
+                  {chip.value}
+                </span>
                 <CloseIcon className="size-3 text-weft-faint" />
               </button>
             </li>

@@ -86,11 +86,11 @@ export const DataTable = ({ rows }: DataTableProps) => {
         <table className="w-full table-fixed border-collapse text-left">
           <thead className="sticky top-0 z-[var(--z-sticky)]">
             <tr className="bg-raised">
-              <th scope="col" className="reed-edge w-[34px] px-[var(--cell-x)]">
+              <th scope="col" className="reed-edge w-[34px] px-[var(--cell-x)] align-middle">
                 <Checkbox.Root
                   checked={headerState}
                   onCheckedChange={toggleAll}
-                  className="inline-flex cursor-pointer items-center"
+                  className="flex cursor-pointer items-center"
                 >
                   <Checkbox.Control className="grid size-[13px] place-items-center border border-reed-lit text-ground transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] data-[state=checked]:border-indigo data-[state=checked]:bg-indigo data-[state=indeterminate]:border-indigo data-[state=indeterminate]:bg-indigo">
                     <Checkbox.Indicator>
@@ -125,11 +125,11 @@ export const DataTable = ({ rows }: DataTableProps) => {
                 className="border-t border-reed/60 transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] hover:bg-indigo-wash data-[selected]:bg-indigo-wash"
                 data-selected={selected.has(run.id) ? '' : undefined}
               >
-                <td className="px-[var(--cell-x)]" style={{ height: 'var(--row-h)' }}>
+                <td className="px-[var(--cell-x)] align-middle" style={{ height: 'var(--row-h)' }}>
                   <Checkbox.Root
                     checked={selected.has(run.id)}
                     onCheckedChange={() => toggleRow(run.id)}
-                    className="inline-flex cursor-pointer items-center"
+                    className="flex cursor-pointer items-center"
                   >
                     <Checkbox.Control className="grid size-[13px] place-items-center border border-reed-lit text-ground transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] data-[state=checked]:border-indigo data-[state=checked]:bg-indigo">
                       <Checkbox.Indicator>
