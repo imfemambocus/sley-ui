@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CommandPalette, type Command } from './components/CommandPalette'
-import { EMPTY_FILTERS, FilterBar, type Filters } from './components/FilterBar'
-import { DataTable } from './components/DataTable'
-import { ASSAYS, STATUSES, runs } from './data/runs'
+import { CommandPalette, type Command } from '@/components/ui/command-palette/CommandPalette'
+import { FilterBar, type FilterValues } from '@/components/ui/filter-bar/FilterBar'
+import { Table } from '@/components/ui/table/Table'
+import { runs } from './data/runs'
+import { RUN_COLUMNS } from './runs/columns'
+import { RUN_GROUPS, matchesFilters } from './runs/filters'
 
 const DENSITIES = ['comfortable', 'compact', 'dense'] as const
 type Density = (typeof DENSITIES)[number]
@@ -10,25 +12,11 @@ type Density = (typeof DENSITIES)[number]
 const THEMES = ['dark', 'light'] as const
 type Theme = (typeof THEMES)[number]
 
-const OWNERS = [...new Set(runs.map((run) => run.owner))].sort((a, b) => a.localeCompare(b))
-
 const KNOBS = ['--row-h', '--cell-x', '--ui-text', '--ctl-h', '--stack', '--reed-pitch'] as const
 
 interface Knob {
   readonly name: string
   readonly value: string
-}
-
-function matchesFilters(run: (typeof runs)[number], filters: Filters) {
-  const needle = filters.query.trim().toLowerCase()
-  if (needle !== '') {
-    const haystack = `${run.id} ${run.sample} ${run.assay} ${run.owner}`.toLowerCase()
-    if (!haystack.includes(needle)) return false
-  }
-  if (filters.assays.length > 0 && !filters.assays.includes(run.assay)) return false
-  if (filters.statuses.length > 0 && !filters.statuses.includes(run.status)) return false
-  if (filters.owners.length > 0 && !filters.owners.includes(run.owner)) return false
-  return true
 }
 
 interface SegmentedProps<T extends string> {
@@ -58,7 +46,8 @@ const Segmented = <T extends string>({ legend, options, value, onSelect }: Segme
 export const App = () => {
   const [density, setDensity] = useState<Density>('compact')
   const [theme, setTheme] = useState<Theme>('dark')
-  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
+  const [query, setQuery] = useState('')
+  const [values, setValues] = useState<FilterValues>({})
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [knobs, setKnobs] = useState<readonly Knob[]>([])
@@ -82,7 +71,7 @@ export const App = () => {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  const visible = useMemo(() => runs.filter((run) => matchesFilters(run, filters)), [filters])
+  const visible = useMemo(() => runs.filter((run) => matchesFilters(run, query, values)), [query, values])
 
   const commands: readonly Command[] = useMemo(
     () => [
@@ -102,19 +91,19 @@ export const App = () => {
         id: 'filter-running',
         group: 'Filters',
         label: 'Show running runs only',
-        run: () => setFilters({ ...EMPTY_FILTERS, statuses: ['running'] }),
+        run: () => setValues({ status: ['running'] }),
       },
       {
         id: 'filter-failed',
         group: 'Filters',
         label: 'Show failed runs only',
-        run: () => setFilters({ ...EMPTY_FILTERS, statuses: ['failed'] }),
+        run: () => setValues({ status: ['failed'] }),
       },
       {
         id: 'filter-clear',
         group: 'Filters',
         label: 'Clear all filters',
-        run: () => setFilters(EMPTY_FILTERS),
+        run: () => setValues({}),
       },
       {
         id: 'table-loading',
@@ -157,14 +146,24 @@ export const App = () => {
         </header>
 
         <FilterBar
-          filters={filters}
-          onChange={setFilters}
-          assays={ASSAYS}
-          statuses={STATUSES}
-          owners={OWNERS}
+          query={query}
+          onQueryChange={setQuery}
+          groups={RUN_GROUPS}
+          values={values}
+          onValuesChange={setValues}
+          searchLabel="Search runs"
+          placeholder="Search runs, samples, owners"
         />
 
-        <DataTable rows={visible} loading={loading} />
+        <Table
+          rows={visible}
+          columns={RUN_COLUMNS}
+          rowId={(run) => run.id}
+          title="Sequencing runs"
+          noun="runs"
+          emptyMessage="No run matches the filters."
+          loading={loading}
+        />
       </div>
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} commands={commands} />

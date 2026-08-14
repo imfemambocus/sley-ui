@@ -1,5 +1,3 @@
-@import 'tailwindcss';
-
 @custom-variant dense (&:where(:root[data-density='dense'] *));
 
 /* every name comes from the loom. the semantic colours are dyes, and there is no success or error. */
@@ -259,6 +257,25 @@
   .ctl-align {
     vertical-align: middle;
     translate: 0 calc(-1 * var(--ctl-lift));
+  }
+
+  /*
+   * the surface that every control shares. it lives here and not in a component
+   * file, because two components that draw the same surface must not drift apart.
+   */
+  .ctl {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border: 1px solid var(--color-reed);
+    background-color: var(--color-ground);
+    padding-inline: var(--cell-x);
+    color: var(--color-weft);
+    transition: border-color var(--dur-instant) var(--ease-beat);
+  }
+
+  .ctl:hover {
+    border-color: var(--color-reed-lit);
   }
 
   /* one tick of the reed stands where a value is absent */

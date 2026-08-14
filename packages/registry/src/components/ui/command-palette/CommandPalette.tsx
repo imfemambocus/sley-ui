@@ -1,7 +1,7 @@
 import { Dialog } from '@ark-ui/react/dialog'
 import { Portal } from '@ark-ui/react/portal'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import { SearchIcon } from './icons'
+import { SearchIcon } from '@/components/ui/icons/Icons'
 
 export interface Command {
   readonly id: string
@@ -15,6 +15,7 @@ interface CommandPaletteProps {
   readonly open: boolean
   readonly onOpenChange: (open: boolean) => void
   readonly commands: readonly Command[]
+  readonly placeholder?: string
 }
 
 interface Entry {
@@ -35,10 +36,16 @@ function groupCommands(commands: readonly Command[]) {
   return [...groups]
 }
 
-export const CommandPalette = ({ open, onOpenChange, commands }: CommandPaletteProps) => {
+export const CommandPalette = ({
+  open,
+  onOpenChange,
+  commands,
+  placeholder = 'Run a command',
+}: CommandPaletteProps) => {
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const listRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const matches = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -84,7 +91,13 @@ export const CommandPalette = ({ open, onOpenChange, commands }: CommandPaletteP
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={(details) => onOpenChange(details.open)} unmountOnExit lazyMount>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(details) => onOpenChange(details.open)}
+      initialFocusEl={() => inputRef.current}
+      unmountOnExit
+      lazyMount
+    >
       <Portal>
         <Dialog.Backdrop className="fixed inset-0 z-(--z-backdrop) bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)]" />
         <Dialog.Positioner className="fixed inset-0 z-(--z-modal) grid place-items-start justify-items-center pt-[12vh]">
@@ -93,15 +106,15 @@ export const CommandPalette = ({ open, onOpenChange, commands }: CommandPaletteP
 
             <div className="reed-edge flex items-center gap-2 px-3" style={{ height: 'calc(var(--ctl-h) + 12px)' }}>
               <SearchIcon className="size-4 text-weft-faint" />
-              {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+              {/* the dialog owns the focus, so the input takes it through the focus trap */}
               <input
-                autoFocus
+                ref={inputRef}
                 name="command"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Run a command"
-                aria-label="Run a command"
+                placeholder={placeholder}
+                aria-label={placeholder}
                 className="w-full bg-transparent text-weft placeholder:text-weft-faint focus:outline-none"
               />
               <kbd className="font-data text-[11px] text-weft-faint">esc</kbd>
