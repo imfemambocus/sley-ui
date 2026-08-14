@@ -16,6 +16,8 @@ npx sley-ui add table
 
 Install it globally and the command shortens to `sley`.
 
+`init` reads your project. It finds the framework, the path alias and the stylesheet that pulls Tailwind in, then writes the token block as a file of its own. Vite and Next are both supported. `add` writes a component and everything it imports. If you have already edited one of those files, it keeps your version and tells you.
+
 ## Why
 
 Most component libraries target marketing pages. They look correct with eight elements on a screen, and they break down with two hundred. Sley UI starts from the opposite case. Density is the design problem, and every component answers to it.
@@ -30,7 +32,7 @@ You own the code, so a normal registry cannot update it. Sley UI records the sou
 
 ## Status
 
-Early development. The design language, the component set, and the CLI are all in progress. Expect breaking changes.
+Early development. The design language is settled, and three components are built on it. `init` and `add` work on a fresh Vite app and a fresh Next app. Neither the package nor the registry is published yet, so the commands above do not run outside this repo. The full component set, `update` and the docs site come next. Expect breaking changes.
 
 ## Licence
 

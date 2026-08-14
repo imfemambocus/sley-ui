@@ -23,6 +23,13 @@ const SPECIFIER = /\b(?:from|import)\s+'([^']+)'/g
 /* the runtime supplies these, so no user installs them because of a component */
 const PROVIDED = new Set(['react', 'react-dom'])
 
+/*
+ * a react server component runs no hook and holds no event handler, so a file that
+ * uses either has to say so. ark builds on hooks, so its parts count too. the cli
+ * writes the directive, because only a next project needs one.
+ */
+const CLIENT = /\bfrom '@ark-ui\/|\buse(?:State|Effect|Ref|Memo|Callback|Reducer|Context)\b/
+
 /* code unit order, so the output does not follow the locale of the machine that built it */
 function byCodeUnit(a, b) {
   if (a < b) return -1
@@ -119,7 +126,11 @@ function buildItem({ name, type, files, fileType, version, extraRegistry = [] })
     sley: {
       version,
       url: `${BASE}/${name}.json`,
-      files: files.map((file) => ({ path: file.target, hash: hash(file.content) })),
+      files: files.map((file) => ({
+        path: file.target,
+        hash: hash(file.content),
+        client: file.target.endsWith('.tsx') && CLIENT.test(file.content),
+      })),
     },
   }
 }

@@ -13,7 +13,8 @@
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "oxlint --type-aware",
-    "lint:single": "oxlint --type-aware"
+    "lint:single": "oxlint --type-aware",
+    "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
     "oxlint": "^1.78.0",

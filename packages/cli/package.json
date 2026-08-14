@@ -1,0 +1,26 @@
+{
+  "name": "sley-ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Add Sley UI components to your project.",
+  "license": "MIT",
+  "author": "Isfaaq M. F. Emambocus",
+  "bin": {
+    "sley": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "test": "node --test test/cli.test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0"
+  }
+}
