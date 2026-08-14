@@ -1,11 +1,8 @@
 @import 'tailwindcss';
 
-/*
- * the palette is named after the loom: the ground is the indigo warp, the weft
- * is the undyed thread that reads on top of it. the semantic colours are the
- * three classic natural dyes, so nothing in the system is a generic "green" or
- * "red" that a later theme has to argue with.
- */
+@custom-variant dense (&:where(:root[data-density='dense'] *));
+
+/* every name comes from the loom. the semantic colours are dyes, and there is no success or error. */
 @theme {
   --font-ui: 'Archivo', ui-sans-serif, system-ui, sans-serif;
   --font-data: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
@@ -13,6 +10,7 @@
   --color-ground: var(--p-ground);
   --color-raised: var(--p-raised);
   --color-sunken: var(--p-sunken);
+  --color-shed: var(--p-shed);
   --color-reed: var(--p-reed);
   --color-reed-lit: var(--p-reed-lit);
 
@@ -27,10 +25,12 @@
   --color-weld: var(--p-weld);
 }
 
+/* the shed is the opening that the loom makes and closes again, so it is the row under the pointer */
 :root {
   --p-ground: #0b0d14;
   --p-raised: #12151f;
   --p-sunken: #070910;
+  --p-shed: #191d29;
   --p-reed: #1c2030;
   --p-reed-lit: #2b3145;
 
@@ -49,6 +49,7 @@
   --p-ground: #f2f1ec;
   --p-raised: #faf9f5;
   --p-sunken: #e8e6df;
+  --p-shed: #f1efe8;
   --p-reed: #dcd9d0;
   --p-reed-lit: #c2beb2;
 
@@ -97,18 +98,25 @@
 }
 
 /*
- * durations are named for what moves, not for how long, so the choice at a call
- * site is about the kind of change rather than a number. the beat easing is the
- * loom's own: it leaves fast and settles without a bounce.
- */
-/*
- * every layer that leaves the flow declares its rank here. a sticky header makes
- * a stacking context, so portalled content with no rank of its own falls behind
- * it however late it enters the dom.
+ * a duration is named for what it moves. the beat easing leaves fast and settles
+ * with no bounce. every layer that leaves the flow declares its rank here, because
+ * a sticky header makes a stacking context and paints over any layer with no rank.
  */
 :root {
   --reed-tick: 1px;
+  --ctl-box: 13px;
 
+  /*
+   * vertical-align: middle centres a control on the x-height. every value in this
+   * table is digits and capitals, so its visual band is the baseline to the cap
+   * height. the lift is half the difference of the two, for the data face.
+   */
+  --ctl-lift: 0.091em;
+
+  /* the advance of the data face, so a column width can be a character count */
+  --data-adv: 0.6em;
+
+  --z-grip: 1;
   --z-pinned: 5;
   --z-sticky: 10;
   --z-popover: 30;
@@ -141,7 +149,9 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  :focus-visible {
+  /* the second selector is for a control whose focus lands on a child, such as a field with an icon */
+  :focus-visible,
+  .focus-ring:has(:focus-visible) {
     outline: 2px solid var(--color-indigo);
     outline-offset: 1px;
   }
@@ -160,18 +170,15 @@
  * ark positions its floating parts with an inline `z-index: var(--z-index)` and
  * an inline `--z-index: auto` beside it. the declaration is the right seam, but
  * an inline custom property outranks a stylesheet, so this has to be important to
- * reach it. it feeds ark's own rule rather than fighting it. parts ark does not
- * position, such as a dialog backdrop, take their rank from a class.
+ * reach it. parts ark does not position, such as a dialog backdrop, take their rank
+ * from a class.
  */
 [data-part='positioner']:not([data-scope='dialog']) {
   --z-index: var(--z-popover) !important;
 }
 
 @layer components {
-  /*
-   * the reed: the evenly spaced slots that hold the warp on a loom. it closes
-   * the table head, in place of the single rule that every other table uses.
-   */
+  /* the reed: the evenly spaced slots that hold the warp on a loom. it closes the table head. */
   .reed-edge {
     position: relative;
   }
@@ -212,6 +219,57 @@
     );
   }
 
+  /*
+   * a value under its threshold takes the reed under its own digits. a divider is
+   * shared with the next column, so a divider cannot name which value is low.
+   */
+  .reed-under {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-madder) 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
+    );
+    background-position: bottom;
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+  }
+
+  /*
+   * three ticks of the reed, and the order of the heights is the direction. the
+   * spacing is tighter than the pitch, because a head reserves this width and the
+   * narrow columns cannot pay a full pitch for it.
+   */
+  .reed-sort {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background-image:
+      linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor),
+      linear-gradient(currentColor, currentColor);
+    background-size: var(--reed-tick) 3px, var(--reed-tick) 5px, var(--reed-tick) 7px;
+    background-position: left bottom, center bottom, right bottom;
+    background-repeat: no-repeat;
+  }
+
+  .reed-sort-down {
+    background-size: var(--reed-tick) 7px, var(--reed-tick) 5px, var(--reed-tick) 3px;
+  }
+
+  /* a control beside a row of values aligns on the cap band and not on the box */
+  .ctl-align {
+    vertical-align: middle;
+    translate: 0 calc(-1 * var(--ctl-lift));
+  }
+
+  /* one tick of the reed stands where a value is absent */
+  .reed-mark {
+    display: inline-block;
+    width: var(--reed-tick);
+    height: var(--reed-pitch);
+    background-color: var(--color-reed-lit);
+    vertical-align: middle;
+  }
+
   .warp-line::before {
     left: 0;
   }
@@ -229,6 +287,7 @@
     position: absolute;
     inset-block: 0;
     right: -4px;
+    z-index: var(--z-grip);
     width: 8px;
     color: var(--color-reed-lit);
     cursor: col-resize;
@@ -255,13 +314,17 @@
     color: var(--color-indigo);
   }
 
-  /* an unwoven warp: the threads sit in the reed and no weft has arrived yet */
+  /* an unwoven warp: the threads sit in the reed and no weft has arrived */
   .reed-warp {
     background-image: repeating-linear-gradient(
       90deg,
       var(--color-reed) 0 var(--reed-tick),
       transparent var(--reed-tick) var(--reed-pitch)
     );
+  }
+
+  /* the weft is on its way, which a result that is empty cannot claim */
+  .reed-warp-beat {
     animation: beat 1.2s var(--ease-glide) infinite;
   }
 
@@ -339,7 +402,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .beat,
-  .reed-warp {
+  .reed-warp-beat {
     animation: none;
   }
 }

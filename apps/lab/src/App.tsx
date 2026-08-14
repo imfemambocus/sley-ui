@@ -12,6 +12,13 @@ type Theme = (typeof THEMES)[number]
 
 const OWNERS = [...new Set(runs.map((run) => run.owner))].sort((a, b) => a.localeCompare(b))
 
+const KNOBS = ['--row-h', '--cell-x', '--ui-text', '--ctl-h', '--stack', '--reed-pitch'] as const
+
+interface Knob {
+  readonly name: string
+  readonly value: string
+}
+
 function matchesFilters(run: (typeof runs)[number], filters: Filters) {
   const needle = filters.query.trim().toLowerCase()
   if (needle !== '') {
@@ -54,13 +61,14 @@ export const App = () => {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [rowHeight, setRowHeight] = useState('')
+  const [knobs, setKnobs] = useState<readonly Knob[]>([])
 
   useEffect(() => {
     const root = document.documentElement
     root.dataset.density = density
     root.dataset.theme = theme
-    setRowHeight(getComputedStyle(root).getPropertyValue('--row-h').trim())
+    const style = getComputedStyle(root)
+    setKnobs(KNOBS.map((token) => ({ name: token.slice(2), value: style.getPropertyValue(token).trim() })))
   }, [density, theme])
 
   useEffect(() => {
@@ -128,9 +136,13 @@ export const App = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-(--stack)">
-            <p className="tnum font-data text-weft-faint">
-              row {rowHeight}
-            </p>
+            <ul className="tnum flex flex-wrap items-center gap-x-3 gap-y-1 font-data text-weft-faint">
+              {knobs.map((knob) => (
+                <li key={knob.name}>
+                  {knob.name} <span className="text-weft-dim">{knob.value}</span>
+                </li>
+              ))}
+            </ul>
             <Segmented legend="Density" options={DENSITIES} value={density} onSelect={setDensity} />
             <Segmented legend="Appearance" options={THEMES} value={theme} onSelect={setTheme} />
             <button
@@ -153,10 +165,6 @@ export const App = () => {
         />
 
         <DataTable rows={visible} loading={loading} />
-
-        <footer className="text-weft-faint">
-          Density is one token group, not fifty. Every control on this page reads the same four values.
-        </footer>
       </div>
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} commands={commands} />

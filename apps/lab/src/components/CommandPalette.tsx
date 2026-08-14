@@ -54,8 +54,7 @@ export const CommandPalette = ({ open, onOpenChange, commands }: CommandPaletteP
     if (!open) setQuery('')
   }, [open])
 
-  // keeping the highlighted row in view is the palette's job, not the browser's,
-  // because the pointer never moves during keyboard navigation
+  // the pointer does not move during keyboard navigation, so nothing else scrolls the row into view
   useEffect(() => {
     listRef.current?.querySelector('[data-active="true"]')?.scrollIntoView({ block: 'nearest' })
   }, [active])
@@ -117,7 +116,7 @@ export const CommandPalette = ({ open, onOpenChange, commands }: CommandPaletteP
 
               {groupCommands(matches).map(([group, items]) => (
                 <div key={group}>
-                  <p className="px-3 pt-2 pb-1 font-data text-[11px] tracking-wide text-weft-faint uppercase">
+                  <p className="px-3 pt-2 pb-1 font-data text-[11px] tracking-wide text-weft-faint uppercase dense:sr-only">
                     {group}
                   </p>
                   {items.map(({ command, index }) => {

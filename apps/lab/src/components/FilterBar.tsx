@@ -37,8 +37,10 @@ const FilterSelect = ({ label, options, selected, onSelect }: FilterSelectProps)
     >
       <Select.Control>
         <Select.Trigger className={`${CONTROL} h-(--ctl-h) cursor-pointer`}>
-          <span className={selected.length > 0 ? 'text-weft' : 'text-weft-dim'}>{label}</span>
-          {selected.length > 0 && <span className="tnum font-data text-indigo">{selected.length}</span>}
+          <span className="inline-flex items-baseline gap-1.5">
+            <span className={selected.length > 0 ? 'text-weft' : 'text-weft-dim'}>{label}</span>
+            {selected.length > 0 && <span className="tnum font-data text-indigo">{selected.length}</span>}
+          </span>
           <ChevronIcon className="size-3 text-weft-faint" />
         </Select.Trigger>
       </Select.Control>
@@ -97,7 +99,7 @@ export const FilterBar = ({ filters, onChange, assays, statuses, owners }: Filte
   return (
     <search className="flex flex-col gap-(--stack)">
       <div className="flex flex-wrap items-center gap-(--stack)">
-        <div className={`${CONTROL} h-(--ctl-h) min-w-55 flex-1 focus-within:border-indigo`}>
+        <div className={`${CONTROL} focus-ring h-(--ctl-h) min-w-55 flex-1`}>
           <SearchIcon className="size-3.5 text-weft-faint" />
           <input
             type="search"
