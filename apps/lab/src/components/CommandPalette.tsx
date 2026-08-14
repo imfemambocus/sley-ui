@@ -87,8 +87,8 @@ export const CommandPalette = ({ open, onOpenChange, commands }: CommandPaletteP
   return (
     <Dialog.Root open={open} onOpenChange={(details) => onOpenChange(details.open)} unmountOnExit lazyMount>
       <Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-[var(--z-backdrop)] bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)]" />
-        <Dialog.Positioner className="fixed inset-0 z-[var(--z-modal)] grid place-items-start justify-items-center pt-[12vh]">
+        <Dialog.Backdrop className="fixed inset-0 z-(--z-backdrop) bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)]" />
+        <Dialog.Positioner className="fixed inset-0 z-(--z-modal) grid place-items-start justify-items-center pt-[12vh]">
           <Dialog.Content className="w-[min(560px,92vw)] border border-reed-lit bg-raised shadow-2xl shadow-black/40 data-[state=open]:animate-[rise_var(--dur-overlay)_var(--ease-beat)]">
             <Dialog.Title className="sr-only">Command palette</Dialog.Title>
 
@@ -129,7 +129,7 @@ export const CommandPalette = ({ open, onOpenChange, commands }: CommandPaletteP
                         data-active={isActive}
                         onPointerMove={() => setActive(index)}
                         onClick={() => choose(command)}
-                        className="flex w-full cursor-pointer items-center justify-between gap-3 px-3 text-left text-weft-dim transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] data-[active=true]:bg-indigo-wash data-[active=true]:text-weft"
+                        className="flex w-full cursor-pointer items-center justify-between gap-3 px-3 text-left text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) data-[active=true]:bg-indigo-wash data-[active=true]:text-weft"
                         style={{ height: 'var(--row-h)' }}
                       >
                         <span className="truncate">{command.label}</span>

@@ -64,9 +64,9 @@
 }
 
 /*
- * density is one knob, not fifty. every control that has a height, a horizontal
- * pad or a label size reads these four values, so a single attribute on the root
- * retunes the whole interface and nothing drifts out of step.
+ * a control reads these values and defines none of its own, so one attribute on
+ * the root retunes the whole interface. the reed pitch belongs here because a
+ * finer reed is what makes denser cloth.
  */
 :root,
 :root[data-density='compact'] {
@@ -75,6 +75,7 @@
   --ui-text: 13px;
   --ctl-h: 28px;
   --stack: 8px;
+  --reed-pitch: 5px;
 }
 
 :root[data-density='comfortable'] {
@@ -83,6 +84,7 @@
   --ui-text: 14px;
   --ctl-h: 34px;
   --stack: 10px;
+  --reed-pitch: 6px;
 }
 
 :root[data-density='dense'] {
@@ -91,6 +93,7 @@
   --ui-text: 12px;
   --ctl-h: 23px;
   --stack: 6px;
+  --reed-pitch: 4px;
 }
 
 /*
@@ -104,6 +107,9 @@
  * it however late it enters the dom.
  */
 :root {
+  --reed-tick: 1px;
+
+  --z-pinned: 5;
   --z-sticky: 10;
   --z-popover: 30;
   --z-backdrop: 40;
@@ -178,9 +184,128 @@
     height: 2px;
     background-image: repeating-linear-gradient(
       90deg,
-      var(--color-reed-lit) 0 1px,
-      transparent 1px 5px
+      var(--color-reed-lit) 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
     );
+  }
+
+  /*
+   * the warp runs across the reed, so a column divider is the same pitch turned a
+   * quarter. a cell takes the leading line, and a pinned cell takes the trailing
+   * one, because the leading line of the next cell travels away under it.
+   */
+  .warp-line,
+  .warp-line-end {
+    position: relative;
+  }
+
+  .warp-line::before,
+  .warp-line-end::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 1px;
+    background-image: repeating-linear-gradient(
+      0deg,
+      var(--color-reed) 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
+    );
+  }
+
+  .warp-line::before {
+    left: 0;
+  }
+
+  .warp-line-end::before {
+    right: 0;
+  }
+
+  /*
+   * the grip straddles the column boundary, and the reed inside it is the divider
+   * that the head would draw anyway. the reed is in currentColor, because a
+   * gradient cannot transition and a colour can.
+   */
+  .reed-grip {
+    position: absolute;
+    inset-block: 0;
+    right: -4px;
+    width: 8px;
+    color: var(--color-reed-lit);
+    cursor: col-resize;
+    touch-action: none;
+    transition: color var(--dur-instant) var(--ease-beat);
+  }
+
+  .reed-grip::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 4px;
+    width: 1px;
+    background-image: repeating-linear-gradient(
+      0deg,
+      currentColor 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
+    );
+  }
+
+  .reed-grip:hover,
+  .reed-grip:focus-visible,
+  .reed-grip[data-dragging] {
+    color: var(--color-indigo);
+  }
+
+  /* an unwoven warp: the threads sit in the reed and no weft has arrived yet */
+  .reed-warp {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-reed) 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
+    );
+    animation: beat 1.2s var(--ease-glide) infinite;
+  }
+
+  /*
+   * the bottom edge carries a reed while rows remain below it. the cover layer is
+   * attached to the content, so it arrives at the edge and hides the reed at the
+   * end of the list. a short list needs no cover, because the scrollable area is
+   * then the padding box and the two layers land together.
+   */
+  .reed-scroll {
+    background-image:
+      linear-gradient(var(--color-raised), var(--color-raised)),
+      repeating-linear-gradient(
+        90deg,
+        var(--color-reed-lit) 0 var(--reed-tick),
+        transparent var(--reed-tick) var(--reed-pitch)
+      );
+    background-position: bottom;
+    background-size: 100% 2px;
+    background-repeat: no-repeat;
+    background-attachment: local, scroll;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-reed-lit) transparent;
+  }
+
+  /*
+   * the standard properties above win wherever they are supported, so these reach
+   * safari only. the frame has no radius, so the thumb has none either.
+   */
+  .reed-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .reed-scroll::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .reed-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--color-reed-lit);
+  }
+
+  .reed-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-indigo);
   }
 
   .beat {
@@ -213,7 +338,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .beat {
+  .beat,
+  .reed-warp {
     animation: none;
   }
 }

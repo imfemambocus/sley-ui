@@ -40,7 +40,7 @@ const Segmented = <T extends string>({ legend, options, value, onSelect }: Segme
         type="button"
         aria-pressed={option === value}
         onClick={() => onSelect(option)}
-        className="h-[var(--ctl-h)] cursor-pointer px-[var(--cell-x)] text-weft-dim transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] hover:text-weft aria-pressed:bg-indigo-wash aria-pressed:text-weft"
+        className="h-(--ctl-h) cursor-pointer px-(--cell-x) text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft aria-pressed:bg-indigo-wash aria-pressed:text-weft"
       >
         {option}
       </button>
@@ -53,6 +53,7 @@ export const App = () => {
   const [theme, setTheme] = useState<Theme>('dark')
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [rowHeight, setRowHeight] = useState('')
 
   useEffect(() => {
@@ -107,20 +108,26 @@ export const App = () => {
         label: 'Clear all filters',
         run: () => setFilters(EMPTY_FILTERS),
       },
+      {
+        id: 'table-loading',
+        group: 'Table',
+        label: 'Toggle the loading state',
+        run: () => setLoading((current) => !current),
+      },
     ],
     [],
   )
 
   return (
     <div className="min-h-dvh px-6 py-8">
-      <div className="mx-auto flex max-w-[1180px] flex-col gap-6">
+      <div className="mx-auto flex max-w-295 flex-col gap-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="font-ui text-[34px] leading-none font-bold tracking-[-0.045em]">sley</p>
             <p className="mt-1.5 text-weft-dim">Components for interfaces that hold a lot of data.</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-[var(--stack)]">
+          <div className="flex flex-wrap items-center gap-(--stack)">
             <p className="tnum font-data text-weft-faint">
               row {rowHeight}
             </p>
@@ -129,9 +136,9 @@ export const App = () => {
             <button
               type="button"
               onClick={() => setPaletteOpen(true)}
-              className="inline-flex h-[var(--ctl-h)] cursor-pointer items-center gap-2 border border-reed bg-ground px-[var(--cell-x)] text-weft-dim transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] hover:border-reed-lit hover:text-weft"
+              className="inline-flex h-(--ctl-h) cursor-pointer items-center gap-2 border border-reed bg-ground px-(--cell-x) text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:border-reed-lit hover:text-weft"
             >
-              Commands
+              <span>Commands</span>
               <kbd className="font-data text-[11px] text-weft-faint">⌘K</kbd>
             </button>
           </div>
@@ -145,7 +152,7 @@ export const App = () => {
           owners={OWNERS}
         />
 
-        <DataTable rows={visible} />
+        <DataTable rows={visible} loading={loading} />
 
         <footer className="text-weft-faint">
           Density is one token group, not fifty. Every control on this page reads the same four values.

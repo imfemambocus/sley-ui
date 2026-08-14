@@ -13,7 +13,7 @@ export interface Filters {
 export const EMPTY_FILTERS: Filters = { query: '', assays: [], statuses: [], owners: [] }
 
 const CONTROL =
-  'inline-flex items-center gap-1.5 border border-reed bg-ground px-[var(--cell-x)] text-weft transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] hover:border-reed-lit'
+  'inline-flex items-center gap-1.5 border border-reed bg-ground px-(--cell-x) text-weft transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:border-reed-lit'
 
 interface FilterSelectProps {
   readonly label: string
@@ -36,7 +36,7 @@ const FilterSelect = ({ label, options, selected, onSelect }: FilterSelectProps)
       onValueChange={(details) => onSelect(details.value)}
     >
       <Select.Control>
-        <Select.Trigger className={`${CONTROL} h-[var(--ctl-h)] cursor-pointer`}>
+        <Select.Trigger className={`${CONTROL} h-(--ctl-h) cursor-pointer`}>
           <span className={selected.length > 0 ? 'text-weft' : 'text-weft-dim'}>{label}</span>
           {selected.length > 0 && <span className="tnum font-data text-indigo">{selected.length}</span>}
           <ChevronIcon className="size-3 text-weft-faint" />
@@ -44,12 +44,12 @@ const FilterSelect = ({ label, options, selected, onSelect }: FilterSelectProps)
       </Select.Control>
       <Portal>
         <Select.Positioner>
-          <Select.Content className="min-w-[168px] border border-reed-lit bg-raised py-1 shadow-lg shadow-black/30 focus:outline-none">
+          <Select.Content className="min-w-42 border border-reed-lit bg-raised py-1 shadow-lg shadow-black/30 focus:outline-none">
             {collection.items.map((item) => (
               <Select.Item
                 key={item.value}
                 item={item}
-                className="flex cursor-pointer items-center justify-between gap-3 px-[var(--cell-x)] py-1 text-weft-dim data-[highlighted]:bg-indigo-wash data-[highlighted]:text-weft"
+                className="flex cursor-pointer items-center justify-between gap-3 px-(--cell-x) py-1 text-weft-dim data-highlighted:bg-indigo-wash data-highlighted:text-weft"
               >
                 <Select.ItemText>{item.label}</Select.ItemText>
                 <Select.ItemIndicator>
@@ -95,9 +95,9 @@ export const FilterBar = ({ filters, onChange, assays, statuses, owners }: Filte
   }
 
   return (
-    <search className="flex flex-col gap-[var(--stack)]">
-      <div className="flex flex-wrap items-center gap-[var(--stack)]">
-        <div className={`${CONTROL} h-[var(--ctl-h)] min-w-[220px] flex-1 focus-within:border-indigo`}>
+    <search className="flex flex-col gap-(--stack)">
+      <div className="flex flex-wrap items-center gap-(--stack)">
+        <div className={`${CONTROL} h-(--ctl-h) min-w-55 flex-1 focus-within:border-indigo`}>
           <SearchIcon className="size-3.5 text-weft-faint" />
           <input
             type="search"
@@ -131,13 +131,13 @@ export const FilterBar = ({ filters, onChange, assays, statuses, owners }: Filte
       </div>
 
       {chips.length > 0 && (
-        <ul className="flex flex-wrap items-center gap-[var(--stack)]">
+        <ul className="flex flex-wrap items-center gap-(--stack)">
           {chips.map((chip) => (
             <li key={`${chip.group}:${chip.value}`}>
               <button
                 type="button"
                 onClick={() => removeChip(chip)}
-                className="inline-flex h-[var(--ctl-h)] cursor-pointer items-center gap-1.5 border border-indigo/40 bg-indigo-wash px-[var(--cell-x)] text-weft transition-colors duration-[var(--dur-instant)] ease-[var(--ease-beat)] hover:border-indigo"
+                className="inline-flex h-(--ctl-h) cursor-pointer items-center gap-1.5 border border-indigo/40 bg-indigo-wash px-(--cell-x) text-weft transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:border-indigo"
               >
                 <span className="inline-flex items-baseline gap-1.5">
                   <span className="font-data text-weft-dim">{GROUP_LABEL[chip.group]}</span>
@@ -151,7 +151,7 @@ export const FilterBar = ({ filters, onChange, assays, statuses, owners }: Filte
             <button
               type="button"
               onClick={() => onChange({ ...EMPTY_FILTERS, query: filters.query })}
-              className="h-[var(--ctl-h)] cursor-pointer px-[var(--cell-x)] text-weft-dim underline-offset-4 hover:text-weft hover:underline"
+              className="h-(--ctl-h) cursor-pointer px-(--cell-x) text-weft-dim underline-offset-4 hover:text-weft hover:underline"
             >
               Clear filters
             </button>
