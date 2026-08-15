@@ -31,7 +31,7 @@ Underneath: Ark UI for behaviour, Tailwind CSS v4 for the token layer. Each comp
 
 ## Updates
 
-You own the code, so a normal registry cannot update it. Sley UI records the source hash of every file that it writes. The `update` command does a three way merge across the old registry version, the new registry version, and your edited file. Your changes stay.
+You own the code, so a normal registry cannot update it. Sley UI records the source hash of every file that it writes, and the exact registry version it came from. Every published version keeps its own path on the registry, so the version you installed is still there a year later. The `update` command does a three way merge across the old registry version, the new registry version, and your edited file. Your changes stay.
 
 ## Status
 
