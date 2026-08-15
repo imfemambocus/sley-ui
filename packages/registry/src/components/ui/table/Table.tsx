@@ -1,17 +1,20 @@
 import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { Checkbox, type CheckedState } from '@/components/ui/checkbox/Checkbox'
+import { EmptyState } from '@/components/ui/empty-state/EmptyState'
+import { Tooltip } from '@/components/ui/tooltip/Tooltip'
 import { cx } from '@/lib/cx'
 
 export interface Column<T> {
   readonly key: string
   readonly label: string
   readonly unit?: string
+  /* what the column means, on the head, where one tip serves every row under it */
+  readonly hint?: string
   /* the characters the widest plausible value holds, which the density turns into a width */
   readonly chars: number
   readonly numeric?: boolean
-  /* the class literal that hides the column, so the tailwind scanner can read it in the caller */
-  readonly drop?: string
-  readonly sortValue: (row: T) => string | number
+  /* a column with no sort value cannot be ordered, and its head takes no control */
+  readonly sortValue?: (row: T) => string | number
   readonly render: (row: T) => ReactNode
 }
 
@@ -34,8 +37,9 @@ function compare(a: string | number, b: string | number) {
   return String(a).localeCompare(String(b))
 }
 
-function ariaSort(sort: Sort | null, key: string) {
-  if (sort?.key !== key) return 'none'
+function ariaSort<T>(sort: Sort | null, column: Column<T>) {
+  if (column.sortValue === undefined) return undefined
+  if (sort?.key !== column.key) return 'none'
   return sort.direction === 'asc' ? 'ascending' : 'descending'
 }
 
@@ -112,23 +116,33 @@ interface ColumnHeadProps<T> {
   readonly onSort: () => void
 }
 
-const ColumnHead = <T,>({ column, sort, onSort }: ColumnHeadProps<T>) => (
-  <button
-    type="button"
-    onClick={onSort}
-    className={cx(
-      'flex h-full w-full cursor-pointer items-center gap-1.5 text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft',
-      column.numeric && 'justify-end',
-    )}
-  >
-    {/* the mark joins the baseline group, so its ticks stand on the baseline of the label */}
+const ColumnHead = <T,>({ column, sort, onSort }: ColumnHeadProps<T>) => {
+  const shell = cx('flex h-full w-full items-center gap-1.5 text-weft-dim', column.numeric && 'justify-end')
+  /* the mark joins the baseline group, so its ticks stand on the baseline of the label */
+  const label = (
     <span className="inline-flex min-w-0 items-baseline gap-1.5">
       <span className="truncate">{column.label}</span>
       {column.unit && <span className="font-data text-weft-faint">{column.unit}</span>}
       {sort?.key === column.key && <SortMark direction={sort.direction} />}
     </span>
-  </button>
-)
+  )
+
+  const head = column.sortValue ? (
+    <button
+      type="button"
+      onClick={onSort}
+      className={cx(shell, 'cursor-pointer transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft')}
+    >
+      {label}
+    </button>
+  ) : (
+    <div className={shell}>{label}</div>
+  )
+
+  /* the tip goes on the control that is already there, so the head grows no second target */
+  if (column.hint === undefined) return head
+  return <Tooltip content={column.hint}>{head}</Tooltip>
+}
 
 const SKELETON_IDS: readonly string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((id) => `warp-${id}`)
 
@@ -152,15 +166,10 @@ interface EmptyRowProps {
   readonly message: string
 }
 
-/* an empty result is the loom threaded and standing still, so the warp holds and the weft does not come */
 const EmptyRow = ({ span, message }: EmptyRowProps) => (
   <tr>
-    <td
-      colSpan={span}
-      className="reed-warp border-t border-reed/60 text-center align-middle text-weft-dim"
-      style={{ height: 'calc(var(--row-h) * 4)' }}
-    >
-      {message}
+    <td colSpan={span} className="border-t border-reed/60 p-0">
+      <EmptyState title={message} />
     </td>
   </tr>
 )
@@ -184,7 +193,10 @@ const Row = <T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (
     data-selected={selected ? '' : undefined}
   >
     <td
-      className="warp-line-end sticky left-0 z-(--z-pinned) border-t border-reed/60 bg-inherit px-(--cell-x) transition-colors duration-(--dur-instant) ease-(--ease-beat)"
+      className={cx(
+        'warp-line-end selvedge sticky left-0 z-(--z-pinned) border-t border-reed/60 bg-inherit px-(--cell-x) transition-colors duration-(--dur-instant) ease-(--ease-beat)',
+        selected && 'selvedge-on',
+      )}
       style={{ height: 'var(--row-h)' }}
     >
       <Checkbox checked={selected} onCheckedChange={() => onToggle(id)} label={`Select row ${id}`} />
@@ -195,7 +207,6 @@ const Row = <T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (
         className={cx(
           'truncate border-t border-reed/60 px-(--cell-x) text-weft-dim',
           index > 0 && 'warp-line',
-          column.drop,
           column.numeric && 'tnum text-right font-data text-weft',
         )}
         style={{ height: 'var(--row-h)' }}
@@ -216,6 +227,8 @@ interface TableProps<T> {
   readonly noun?: string
   readonly emptyMessage?: string
   readonly loading?: boolean
+  /* the controls that belong to the whole table, which sit beside the count */
+  readonly actions?: ReactNode
   readonly onSelectionChange?: (selected: ReadonlySet<string>) => void
   readonly className?: string
 }
@@ -228,6 +241,7 @@ export const Table = <T,>({
   noun = 'rows',
   emptyMessage = 'No row matches the filters.',
   loading = false,
+  actions,
   onSelectionChange,
   className,
 }: TableProps<T>) => {
@@ -253,20 +267,29 @@ export const Table = <T,>({
 
   const ordered = useMemo(() => {
     const column = columns.find((entry) => entry.key === sort?.key)
-    if (sort === null || column === undefined) return rows
+    const value = column?.sortValue
+    if (sort === null || value === undefined) return rows
     const factor = sort.direction === 'asc' ? 1 : -1
-    return [...rows].sort((a, b) => factor * compare(column.sortValue(a), column.sortValue(b)))
+    return [...rows].sort((a, b) => factor * compare(value(a), value(b)))
   }, [rows, columns, sort])
 
+  /*
+   * a filter can take a selected row off the screen, and a row the reader cannot see
+   * is a row they cannot act on. the count and the head control therefore read the
+   * rows on screen, and the set keeps the rest for the moment the filter comes back.
+   */
+  const onScreen = useMemo(() => new Set(rows.map(rowId)), [rows, rowId])
+  const active = useMemo(() => new Set([...selected].filter((id) => onScreen.has(id))), [selected, onScreen])
+
   const headerState = useMemo<CheckedState>(() => {
-    if (selected.size === 0) return false
-    if (selected.size === rows.length) return true
+    if (active.size === 0) return false
+    if (active.size === rows.length) return true
     return 'indeterminate'
-  }, [selected, rows.length])
+  }, [active, rows.length])
 
   const applySelection = (next: ReadonlySet<string>) => {
     setSelected(next)
-    onSelectionChange?.(next)
+    onSelectionChange?.(new Set([...next].filter((id) => onScreen.has(id))))
   }
 
   const toggleRow = (id: string) => {
@@ -276,7 +299,13 @@ export const Table = <T,>({
   }
 
   const toggleAll = () => {
-    applySelection(selected.size === rows.length ? new Set() : new Set(rows.map(rowId)))
+    const next = new Set(selected)
+    if (active.size === rows.length) {
+      onScreen.forEach((id) => next.delete(id))
+    } else {
+      onScreen.forEach((id) => next.add(id))
+    }
+    applySelection(next)
   }
 
   const renderBody = () => {
@@ -290,13 +319,16 @@ export const Table = <T,>({
 
   return (
     <section className={cx('@container border border-reed bg-raised', className)}>
-      <header className="flex items-center justify-between border-b border-reed px-(--cell-x) py-(--stack)">
+      <header className="flex items-center justify-between gap-(--stack) border-b border-reed px-(--cell-x) py-(--stack)">
         <h2 className="font-medium">{title}</h2>
-        {!loading && (
-          <p className="text-weft-dim tnum">
-            {selected.size > 0 ? `${selected.size} of ${rows.length} selected` : `${rows.length} ${noun}`}
-          </p>
-        )}
+        <div className="flex items-center gap-(--stack)">
+          {!loading && (
+            <p className="text-weft-dim tnum">
+              {active.size > 0 ? `${active.size} of ${rows.length} selected` : `${rows.length} ${noun}`}
+            </p>
+          )}
+          {actions}
+        </div>
       </header>
 
       <div className="reed-scroll max-h-130 overflow-auto">
@@ -316,8 +348,8 @@ export const Table = <T,>({
                 <th
                   key={column.key}
                   scope="col"
-                  aria-sort={ariaSort(sort, column.key)}
-                  className={cx('reed-edge px-(--cell-x) font-medium', column.drop)}
+                  aria-sort={ariaSort(sort, column)}
+                  className="reed-edge px-(--cell-x) font-medium"
                   style={{
                     height: 'var(--row-h)',
                     width: widths[column.key] ?? intrinsicWidth(column, sort?.key === column.key),

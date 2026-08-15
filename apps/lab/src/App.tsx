@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Button } from '@/components/ui/button/Button'
 import { CommandPalette, type Command } from '@/components/ui/command-palette/CommandPalette'
 import { FilterBar, type FilterValues } from '@/components/ui/filter-bar/FilterBar'
 import { Table } from '@/components/ui/table/Table'
-import { runs } from './data/runs'
-import { RUN_COLUMNS } from './runs/columns'
+import { Toaster } from '@/components/ui/toast/Toast'
+import { runs, type Run } from './data/runs'
+import { CancelDialog } from './runs/CancelDialog'
+import { ColumnMenu } from './runs/ColumnMenu'
+import { RunPanel } from './runs/RunPanel'
+import { runColumns } from './runs/columns'
 import { RUN_GROUPS, matchesFilters } from './runs/filters'
+import { toaster } from './toaster'
 
 const DENSITIES = ['comfortable', 'compact', 'dense'] as const
 type Density = (typeof DENSITIES)[number]
@@ -51,6 +57,10 @@ export const App = () => {
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [knobs, setKnobs] = useState<readonly Knob[]>([])
+  const [detail, setDetail] = useState<Run | null>(null)
+  const [pending, setPending] = useState<Run | null>(null)
+  const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set())
+  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())
 
   useEffect(() => {
     const root = document.documentElement
@@ -72,6 +82,30 @@ export const App = () => {
   }, [])
 
   const visible = useMemo(() => runs.filter((run) => matchesFilters(run, query, values)), [query, values])
+
+  /* the table reports what it selected, and a later filter can take a row off the screen */
+  const exportable = useMemo(() => visible.filter((run) => selected.has(run.id)).length, [visible, selected])
+
+  const allColumns = useMemo(() => runColumns(setDetail), [])
+  const columns = useMemo(() => allColumns.filter((column) => !hidden.has(column.key)), [allColumns, hidden])
+
+  const toggleColumn = (key: string) => {
+    setHidden((current) => {
+      const next = new Set(current)
+      if (!next.delete(key)) next.add(key)
+      return next
+    })
+  }
+
+  const cancelRun = (run: Run) => {
+    setPending(null)
+    setDetail(null)
+    toaster.create({
+      title: `${run.id} is cancelled`,
+      description: 'The instrument has stopped, and the reads stay on the run.',
+      type: 'warning',
+    })
+  }
 
   const commands: readonly Command[] = useMemo(
     () => [
@@ -111,6 +145,18 @@ export const App = () => {
         label: 'Toggle the loading state',
         run: () => setLoading((current) => !current),
       },
+      {
+        id: 'table-columns',
+        group: 'Table',
+        label: 'Show every column',
+        run: () => setHidden(new Set()),
+      },
+      {
+        id: 'run-open',
+        group: 'Runs',
+        label: 'Open the newest run',
+        run: () => setDetail(runs[0]),
+      },
     ],
     [],
   )
@@ -134,14 +180,10 @@ export const App = () => {
             </ul>
             <Segmented legend="Density" options={DENSITIES} value={density} onSelect={setDensity} />
             <Segmented legend="Appearance" options={THEMES} value={theme} onSelect={setTheme} />
-            <button
-              type="button"
-              onClick={() => setPaletteOpen(true)}
-              className="inline-flex h-(--ctl-h) cursor-pointer items-center gap-2 border border-reed bg-ground px-(--cell-x) text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:border-reed-lit hover:text-weft"
-            >
+            <Button onClick={() => setPaletteOpen(true)}>
               <span>Commands</span>
               <kbd className="font-data text-[11px] text-weft-faint">⌘K</kbd>
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -157,16 +199,37 @@ export const App = () => {
 
         <Table
           rows={visible}
-          columns={RUN_COLUMNS}
+          columns={columns}
           rowId={(run) => run.id}
           title="Sequencing runs"
           noun="runs"
           emptyMessage="No run matches the filters."
           loading={loading}
+          onSelectionChange={setSelected}
+          actions={
+            <>
+              {exportable > 0 && (
+                <Button
+                  onClick={() =>
+                    toaster.create({
+                      title: `${exportable} ${exportable === 1 ? 'run is' : 'runs are'} queued for export`,
+                      type: 'success',
+                    })
+                  }
+                >
+                  Export
+                </Button>
+              )}
+              <ColumnMenu columns={allColumns} hidden={hidden} onToggle={toggleColumn} />
+            </>
+          }
         />
       </div>
 
+      <RunPanel run={detail} onClose={() => setDetail(null)} onCancelRun={setPending} />
+      <CancelDialog run={pending} onClose={() => setPending(null)} onConfirm={cancelRun} />
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} commands={commands} />
+      <Toaster toaster={toaster} />
     </div>
   )
 }

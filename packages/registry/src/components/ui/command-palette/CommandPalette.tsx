@@ -57,13 +57,14 @@ export const CommandPalette = ({
     setActive(0)
   }, [query])
 
+  /* the list holds its matches while the dialog leaves, so the query clears on the way in */
   useEffect(() => {
-    if (!open) setQuery('')
+    if (open) setQuery('')
   }, [open])
 
   // the pointer does not move during keyboard navigation, so nothing else scrolls the row into view
   useEffect(() => {
-    listRef.current?.querySelector('[data-active="true"]')?.scrollIntoView({ block: 'nearest' })
+    listRef.current?.querySelector('[data-active]')?.scrollIntoView({ block: 'nearest' })
   }, [active])
 
   const choose = (command: Command) => {
@@ -99,9 +100,9 @@ export const CommandPalette = ({
       lazyMount
     >
       <Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-(--z-backdrop) bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)]" />
+        <Dialog.Backdrop className="fixed inset-0 z-(--z-backdrop) bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)] data-[state=closed]:animate-[fade-out_var(--dur-local)_var(--ease-exit)]" />
         <Dialog.Positioner className="fixed inset-0 z-(--z-modal) grid place-items-start justify-items-center pt-[12vh]">
-          <Dialog.Content className="w-[min(560px,92vw)] border border-reed-lit bg-raised shadow-2xl shadow-black/40 data-[state=open]:animate-[rise_var(--dur-overlay)_var(--ease-beat)]">
+          <Dialog.Content className="layer w-[min(560px,92vw)] data-[state=open]:animate-[rise_var(--dur-overlay)_var(--ease-beat)] data-[state=closed]:animate-[rise-out_var(--dur-local)_var(--ease-exit)]">
             <Dialog.Title className="sr-only">Command palette</Dialog.Title>
 
             <div className="reed-edge flex items-center gap-2 px-3" style={{ height: 'calc(var(--ctl-h) + 12px)' }}>
@@ -138,10 +139,10 @@ export const CommandPalette = ({
                       <button
                         key={command.id}
                         type="button"
-                        data-active={isActive}
+                        data-active={isActive ? '' : undefined}
                         onPointerMove={() => setActive(index)}
                         onClick={() => choose(command)}
-                        className="flex w-full cursor-pointer items-center justify-between gap-3 px-3 text-left text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) data-[active=true]:bg-indigo-wash data-[active=true]:text-weft"
+                        className="flex w-full cursor-pointer items-center justify-between gap-3 px-3 text-left text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) data-active:bg-shed data-active:text-weft"
                         style={{ height: 'var(--row-h)' }}
                       >
                         <span className="truncate">{command.label}</span>

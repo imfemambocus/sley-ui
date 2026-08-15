@@ -32,12 +32,7 @@ export const SelectTrigger = ({ children, className }: PartProps) => (
 export const SelectContent = ({ children, className }: PartProps) => (
   <Portal>
     <ArkSelect.Positioner>
-      <ArkSelect.Content
-        className={cx(
-          'min-w-42 border border-reed-lit bg-raised py-1 shadow-lg shadow-black/30 focus:outline-none',
-          className,
-        )}
-      >
+      <ArkSelect.Content className={cx('layer min-w-42 py-1 focus:outline-none', className)}>
         {children}
       </ArkSelect.Content>
     </ArkSelect.Positioner>
@@ -49,11 +44,12 @@ interface SelectOptionProps {
   readonly className?: string
 }
 
+/* the shed says where the keyboard is, and the selvedge says what the user chose */
 export const SelectOption = ({ item, className }: SelectOptionProps) => (
   <ArkSelect.Item
     item={item}
     className={cx(
-      'flex cursor-pointer items-center justify-between gap-3 px-(--cell-x) py-1 text-weft-dim data-highlighted:bg-indigo-wash data-highlighted:text-weft',
+      'selvedge flex cursor-pointer items-center justify-between gap-3 px-(--cell-x) py-1 text-weft-dim data-highlighted:bg-shed data-highlighted:text-weft data-[state=checked]:bg-indigo-wash data-[state=checked]:text-weft data-[state=checked]:selvedge-on',
       className,
     )}
   >
