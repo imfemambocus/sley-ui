@@ -41,6 +41,8 @@
   --p-jade: #4fa88b;
   --p-madder: #d2624f;
   --p-weld: #c9a227;
+
+  --shadow-layer: 0 18px 44px -16px rgb(0 0 0 / 0.62);
 }
 
 :root[data-theme='light'] {
@@ -60,6 +62,8 @@
   --p-jade: #2f7a61;
   --p-madder: #b04430;
   --p-weld: #8a6f12;
+
+  --shadow-layer: 0 18px 44px -16px rgb(26 24 20 / 0.24);
 }
 
 /*
@@ -117,6 +121,8 @@
   --z-grip: 1;
   --z-pinned: 5;
   --z-sticky: 10;
+  /* the panel keeps the page usable, so a popover opened inside it paints above it */
+  --z-panel: 20;
   --z-popover: 30;
   --z-backdrop: 40;
   --z-modal: 50;
@@ -162,6 +168,11 @@
 
 @utility tnum {
   font-variant-numeric: tabular-nums;
+}
+
+/* a utility, so a state variant can dye the selvedge of a part that ark controls */
+@utility selvedge-on {
+  --selvedge: var(--color-indigo);
 }
 
 /*
@@ -230,6 +241,70 @@
     background-position: bottom;
     background-size: 100% 1px;
     background-repeat: no-repeat;
+  }
+
+  /*
+   * the selvedge is the finished edge of a cloth, and it marks a choice. the shed
+   * says where the pointer or the keyboard is, and this says what the user chose,
+   * so no state depends on telling one wash from another.
+   */
+  .selvedge {
+    position: relative;
+    --selvedge: transparent;
+  }
+
+  .selvedge::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 2px;
+    background-image: repeating-linear-gradient(
+      0deg,
+      var(--selvedge) 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
+    );
+  }
+
+  /* the same edge turned a quarter, for a list of choices that runs across */
+  .selvedge-bottom::after {
+    inset-block: auto 0;
+    inset-inline: 0;
+    width: auto;
+    height: 2px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--selvedge) 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
+    );
+  }
+
+  /* zag places the mark and reads these two names for the slide from tab to tab */
+  .tab-mark {
+    --transition-duration: var(--dur-local);
+    --transition-timing-function: var(--ease-beat);
+  }
+
+  /* every surface that leaves the flow draws the same edge and the same shadow */
+  .layer {
+    border: 1px solid var(--color-reed-lit);
+    background-color: var(--color-raised);
+    box-shadow: var(--shadow-layer);
+  }
+
+  /*
+   * zag gives a toast its offset, its height and its opacity as custom properties,
+   * and the transition between two of its positions belongs to the stylesheet.
+   */
+  .toast {
+    translate: var(--x) var(--y);
+    height: var(--height, auto);
+    opacity: var(--opacity);
+    transition:
+      translate var(--dur-overlay) var(--ease-beat),
+      height var(--dur-overlay) var(--ease-beat),
+      opacity var(--dur-overlay) var(--ease-beat);
+    will-change: translate, opacity;
   }
 
   /*
@@ -409,11 +484,40 @@
   }
 }
 
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
 /* the beat-up: the reed drives the weft down into place and settles */
 @keyframes rise {
   from {
     opacity: 0;
     transform: translateY(-6px) scale(0.99);
+  }
+}
+
+@keyframes rise-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.99);
+  }
+}
+
+/* the panel arrives from the edge that holds it, which sets --slide-from */
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(var(--slide-from));
+  }
+}
+
+/* it leaves the way it came, and it leaves faster, on the exit curve */
+@keyframes slide-out {
+  to {
+    opacity: 0;
+    transform: translateX(var(--slide-from));
   }
 }
 
