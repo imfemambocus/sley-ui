@@ -21,13 +21,13 @@ Install it globally and the command shortens to `sley`.
 
 ## Why
 
-Most component libraries target marketing pages. They look correct with eight elements on a screen, and they break down with two hundred. Sley UI starts from the opposite case. Density is the design problem, and every component answers to it.
+I build data-heavy internal tools for a living, and every component library I reached for was designed for a marketing page. They look right with eight elements on a screen. At two hundred the padding eats the viewport, the rows drift out of step with the controls beside them, and I spend more time overriding the library than using it.
 
-One attribute on the root element moves every component between three densities: comfortable, compact and dense. Row height, control height, padding and label size all change together, so nothing drifts out of step. It is CSS custom properties, so it costs no JavaScript.
+So I started from the dense case. One attribute on the root element moves every component between comfortable, compact and dense. Row height, control height, padding and label size all move together. It is CSS custom properties, so it costs no JavaScript.
 
-A narrow screen hides nothing. The table scrolls instead, because which columns matter is your call and not the library's.
+A narrow screen hides nothing. The table scrolls instead. Which columns matter is your call, not mine.
 
-Sley UI uses Ark UI for behaviour and Tailwind CSS v4 for the token layer. Each component is readable TypeScript. There is no runtime style engine.
+Underneath: Ark UI for behaviour, Tailwind CSS v4 for the token layer. Each component is readable TypeScript. There is no runtime style engine.
 
 ## Updates
 
