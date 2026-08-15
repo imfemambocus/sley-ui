@@ -31,5 +31,6 @@ The fixtures carry comments and a trailing comma on purpose. A fresh Vite templa
 The alias goes into the tsconfig and into the Vite config. The token block lands in its own file and
 the entry imports it one time. The framework decides the `rsc` field. A dependency is written before
 the item that imports it. A Next project gets the client directive, and only on the files that need
-one. Another alias prefix moves every import. The lockfile hashes the file on disk. An edited file
-survives until `--overwrite`. `add` refuses to run before `init`.
+one. Another alias prefix moves every import. The lockfile hashes the file on disk, and it pins a
+versioned registry url that still resolves. An edited file survives until `--overwrite`. `add`
+refuses to run before `init`.

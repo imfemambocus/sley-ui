@@ -161,6 +161,24 @@ test('the lockfile hashes the file on disk, so a second run reports no drift', a
   assert.doesNotMatch(sley(next, ['add', 'table']), /!/, 'nothing is marked as edited')
 })
 
+test('the lockfile pins a url that the registry still serves after the flat path moves on', async () => {
+  const cwd = await viteProject()
+  sley(cwd, ['init'])
+  sley(cwd, ['add', 'table'])
+
+  const lock = JSON.parse(await readFile(join(cwd, 'sley.lock'), 'utf8'))
+  const { version, url } = lock.items.table
+  assert.ok(url.endsWith(`/${version}/table.json`), `${url} carries no version`)
+
+  const served = join(registry, version, 'table.json')
+  assert.ok(existsSync(served), `nothing at ${served}`)
+  assert.equal(
+    await readFile(served, 'utf8'),
+    await readFile(join(registry, 'table.json'), 'utf8'),
+    'the versioned copy holds the bytes the flat path served',
+  )
+})
+
 test('an edited file is kept until overwrite is asked for', async () => {
   const cwd = await viteProject()
   sley(cwd, ['init'])
