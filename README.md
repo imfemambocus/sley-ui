@@ -1,7 +1,8 @@
-<!--
-  banner slot: a 1280x360 light and dark pair behind a <picture>, built by banner.mjs.
-  it goes in here once the design language exists.
--->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/banner-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset=".github/banner-light.png">
+  <img src=".github/banner-dark.png" alt="Sley UI: components for interfaces that hold a lot of data." width="100%">
+</picture>
 
 Sley UI is a component registry for React. It covers the interfaces that hold a lot of data: tables, filter bars, command palettes, side panels and long forms.
 
