@@ -24,6 +24,8 @@ Most component libraries target marketing pages. They look correct with eight el
 
 One attribute on the root element moves every component between three densities: comfortable, compact and dense. Row height, control height, padding and label size all change together, so nothing drifts out of step. It is CSS custom properties, so it costs no JavaScript.
 
+A narrow screen hides nothing. The table scrolls instead, because which columns matter is your call and not the library's.
+
 Sley UI uses Ark UI for behaviour and Tailwind CSS v4 for the token layer. Each component is readable TypeScript. There is no runtime style engine.
 
 ## Updates
@@ -32,7 +34,7 @@ You own the code, so a normal registry cannot update it. Sley UI records the sou
 
 ## Status
 
-Early development. The design language is settled, and three components are built on it. `init` and `add` work on a fresh Vite app and a fresh Next app. Neither the package nor the registry is published yet, so the commands above do not run outside this repo. The full component set, `update` and the docs site come next. Expect breaking changes.
+Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state. `init` and `add` work on a fresh Vite app and a fresh Next app. Neither the package nor the registry is published yet, so the commands above do not run outside this repo. The docs site and `update` come next. Expect breaking changes.
 
 ## Licence
 
