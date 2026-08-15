@@ -31,6 +31,12 @@
       "rules": {
         "no-await-in-loop": "off"
       }
+    },
+    {
+      "files": ["packages/cli/test/**"],
+      "rules": {
+        "typescript/no-floating-promises": "off"
+      }
     }
   ],
   "ignorePatterns": ["**/dist/**", "**/node_modules/**"]
