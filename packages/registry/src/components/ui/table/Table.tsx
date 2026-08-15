@@ -32,6 +32,17 @@ const KEY_STEP = 8
 /* the sort mark is 7px and its gap is 6px, which two characters cover in every density */
 const SORT_CHARS = 2
 
+/* the gutter is its padding plus its control, and the column that follows it starts where it ends */
+const GUTTER = 'calc(var(--cell-x) * 2 + var(--ctl-box))'
+
+/*
+ * the first column names the row, so it stays while the rest travels. a pinned cell
+ * hides what passes under it, which needs an opaque background of its own, and a
+ * transition of its own, because a parent transition does not animate an inherited
+ * value. the trailing divider is the seam that the travelling cells go under.
+ */
+const PINNED = 'warp-line-end bg-inherit px-(--cell-x) transition-colors duration-(--dur-instant) ease-(--ease-beat)'
+
 function compare(a: string | number, b: string | number) {
   if (typeof a === 'number' && typeof b === 'number') return a - b
   return String(a).localeCompare(String(b))
@@ -183,8 +194,8 @@ interface RowProps<T> {
 }
 
 /*
- * the row declares every state, and the pinned cell inherits the colour. an opaque
- * hover colour is what allows that, because the pinned cell has to hide the cells
+ * the row declares every state, and a pinned cell inherits the colour. an opaque
+ * hover colour is what allows that, because a pinned cell has to hide the cells
  * that travel under it.
  */
 const Row = <T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (
@@ -193,10 +204,7 @@ const Row = <T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (
     data-selected={selected ? '' : undefined}
   >
     <td
-      className={cx(
-        'warp-line-end selvedge sticky left-0 z-(--z-pinned) border-t border-reed/60 bg-inherit px-(--cell-x) transition-colors duration-(--dur-instant) ease-(--ease-beat)',
-        selected && 'selvedge-on',
-      )}
+      className={cx('selvedge sticky left-0 z-(--z-pinned) border-t border-reed/60', PINNED, selected && 'selvedge-on')}
       style={{ height: 'var(--row-h)' }}
     >
       <Checkbox checked={selected} onCheckedChange={() => onToggle(id)} label={`Select row ${id}`} />
@@ -206,10 +214,11 @@ const Row = <T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (
         key={column.key}
         className={cx(
           'truncate border-t border-reed/60 px-(--cell-x) text-weft-dim',
-          index > 0 && 'warp-line',
+          index === 0 && `sticky z-(--z-pinned) ${PINNED}`,
+          index > 1 && 'warp-line',
           column.numeric && 'tnum text-right font-data text-weft',
         )}
-        style={{ height: 'var(--row-h)' }}
+        style={{ height: 'var(--row-h)', left: index === 0 ? GUTTER : undefined }}
       >
         {column.render(row)}
       </td>
@@ -336,22 +345,26 @@ export const Table = <T,>({
         <table aria-busy={loading} className="w-full table-fixed border-separate border-spacing-0 text-left">
           <thead className="sticky top-0 z-(--z-sticky)">
             <tr className="bg-raised select-none">
-              {/* the gutter is its padding plus its control, so the box never flexes down */}
+              {/* the gutter width keeps the box from flexing down, and it places the column beside it */}
               <th
                 scope="col"
                 className="reed-edge warp-line-end sticky left-0 z-(--z-pinned) bg-raised px-(--cell-x)"
-                style={{ height: 'var(--row-h)', width: 'calc(var(--cell-x) * 2 + var(--ctl-box))' }}
+                style={{ height: 'var(--row-h)', width: GUTTER }}
               >
                 <Checkbox checked={headerState} onCheckedChange={toggleAll} label={`Select all ${noun}`} />
               </th>
-              {columns.map((column) => (
+              {columns.map((column, index) => (
                 <th
                   key={column.key}
                   scope="col"
                   aria-sort={ariaSort(sort, column)}
-                  className="reed-edge px-(--cell-x) font-medium"
+                  className={cx(
+                    'reed-edge px-(--cell-x) font-medium',
+                    index === 0 && 'warp-line-end sticky z-(--z-pinned) bg-raised',
+                  )}
                   style={{
                     height: 'var(--row-h)',
+                    left: index === 0 ? GUTTER : undefined,
                     width: widths[column.key] ?? intrinsicWidth(column, sort?.key === column.key),
                   }}
                 >
