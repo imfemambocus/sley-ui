@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run build -w @sley-ui/registry && npm run build -w docs",
+  "outputDirectory": "apps/docs/dist",
+  "rewrites": [{ "source": "/((?!r/|assets/|favicon).*)", "destination": "/index.html" }],
+  "headers": [
+    {
+      "source": "/r/:version(\\d+\\.\\d+\\.\\d+[^/]*)/:file*",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/r/:file*.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=300" }]
+    }
+  ]
+}
