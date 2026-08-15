@@ -1,6 +1,6 @@
 import { Elapsed, Figure } from '@/components/ui/figure/Figure'
 import type { Column } from '@/components/ui/table/Table'
-import { STATUSES, type Run } from '../data/runs'
+import { STATUSES, type Run } from './runs'
 import { stamp } from './format'
 import { STATUS_TONE } from './status'
 

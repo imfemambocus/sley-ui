@@ -4,13 +4,13 @@ import { CommandPalette, type Command } from '@/components/ui/command-palette/Co
 import { FilterBar, type FilterValues } from '@/components/ui/filter-bar/FilterBar'
 import { Table } from '@/components/ui/table/Table'
 import { Toaster } from '@/components/ui/toast/Toast'
-import { runs, type Run } from './data/runs'
-import { CancelDialog } from './runs/CancelDialog'
-import { ColumnMenu } from './runs/ColumnMenu'
-import { RunPanel } from './runs/RunPanel'
-import { runColumns } from './runs/columns'
-import { RUN_GROUPS, matchesFilters } from './runs/filters'
-import { toaster } from './toaster'
+import { CancelDialog } from '@demo/CancelDialog'
+import { ColumnMenu } from '@demo/ColumnMenu'
+import { RunPanel } from '@demo/RunPanel'
+import { runColumns } from '@demo/columns'
+import { RUN_GROUPS, matchesFilters } from '@demo/filters'
+import { runs, type Run } from '@demo/runs'
+import { toaster } from '@demo/toaster'
 
 const DENSITIES = ['comfortable', 'compact', 'dense'] as const
 type Density = (typeof DENSITIES)[number]

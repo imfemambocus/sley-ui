@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button/Button'
 import { Checkbox } from '@/components/ui/checkbox/Checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover/Popover'
 import type { Column } from '@/components/ui/table/Table'
-import type { Run } from '../data/runs'
+import type { Run } from './runs'
 
 interface ColumnMenuProps {
   readonly columns: readonly Column<Run>[]

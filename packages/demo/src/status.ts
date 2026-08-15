@@ -1,4 +1,4 @@
-import type { RunStatus } from '../data/runs'
+import type { RunStatus } from './runs'
 
 export const STATUS_TONE: Record<RunStatus, string> = {
   complete: 'text-jade',

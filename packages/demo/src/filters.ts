@@ -1,5 +1,5 @@
 import type { FilterGroup, FilterValues } from '@/components/ui/filter-bar/FilterBar'
-import { ASSAYS, STATUSES, runs, type Run } from '../data/runs'
+import { ASSAYS, STATUSES, runs, type Run } from './runs'
 
 const OWNERS = [...new Set(runs.map((run) => run.owner))].sort((a, b) => a.localeCompare(b))
 

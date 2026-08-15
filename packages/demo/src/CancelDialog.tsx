@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog/Dialog'
-import type { Run } from '../data/runs'
+import type { Run } from './runs'
 
 interface CancelDialogProps {
   readonly run: Run | null
