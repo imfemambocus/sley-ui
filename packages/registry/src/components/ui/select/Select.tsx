@@ -18,7 +18,6 @@ interface PartProps {
   readonly className?: string
 }
 
-/* the control wraps the trigger, so a consumer never has to name two parts for one box */
 export const SelectTrigger = ({ children, className }: PartProps) => (
   <ArkSelect.Control>
     <ArkSelect.Trigger className={cx('ctl h-(--ctl-h) cursor-pointer', className)}>
@@ -28,7 +27,7 @@ export const SelectTrigger = ({ children, className }: PartProps) => (
   </ArkSelect.Control>
 )
 
-/* the content is portalled, and the positioner takes its rank from the stylesheet */
+/* rank comes from the stylesheet; ark sets it inline on the positioner */
 export const SelectContent = ({ children, className }: PartProps) => (
   <Portal>
     <ArkSelect.Positioner>
@@ -44,7 +43,7 @@ interface SelectOptionProps {
   readonly className?: string
 }
 
-/* the shed says where the keyboard is, and the selvedge says what the user chose */
+/* the shed follows the keyboard, the selvedge marks the choice */
 export const SelectOption = ({ item, className }: SelectOptionProps) => (
   <ArkSelect.Item
     item={item}

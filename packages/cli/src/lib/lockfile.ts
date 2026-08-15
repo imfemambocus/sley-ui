@@ -20,11 +20,7 @@ export interface Lockfile {
   items: Record<string, LockedItem>
 }
 
-/*
- * the merge in a later release compares three sides, and the hash written here is
- * the base of that comparison. it is recorded from the first release, because a
- * lockfile added afterwards leaves every early user without one.
- */
+/* the hash written here is the base of the three way merge in a later release */
 export async function readLockfile(cwd: string, registry: string): Promise<Lockfile> {
   const path = join(cwd, LOCKFILE)
   if (!exists(path)) return { version: 1, registry, items: {} }

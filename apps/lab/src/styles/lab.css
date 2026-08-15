@@ -1,5 +1,5 @@
 @import 'tailwindcss';
 @import '../../../../packages/registry/src/styles/tokens.css';
 
-/* the components sit outside this app, so the class scanner needs the path */
+/* the components sit outside this app; the scanner needs the path */
 @source '../../../../packages/registry/src';

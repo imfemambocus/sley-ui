@@ -1,6 +1,6 @@
 @custom-variant dense (&:where(:root[data-density='dense'] *));
 
-/* every name comes from the loom. the semantic colours are dyes, and there is no success or error. */
+/* every name comes from the loom. the semantic colours are dyes. */
 @theme {
   --font-ui: 'Archivo', ui-sans-serif, system-ui, sans-serif;
   --font-data: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
@@ -23,7 +23,7 @@
   --color-weld: var(--p-weld);
 }
 
-/* the shed is the opening that the loom makes and closes again, so it is the row under the pointer */
+/* the shed is the opening a loom makes and closes: the row under the pointer */
 :root {
   --p-ground: #0b0d14;
   --p-raised: #12151f;
@@ -67,9 +67,8 @@
 }
 
 /*
- * a control reads these values and defines none of its own, so one attribute on
- * the root retunes the whole interface. the reed pitch belongs here because a
- * finer reed is what makes denser cloth.
+ * a control reads these and defines none of its own, so one attribute on the root
+ * retunes the whole interface.
  */
 :root,
 :root[data-density='compact'] {
@@ -100,28 +99,28 @@
 }
 
 /*
- * a duration is named for what it moves. the beat easing leaves fast and settles
- * with no bounce. every layer that leaves the flow declares its rank here, because
- * a sticky header makes a stacking context and paints over any layer with no rank.
+ * a duration is named for what it moves. every layer that leaves the flow declares
+ * its rank here: a sticky header makes a stacking context and paints over any layer
+ * with no rank.
  */
 :root {
   --reed-tick: 1px;
   --ctl-box: 13px;
 
   /*
-   * vertical-align: middle centres a control on the x-height. every value in this
-   * table is digits and capitals, so its visual band is the baseline to the cap
-   * height. the lift is half the difference of the two, for the data face.
+   * vertical-align: middle centres on the x-height. every value here is digits and
+   * capitals, so the band runs baseline to cap height. this is half the difference,
+   * for the data face.
    */
   --ctl-lift: 0.091em;
 
-  /* the advance of the data face, so a column width can be a character count */
+  /* the advance of the data face. a column width can then be a character count. */
   --data-adv: 0.6em;
 
   --z-grip: 1;
   --z-pinned: 5;
   --z-sticky: 10;
-  /* the panel keeps the page usable, so a popover opened inside it paints above it */
+  /* the panel keeps the page usable: a popover opened inside it paints above it */
   --z-panel: 20;
   --z-popover: 30;
   --z-backdrop: 40;
@@ -153,7 +152,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* the second selector is for a control whose focus lands on a child, such as a field with an icon */
+  /* the second selector: a control whose focus lands on a child, like a field with an icon */
   :focus-visible,
   .focus-ring:has(:focus-visible) {
     outline: 2px solid var(--color-indigo);
@@ -170,24 +169,22 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* a utility, so a state variant can dye the selvedge of a part that ark controls */
+/* a utility, for a state variant to dye a part that ark controls */
 @utility selvedge-on {
   --selvedge: var(--color-indigo);
 }
 
 /*
- * ark positions its floating parts with an inline `z-index: var(--z-index)` and
- * an inline `--z-index: auto` beside it. the declaration is the right seam, but
- * an inline custom property outranks a stylesheet, so this has to be important to
- * reach it. parts ark does not position, such as a dialog backdrop, take their rank
- * from a class.
+ * ark positions its floating parts with an inline `z-index: var(--z-index)` beside
+ * an inline `--z-index: auto`. an inline custom property outranks a stylesheet, so
+ * this has to be important to reach it. parts ark does not position take a class.
  */
 [data-part='positioner']:not([data-scope='dialog']) {
   --z-index: var(--z-popover) !important;
 }
 
 @layer components {
-  /* the reed: the evenly spaced slots that hold the warp on a loom. it closes the table head. */
+  /* the reed: the evenly spaced slots that hold the warp on a loom */
   .reed-edge {
     position: relative;
   }
@@ -206,9 +203,8 @@
   }
 
   /*
-   * the warp runs across the reed, so a column divider is the same pitch turned a
-   * quarter. a cell takes the leading line, and a pinned cell takes the trailing
-   * one, because the leading line of the next cell travels away under it.
+   * the same pitch turned a quarter. a cell takes the leading line and a pinned cell
+   * takes the trailing one: the next cell's leading line travels away under it.
    */
   .warp-line,
   .warp-line-end {
@@ -228,10 +224,7 @@
     );
   }
 
-  /*
-   * a value under its threshold takes the reed under its own digits. a divider is
-   * shared with the next column, so a divider cannot name which value is low.
-   */
+  /* under the digits, never on the divider: a divider cannot name which value is low */
   .reed-under {
     background-image: repeating-linear-gradient(
       90deg,
@@ -243,11 +236,7 @@
     background-repeat: no-repeat;
   }
 
-  /*
-   * the selvedge is the finished edge of a cloth, and it marks a choice. the shed
-   * says where the pointer or the keyboard is, and this says what the user chose,
-   * so no state depends on telling one wash from another.
-   */
+  /* the selvedge is the finished edge of a cloth. it marks a choice; the shed marks a position. */
   .selvedge {
     position: relative;
     --selvedge: transparent;
@@ -308,9 +297,8 @@
   }
 
   /*
-   * three ticks of the reed, and the order of the heights is the direction. the
-   * spacing is tighter than the pitch, because a head reserves this width and the
-   * narrow columns cannot pay a full pitch for it.
+   * three ticks, and the order of the heights is the direction. tighter than the
+   * pitch, because a head reserves this width and a narrow column cannot pay a full one.
    */
   .reed-sort {
     display: inline-block;
@@ -328,16 +316,13 @@
     background-size: var(--reed-tick) 7px, var(--reed-tick) 5px, var(--reed-tick) 3px;
   }
 
-  /* a control beside a row of values aligns on the cap band and not on the box */
+  /* a control beside a row of values aligns on the cap band */
   .ctl-align {
     vertical-align: middle;
     translate: 0 calc(-1 * var(--ctl-lift));
   }
 
-  /*
-   * the surface that every control shares. it lives here and not in a component
-   * file, because two components that draw the same surface must not drift apart.
-   */
+  /* the surface that every control shares */
   .ctl {
     display: inline-flex;
     align-items: center;
@@ -371,9 +356,8 @@
   }
 
   /*
-   * the grip straddles the column boundary, and the reed inside it is the divider
-   * that the head would draw anyway. the reed is in currentColor, because a
-   * gradient cannot transition and a colour can.
+   * the grip straddles the column boundary, and the reed inside it is the divider the
+   * head would draw anyway. currentColor, because a gradient cannot transition.
    */
   .reed-grip {
     position: absolute;
@@ -415,16 +399,15 @@
     );
   }
 
-  /* the weft is on its way, which a result that is empty cannot claim */
+  /* only the loading state moves */
   .reed-warp-beat {
     animation: beat 1.2s var(--ease-glide) infinite;
   }
 
   /*
-   * the bottom edge carries a reed while rows remain below it. the cover layer is
-   * attached to the content, so it arrives at the edge and hides the reed at the
-   * end of the list. a short list needs no cover, because the scrollable area is
-   * then the padding box and the two layers land together.
+   * the cover layer is attached to the content, so it arrives at the edge and hides
+   * the reed at the end of the list. a short list needs no cover: the scrollable area
+   * is then the padding box and the two layers land together.
    */
   .reed-scroll {
     background-image:
@@ -442,10 +425,7 @@
     scrollbar-color: var(--color-reed-lit) transparent;
   }
 
-  /*
-   * the standard properties above win wherever they are supported, so these reach
-   * safari only. the frame has no radius, so the thumb has none either.
-   */
+  /* the standard properties above win where supported, so these reach safari only */
   .reed-scroll::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -490,7 +470,6 @@
   }
 }
 
-/* the beat-up: the reed drives the weft down into place and settles */
 @keyframes rise {
   from {
     opacity: 0;

@@ -57,12 +57,12 @@ export const CommandPalette = ({
     setActive(0)
   }, [query])
 
-  /* the list holds its matches while the dialog leaves, so the query clears on the way in */
+  /* clears on the way in: the list must keep its matches while the dialog leaves */
   useEffect(() => {
     if (open) setQuery('')
   }, [open])
 
-  // the pointer does not move during keyboard navigation, so nothing else scrolls the row into view
+  // keyboard navigation moves no pointer, so nothing else scrolls the row into view
   useEffect(() => {
     listRef.current?.querySelector('[data-active]')?.scrollIntoView({ block: 'nearest' })
   }, [active])
@@ -107,7 +107,6 @@ export const CommandPalette = ({
 
             <div className="reed-edge flex items-center gap-2 px-3" style={{ height: 'calc(var(--ctl-h) + 12px)' }}>
               <SearchIcon className="size-4 text-weft-faint" />
-              {/* the dialog owns the focus, so the input takes it through the focus trap */}
               <input
                 ref={inputRef}
                 name="command"

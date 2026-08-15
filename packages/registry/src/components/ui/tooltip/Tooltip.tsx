@@ -5,14 +5,14 @@ import { cx } from '@/lib/cx'
 
 interface TooltipProps {
   readonly content: ReactNode
-  /* the trigger takes the element itself, so the description lands on the control */
+  /* asChild: the trigger becomes this element */
   readonly children: ReactElement
   readonly openDelay?: number
   readonly closeDelay?: number
   readonly className?: string
 }
 
-/* a dense interface asks a lot of small questions, so the tip answers faster than the ark default */
+/* faster than the ark default, for an interface with many small questions */
 export const Tooltip = ({ content, children, openDelay = 200, closeDelay = 80, className }: TooltipProps) => (
   <ArkTooltip.Root openDelay={openDelay} closeDelay={closeDelay}>
     <ArkTooltip.Trigger asChild>{children}</ArkTooltip.Trigger>

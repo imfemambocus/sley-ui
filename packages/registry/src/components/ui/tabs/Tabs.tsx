@@ -9,10 +9,7 @@ interface PartProps {
   readonly className?: string
 }
 
-/*
- * the mark is the selvedge of the list, and ark moves it from one tab to the next.
- * the list is the frame it is placed against, so it declares the position.
- */
+/* ark moves the mark between tabs, and the list is the frame it is placed against */
 export const TabsList = ({ children, className }: PartProps) => (
   <ArkTabs.List className={cx('relative flex items-center border-b border-reed', className)}>
     {children}

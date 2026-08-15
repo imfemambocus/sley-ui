@@ -18,7 +18,7 @@ interface CancelDialogProps {
 }
 
 export const CancelDialog = ({ run, onClose, onConfirm }: CancelDialogProps) => {
-  /* the dialog leaves before it goes, so it keeps the run it asked about until it is gone */
+  /* holds the run until the dialog has left the screen */
   const [shown, setShown] = useState(run)
 
   useEffect(() => {

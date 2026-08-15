@@ -8,9 +8,8 @@ export type CheckedState = boolean | 'indeterminate'
 interface CheckboxProps {
   readonly checked: CheckedState
   readonly onCheckedChange: (checked: CheckedState) => void
-  /* the text beside the box, which is also the name of the box */
   readonly children?: ReactNode
-  /* the name of a box that shows no text, such as one in a table row */
+  /* names a box that shows no text */
   readonly label?: string
   readonly className?: string
 }
@@ -18,7 +17,7 @@ interface CheckboxProps {
 const CONTROL =
   'grid size-(--ctl-box) shrink-0 place-items-center border border-reed-lit text-ground transition-colors duration-(--dur-instant) ease-(--ease-beat) data-[state=checked]:border-indigo data-[state=checked]:bg-indigo data-[state=indeterminate]:border-indigo data-[state=indeterminate]:bg-indigo'
 
-/* the ark root is a label element, so the text inside it toggles the box and names it */
+/* the ark root is a label element, so the text inside it toggles the box */
 export const Checkbox = ({ checked, onCheckedChange, children, label, className }: CheckboxProps) => (
   <ArkCheckbox.Root
     checked={checked}

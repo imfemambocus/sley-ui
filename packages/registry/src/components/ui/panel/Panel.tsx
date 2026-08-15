@@ -6,7 +6,7 @@ import { cx } from '@/lib/cx'
 
 export type PanelSide = 'start' | 'end'
 
-/* under this width the panel covers the page, so it has to take the duties of a modal */
+/* below this the panel covers the page and has to behave as a modal */
 const SHEET = '(max-width: 640px)'
 
 function useSheet() {
@@ -23,7 +23,7 @@ function useSheet() {
   return sheet
 }
 
-/* the positioner holds the edge it is pinned to, and the panel draws its own border */
+/* the positioner holds the edge; the border belongs to the part that animates */
 const SIDE: Record<PanelSide, string> = {
   start: 'start-0 [--slide-from:-100%]',
   end: 'end-0 [--slide-from:100%]',
@@ -41,10 +41,8 @@ interface PanelProps {
 }
 
 /*
- * the panel reads a row while the table stays live, so it holds no focus trap and
- * it closes on escape or on its own control. a click outside is how a user picks
- * the next row to read, so it does not close the panel. on a screen it covers, it
- * traps the focus and locks the page instead, because nothing behind it is usable.
+ * not modal while the table stays live: no focus trap, and a click outside picks the
+ * next row rather than closing. on a screen it covers, it locks the page.
  */
 export const Panel = ({
   open,

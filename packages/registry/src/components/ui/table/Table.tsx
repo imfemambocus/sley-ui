@@ -8,12 +8,10 @@ export interface Column<T> {
   readonly key: string
   readonly label: string
   readonly unit?: string
-  /* what the column means, on the head, where one tip serves every row under it */
   readonly hint?: string
-  /* the characters the widest plausible value holds, which the density turns into a width */
+  /* the widest plausible value, in characters. the density turns it into a width. */
   readonly chars: number
   readonly numeric?: boolean
-  /* a column with no sort value cannot be ordered, and its head takes no control */
   readonly sortValue?: (row: T) => string | number
   readonly render: (row: T) => ReactNode
 }
@@ -29,17 +27,15 @@ const MIN_WIDTH = 56
 const MAX_WIDTH = 420
 const KEY_STEP = 8
 
-/* the sort mark is 7px and its gap is 6px, which two characters cover in every density */
+/* the 7px mark and its 6px gap: two characters cover both in every density */
 const SORT_CHARS = 2
 
-/* the gutter is its padding plus its control, and the column that follows it starts where it ends */
+/* doubles as the left offset of the pinned column beside it */
 const GUTTER = 'calc(var(--cell-x) * 2 + var(--ctl-box))'
 
 /*
- * the first column names the row, so it stays while the rest travels. a pinned cell
- * hides what passes under it, which needs an opaque background of its own, and a
- * transition of its own, because a parent transition does not animate an inherited
- * value. the trailing divider is the seam that the travelling cells go under.
+ * a pinned cell hides what travels under it, so it needs an opaque background and a
+ * transition of its own. a parent transition does not animate an inherited value.
  */
 const PINNED = 'warp-line-end bg-inherit px-(--cell-x) transition-colors duration-(--dur-instant) ease-(--ease-beat)'
 
@@ -59,10 +55,8 @@ function clampWidth(value: number) {
 }
 
 /*
- * a column declares the characters it holds, and the density supplies the rest. the
- * head counts too, because a label and its unit can be longer than the value under
- * it. the count is in the advance of the data face, and the half character covers
- * the rounding that a table layout applies to a column.
+ * the head counts too, because a label and its unit can run longer than the value
+ * under it. the half character covers the rounding a table layout applies.
  */
 function intrinsicWidth<T>(column: Column<T>, sorted: boolean) {
   const unit = column.unit ? column.unit.length + 1 : 0
@@ -75,7 +69,7 @@ interface ColumnGripProps {
   readonly onResize: (next: number) => void
 }
 
-/* the drag starts from the width on screen, so a column that never moved needs no px of its own */
+/* the width on screen. a column that never moved holds no px of its own. */
 const cellWidth = (grip: HTMLButtonElement) => grip.parentElement?.offsetWidth ?? 0
 
 const ColumnGrip = ({ label, onResize }: ColumnGripProps) => {
@@ -116,7 +110,6 @@ const ColumnGrip = ({ label, onResize }: ColumnGripProps) => {
   )
 }
 
-/* three ticks of the reed, short to tall, which reads as a direction without a glyph */
 const SortMark = ({ direction }: { readonly direction: Direction }) => (
   <span className={cx('reed-sort text-indigo', direction === 'desc' && 'reed-sort-down')} aria-hidden="true" />
 )
@@ -129,7 +122,7 @@ interface ColumnHeadProps<T> {
 
 const ColumnHead = <T,>({ column, sort, onSort }: ColumnHeadProps<T>) => {
   const shell = cx('flex h-full w-full items-center gap-1.5 text-weft-dim', column.numeric && 'justify-end')
-  /* the mark joins the baseline group, so its ticks stand on the baseline of the label */
+  /* the mark sits inside the baseline group, standing on the baseline of the label */
   const label = (
     <span className="inline-flex min-w-0 items-baseline gap-1.5">
       <span className="truncate">{column.label}</span>
@@ -150,14 +143,12 @@ const ColumnHead = <T,>({ column, sort, onSort }: ColumnHeadProps<T>) => {
     <div className={shell}>{label}</div>
   )
 
-  /* the tip goes on the control that is already there, so the head grows no second target */
   if (column.hint === undefined) return head
   return <Tooltip content={column.hint}>{head}</Tooltip>
 }
 
 const SKELETON_IDS: readonly string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((id) => `warp-${id}`)
 
-/* the weft arrives one row after another, so each row waits one instant longer than the row above it */
 const WarpRows = ({ span }: { readonly span: number }) => (
   <>
     {SKELETON_IDS.map((id, index) => (
@@ -193,12 +184,7 @@ interface RowProps<T> {
   readonly onToggle: (id: string) => void
 }
 
-/*
- * the row declares every state, and a pinned cell inherits the colour. an opaque
- * hover colour is what allows that, because a pinned cell has to hide the cells
- * that travel under it.
- */
-const Row = <T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (
+const Row =<T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (
   <tr
     className="bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash"
     data-selected={selected ? '' : undefined}
@@ -232,11 +218,9 @@ interface TableProps<T> {
   readonly columns: readonly Column<T>[]
   readonly rowId: (row: T) => string
   readonly title: string
-  /* the word the count reads with, and the word the select all control announces */
   readonly noun?: string
   readonly emptyMessage?: string
   readonly loading?: boolean
-  /* the controls that belong to the whole table, which sit beside the count */
   readonly actions?: ReactNode
   readonly onSelectionChange?: (selected: ReadonlySet<string>) => void
   readonly className?: string
@@ -255,7 +239,7 @@ export const Table = <T,>({
   className,
 }: TableProps<T>) => {
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())
-  /* only a column the user dragged holds a px width. the rest follow the density. */
+  /* only a dragged column holds a px width; the rest follow the density */
   const [widths, setWidths] = useState<Record<string, number | undefined>>({})
   const [sort, setSort] = useState<Sort | null>(null)
 
@@ -265,7 +249,7 @@ export const Table = <T,>({
     setWidths((current) => ({ ...current, [key]: clampWidth(next) }))
   }
 
-  /* the third click restores the order the rows arrived in, which is a state of its own */
+  /* third click restores the order the rows arrived in */
   const toggleSort = (key: string) => {
     setSort((current) => {
       if (current?.key !== key) return { key, direction: 'asc' }
@@ -283,9 +267,8 @@ export const Table = <T,>({
   }, [rows, columns, sort])
 
   /*
-   * a filter can take a selected row off the screen, and a row the reader cannot see
-   * is a row they cannot act on. the count and the head control therefore read the
-   * rows on screen, and the set keeps the rest for the moment the filter comes back.
+   * a filter can take a selected row off the screen. the count and the head control
+   * read only what is on screen, and the set keeps the rest for when it comes back.
    */
   const onScreen = useMemo(() => new Set(rows.map(rowId)), [rows, rowId])
   const active = useMemo(() => new Set([...selected].filter((id) => onScreen.has(id))), [selected, onScreen])
@@ -341,11 +324,10 @@ export const Table = <T,>({
       </header>
 
       <div className="reed-scroll max-h-130 overflow-auto">
-        {/* separate borders, because a pinned cell paints its background over a collapsed one */}
+        {/* separate borders: a pinned cell paints its background over a collapsed one */}
         <table aria-busy={loading} className="w-full table-fixed border-separate border-spacing-0 text-left">
           <thead className="sticky top-0 z-(--z-sticky)">
             <tr className="bg-raised select-none">
-              {/* the gutter width keeps the box from flexing down, and it places the column beside it */}
               <th
                 scope="col"
                 className="reed-edge warp-line-end sticky left-0 z-(--z-pinned) bg-raised px-(--cell-x)"

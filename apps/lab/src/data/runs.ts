@@ -8,7 +8,7 @@ export interface Run {
   readonly reads: number
   readonly q30: number
   readonly coverage: number
-  /* an iso stamp and a count of minutes, because a column sorts the model and not the text in a cell */
+  /* a column sorts the model, not the text in a cell */
   readonly started: string
   readonly duration: number
   readonly owner: string

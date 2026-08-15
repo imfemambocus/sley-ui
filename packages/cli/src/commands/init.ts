@@ -30,9 +30,8 @@ function importPath(from: string, to: string) {
 }
 
 /*
- * the token block goes in as its own file with one import line, and not as text
- * inside the entry. a later merge needs a whole file to compare, and a block
- * pasted into a file the user also edits has no stable position.
+ * a later merge needs a whole file to compare, and a block pasted into a file the
+ * user also edits has no stable position.
  */
 async function linkTokens(cssEntry: string, tokensPath: string) {
   const text = await readFile(cssEntry, 'utf8')

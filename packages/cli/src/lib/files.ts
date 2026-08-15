@@ -4,9 +4,8 @@ import { existsSync } from 'node:fs'
 import { dirname } from 'node:path'
 
 /*
- * a tsconfig from a fresh vite template holds comments, and JSON.parse refuses
- * them. the scanner tracks whether it is inside a string, so a `//` in a url
- * survives.
+ * a tsconfig from a fresh vite template holds comments, and JSON.parse refuses them.
+ * the scanner tracks strings so a `//` in a url survives.
  */
 function stripComments(text: string) {
   let out = ''
@@ -97,8 +96,8 @@ function stripTrailingCommas(text: string) {
 }
 
 /*
- * a parse cannot know the shape of what it reads, so the claim stays here and the
- * callers own it. every file this reads belongs to the user's project.
+ * a parse cannot know the shape of what it reads. every file here belongs to the
+ * user's own project.
  */
 // oxlint-disable-next-line typescript/no-unnecessary-type-parameters
 export function parseJsonc<T>(text: string): T {
@@ -123,7 +122,7 @@ export function exists(path: string) {
   return existsSync(path)
 }
 
-/* the same shape the registry build writes, so the two can be compared directly */
+/* the same shape the registry build writes, for a direct comparison */
 export function hash(content: string) {
   return `sha256-${createHash('sha256').update(content).digest('base64')}`
 }

@@ -13,7 +13,7 @@ export interface Project {
   readonly sourceDir: string
   readonly cssEntry: string
   readonly packageManager: PackageManager
-  /* a react server component takes no hook, so the writer adds a directive */
+  /* a react server component takes no hook. the writer adds a directive. */
   readonly rsc: boolean
 }
 
@@ -52,9 +52,8 @@ export function detectPackageManager(cwd: string): PackageManager {
 }
 
 /*
- * a fresh vite template splits its options into tsconfig.app.json, and the root
- * file holds only references, so the alias belongs in whichever file carries
- * compilerOptions.
+ * a fresh vite template splits its options into tsconfig.app.json and leaves only
+ * references in the root file. the alias belongs wherever compilerOptions is.
  */
 export async function findTsconfig(cwd: string) {
   for (const name of ['tsconfig.app.json', 'tsconfig.json']) {
@@ -87,10 +86,7 @@ export async function readAlias(tsconfigPath: string): Promise<Alias | null> {
   return null
 }
 
-/*
- * the file keeps its comments, so the key goes in as text rather than through a
- * parse and a re-serialise.
- */
+/* the file keeps its comments, so the key goes in as text */
 export async function writeAlias(tsconfigPath: string, sourceDir: string) {
   const text = await readFile(tsconfigPath, 'utf8')
   const anchor = text.indexOf('"compilerOptions"')
@@ -104,10 +100,7 @@ export async function writeAlias(tsconfigPath: string, sourceDir: string) {
   await write(tsconfigPath, text.slice(0, brace + 1) + block + text.slice(brace + 1))
 }
 
-/*
- * vite resolves an alias through its own config, so a path in the tsconfig alone
- * compiles and then fails at run time.
- */
+/* vite resolves an alias through its own config. the tsconfig alone fails at run time. */
 export async function writeViteAlias(cwd: string, sourceDir: string, prefix: string) {
   const path = ['vite.config.ts', 'vite.config.js', 'vite.config.mts'].map((name) => join(cwd, name)).find(exists)
   if (!path) return { done: false, path: join(cwd, 'vite.config.ts') }
@@ -160,7 +153,6 @@ export async function resolveProject(cwd: string, cssEntry: string, rsc: boolean
   }
 }
 
-/* the entry is the file that pulls tailwind in, whatever the template named it */
 export async function findCssEntry(cwd: string) {
   const candidates = await walkCss(cwd, 4)
   for (const path of candidates) {

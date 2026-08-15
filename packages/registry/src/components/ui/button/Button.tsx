@@ -7,7 +7,6 @@ interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
   readonly variant?: ButtonVariant
 }
 
-/* a fill takes the ground colour on top of it, which is the treatment the checkbox uses */
 const VARIANT: Record<ButtonVariant, string> = {
   default: 'ctl',
   primary: 'border border-indigo bg-indigo text-ground hover:bg-indigo/90',

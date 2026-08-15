@@ -83,7 +83,6 @@ export const App = () => {
 
   const visible = useMemo(() => runs.filter((run) => matchesFilters(run, query, values)), [query, values])
 
-  /* the table reports what it selected, and a later filter can take a row off the screen */
   const exportable = useMemo(() => visible.filter((run) => selected.has(run.id)).length, [visible, selected])
 
   const allColumns = useMemo(() => runColumns(setDetail), [])

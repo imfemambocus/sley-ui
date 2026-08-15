@@ -39,7 +39,7 @@ interface ConfigInput {
 export async function writeConfig({ cwd, prefix, cssEntry, rsc }: ConfigInput) {
   const config: ComponentsConfig = {
     $schema: 'https://ui.shadcn.com/schema.json',
-    /* shadcn's own cli validates this field against its list, so it holds one of theirs */
+    /* shadcn's own cli validates this field against its list */
     style: 'new-york',
     rsc,
     tsx: true,

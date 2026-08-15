@@ -53,7 +53,7 @@ const Overview = ({ run }: { readonly run: Run }) => (
         <Elapsed minutes={run.duration} />
       </span>
     </Detail>
-    {/* the owner is a person, so it keeps the interface face */}
+    {/* a person, not a machine value: no data face */}
     <Detail label="Owner">{run.owner}</Detail>
   </dl>
 )
@@ -138,7 +138,7 @@ interface RunPanelProps {
 }
 
 export const RunPanel = ({ run, onClose, onCancelRun }: RunPanelProps) => {
-  /* the panel slides out, so it holds the run it was reading until it has left the screen */
+  /* the panel needs its run while it slides out */
   const [shown, setShown] = useState(run)
 
   useEffect(() => {
@@ -169,7 +169,7 @@ export const RunPanel = ({ run, onClose, onCancelRun }: RunPanelProps) => {
         </>
       }
     >
-      {/* the key restarts the tabs and the form when the reader opens another run */}
+      {/* the key remounts the tabs and the form for another run */}
       <Tabs key={shown.id} defaultValue="overview" className="flex flex-col">
         <TabsList className="px-(--cell-x)">
           <TabsTab value="overview">Overview</TabsTab>

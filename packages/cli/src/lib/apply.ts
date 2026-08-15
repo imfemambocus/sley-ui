@@ -14,16 +14,15 @@ export interface AppliedFile {
 
 const CLIENT_DIRECTIVE = "'use client'\n\n"
 
-/* the source ships with `@`, so a project on another prefix has its imports moved */
+/* the source ships with `@`. a project on another prefix has its imports moved. */
 function retarget(content: string, prefix: string) {
   if (prefix === '@') return content
   return content.replaceAll(/(['"])@\//g, `$1${prefix}/`)
 }
 
 /*
- * the written content is what the lock hashes, and not what the registry sent. an
- * alias of its own and the client directive both change the file, so a hash of the
- * registry copy would report every file as edited on the next run.
+ * the lock hashes what was written, not what the registry sent. an alias of its own
+ * and the client directive both change the file.
  */
 function transform(content: string, prefix: string, client: boolean) {
   const retargeted = retarget(content, prefix)
@@ -40,9 +39,8 @@ async function statusOf(path: string, base: string | undefined, overwrite: boole
 }
 
 /*
- * the lock entry moves only when every file of the item was written. a partial
- * write would otherwise record a base that no file on disk came from, and the
- * three way merge reads that base as its truth.
+ * a partial write would record a base that no file on disk came from, and the three
+ * way merge reads that base as its truth.
  */
 export async function applyItem(
   project: Project,

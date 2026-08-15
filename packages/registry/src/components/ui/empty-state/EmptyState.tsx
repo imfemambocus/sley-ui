@@ -8,10 +8,7 @@ interface EmptyStateProps {
   readonly className?: string
 }
 
-/*
- * the warp is threaded and the weft has not come, which is the state itself and not
- * a picture of it. the text sits on a patch of cloth, so no thread runs through it.
- */
+/* the text sits on a patch of cloth. no warp runs behind it. */
 export const EmptyState = ({ title, description, action, className }: EmptyStateProps) => (
   <div
     className={cx('reed-warp flex flex-col items-center justify-center gap-(--stack) p-(--cell-x) text-center', className)}

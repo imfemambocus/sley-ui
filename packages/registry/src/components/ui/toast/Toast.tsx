@@ -5,10 +5,7 @@ import { cx } from '@/lib/cx'
 export { createToaster } from '@ark-ui/react/toast'
 export type { CreateToasterReturn }
 
-/*
- * the machine names the five kinds, and each one takes a dye. the dot repeats the
- * treatment the status column uses, so one state reads the same in both places.
- */
+/* zag names these five types */
 const TONE: Record<string, string> = {
   success: 'text-jade',
   error: 'text-madder',
@@ -22,7 +19,7 @@ interface ToasterProps {
   readonly className?: string
 }
 
-/* zag gives the group the highest rank in the document, so no token ranks it here */
+/* zag gives the group the highest rank in the document. no token ranks it here. */
 export const Toaster = ({ toaster, className }: ToasterProps) => (
   <ArkToaster toaster={toaster}>
     {(toast) => (

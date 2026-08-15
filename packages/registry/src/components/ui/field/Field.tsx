@@ -19,7 +19,6 @@ export const FieldLabel = ({ children, className }: PartProps) => (
   </ArkField.Label>
 )
 
-/* the control surface is one rule in the stylesheet, so a field and a select cannot drift apart */
 const CONTROL = 'ctl block w-full data-invalid:border-madder disabled:cursor-not-allowed disabled:opacity-50'
 
 export const FieldInput = ({ className, ...props }: ComponentPropsWithoutRef<'input'>) => (
@@ -30,7 +29,6 @@ export const FieldTextarea = ({ className, ...props }: ComponentPropsWithoutRef<
   <ArkField.Textarea className={cx(CONTROL, 'min-h-20 resize-y py-(--stack) leading-relaxed', className)} {...props} />
 )
 
-/* the dense mode drops the hint from the screen and keeps it for a screen reader */
 export const FieldHint = ({ children, className }: PartProps) => (
   <ArkField.HelperText className={cx('text-weft-faint dense:sr-only', className)}>{children}</ArkField.HelperText>
 )

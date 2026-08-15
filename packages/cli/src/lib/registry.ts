@@ -41,10 +41,7 @@ export async function loadItem(source: string, name: string): Promise<RegistryIt
   return parseJsonc<RegistryItem>(await response.text())
 }
 
-/*
- * a dependency is written before the item that imports it, so a half finished run
- * never leaves an import pointing at a file that is absent.
- */
+/* a dependency is written before the item that imports it */
 export async function resolveItems(source: string, names: readonly string[]) {
   const ordered: RegistryItem[] = []
   const seen = new Set<string>()

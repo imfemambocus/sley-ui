@@ -11,7 +11,7 @@ interface PartProps {
   readonly className?: string
 }
 
-/* the positioner takes its rank from the stylesheet, which reaches ark's inline value */
+/* the positioner has no rank here: the stylesheet reaches ark's inline value */
 export const PopoverContent = ({ children, className }: PartProps) => (
   <Portal>
     <ArkPopover.Positioner>

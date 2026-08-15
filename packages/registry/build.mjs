@@ -10,27 +10,22 @@ const out = join(root, 'dist', 'r')
 const SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json'
 const STYLE_ITEM = 'tokens'
 
-/*
- * the lockfile records where a file came from, so the base has to be settled before
- * the first release writes one. the shadcn cli installs from a full url, which is
- * what carries this registry to their users.
- */
+/* the shadcn cli installs from a full url */
 const BASE = 'https://sley-ui.dev/r'
 
 /* `import x from 'y'`, `import 'y'` and `export { x } from 'y'` all end in the same shape */
 const SPECIFIER = /\b(?:from|import)\s+'([^']+)'/g
 
-/* the runtime supplies these, so no user installs them because of a component */
+/* the runtime supplies these */
 const PROVIDED = new Set(['react', 'react-dom'])
 
 /*
- * a react server component runs no hook and holds no event handler, so a file that
- * uses either has to say so. ark builds on hooks, so its parts count too. the cli
- * writes the directive, because only a next project needs one.
+ * a react server component runs no hook and holds no event handler. ark builds on
+ * hooks, so its parts count too. only a next project needs the directive.
  */
 const CLIENT = /\bfrom '@ark-ui\/|\buse(?:State|Effect|Ref|Memo|Callback|Reducer|Context)\b/
 
-/* code unit order, so the output does not follow the locale of the machine that built it */
+/* code unit order, to keep the output off the build machine's locale */
 function byCodeUnit(a, b) {
   if (a < b) return -1
   return a > b ? 1 : 0
@@ -56,9 +51,8 @@ function packageOf(specifier) {
 }
 
 /*
- * an import inside the registry becomes a registry dependency, and an import from
- * outside becomes an npm one. the source is the only declaration, because a header
- * a person maintains by hand goes out of date.
+ * an import inside the registry becomes a registry dependency, and one from outside
+ * becomes an npm dependency. the source is the only declaration.
  */
 function classify(specifier) {
   if (specifier.startsWith('@/components/ui/')) return { registry: specifier.split('/')[3] }
@@ -119,10 +113,7 @@ function buildItem({ name, type, files, fileType, version, extraRegistry = [] })
       type: file.type ?? fileType,
       content: file.content,
     })),
-    /*
-     * one version covers the whole registry, and a hash answers whether a single
-     * file moved. twelve version numbers kept by hand would answer neither well.
-     */
+    /* one version covers the whole registry, and a hash answers whether a single file moved */
     sley: {
       version,
       url: `${BASE}/${name}.json`,

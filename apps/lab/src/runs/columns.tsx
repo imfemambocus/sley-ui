@@ -83,7 +83,7 @@ export function runColumns(onOpen: (run: Run) => void): readonly Column<Run>[] {
       sortValue: (r) => r.coverage,
       render: (r) => <Figure value={r.coverage} />,
     },
-    /* a machine value takes the data face, and a human name keeps the interface face */
+    /* a machine value takes the data face; a human name keeps the interface face */
     {
       key: 'started',
       label: 'Started',

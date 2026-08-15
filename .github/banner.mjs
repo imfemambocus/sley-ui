@@ -4,12 +4,11 @@
  *
  * png rather than svg: github sanitises svg and will not load a webfont, so the
  * wordmark would fall back to something generic. the page pulls the two faces from
- * google fonts, so this needs a network connection at build time.
+ * google fonts, so this needs a network connection.
  *
  *   npm install --no-save puppeteer && node .github/banner.mjs
  *
- * keep puppeteer out of package.json and the lockfile, and read `git diff` on both
- * afterwards, because that is the only thing that proves it.
+ * check `git diff` on package.json and the lockfile afterwards.
  */
 import { writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -40,7 +39,7 @@ const page = `<!doctype html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
-  /* the library's own tokens, so the banner cannot drift from the components */
+  /* the library's own tokens: the banner cannot drift from the components */
   html[data-theme='dark'] {
     --bg: #0b0d14;
     --fg: #e9e5db;

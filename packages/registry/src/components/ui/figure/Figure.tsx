@@ -7,7 +7,7 @@ interface FigureProps {
   readonly className?: string
 }
 
-/* the digits are the content, so anything that is not a digit reads one step back */
+/* anything that is not a digit reads one step back */
 export const Figure = ({ value, digits = 1, low = false, className }: FigureProps) => {
   if (value === 0) return <span className={cx('reed-mark', className)} aria-hidden="true" />
 
@@ -26,7 +26,7 @@ interface ElapsedProps {
   readonly className?: string
 }
 
-/* a duration carries its units in the cell, because a head cannot hold two of them */
+/* a head cannot hold two units, so a duration carries them in the cell */
 export const Elapsed = ({ minutes, className }: ElapsedProps) => (
   <span className={className}>
     {Math.trunc(minutes / 60)}

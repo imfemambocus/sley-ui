@@ -4,10 +4,7 @@ import type { ReactNode } from 'react'
 import { CloseIcon } from '@/components/ui/icons/Icons'
 import { cx } from '@/lib/cx'
 
-/*
- * the content leaves before it goes, and ark removes the node when the animation
- * ends, so both mount options are on by default.
- */
+/* ark removes the node when the exit animation ends. both mount options default on. */
 export const Dialog = ({ unmountOnExit = true, lazyMount = true, ...props }: DialogRootProps) => (
   <ArkDialog.Root unmountOnExit={unmountOnExit} lazyMount={lazyMount} {...props} />
 )
@@ -19,7 +16,7 @@ interface PartProps {
   readonly className?: string
 }
 
-/* ark points the name of the dialog at the title, so every dialog carries one */
+/* ark names the dialog from its title, so every dialog carries one */
 export const DialogContent = ({ children, className }: PartProps) => (
   <Portal>
     <ArkDialog.Backdrop className="fixed inset-0 z-(--z-backdrop) bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)] data-[state=closed]:animate-[fade-out_var(--dur-local)_var(--ease-exit)]" />
@@ -36,7 +33,6 @@ export const DialogContent = ({ children, className }: PartProps) => (
   </Portal>
 )
 
-/* the reed closes a head here for the same reason it closes the table head */
 export const DialogHeader = ({ children, className }: PartProps) => (
   <header
     className={cx('reed-edge flex items-start justify-between gap-4 px-(--cell-x) py-(--stack)', className)}
