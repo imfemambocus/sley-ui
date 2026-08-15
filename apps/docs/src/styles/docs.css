@@ -1,0 +1,49 @@
+@import 'tailwindcss';
+@import '../../../../packages/registry/src/styles/tokens.css';
+
+/* the components and the demo sit outside this app; the scanner needs the paths */
+@source '../../../../packages/registry/src';
+@source '../../../../packages/demo/src';
+
+/*
+ * the reading column does not follow the density. density is for an application
+ * surface, and 12px body copy is a worse article at every width.
+ */
+@theme {
+  --text-prose: 15px;
+  --text-prose--line-height: 1.7;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 7rem;
+  }
+
+  /* a scroll to an anchor must not race the reader who asked for no motion */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  /* the loom seen head on: warp threads standing in the reed, at the current pitch */
+  .warp-field {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-reed) 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
+    );
+  }
+
+  /* the cloth line the hero rests on: two picks beaten together */
+  .reed-band {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-indigo) 0 var(--reed-tick),
+      transparent var(--reed-tick) var(--reed-pitch)
+    );
+  }
+}
