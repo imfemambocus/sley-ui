@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
+    "freeze": "node build.mjs --freeze",
     "typecheck": "tsc -b"
   },
   "dependencies": {

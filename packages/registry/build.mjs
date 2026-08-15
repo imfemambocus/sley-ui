@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { existsSync } from 'node:fs'
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -6,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 const root = dirname(fileURLToPath(import.meta.url))
 const src = join(root, 'src')
 const out = join(root, 'dist', 'r')
+const releases = join(root, 'releases')
 
 const SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json'
 const STYLE_ITEM = 'tokens'
@@ -29,6 +31,22 @@ const CLIENT = /\bfrom '@ark-ui\/|\buse(?:State|Effect|Ref|Memo|Callback|Reducer
 function byCodeUnit(a, b) {
   if (a < b) return -1
   return a > b ? 1 : 0
+}
+
+/* a prerelease ranks below the release whose numbers it shares */
+function compareVersions(a, b) {
+  const [aMain, aPre] = a.split('-')
+  const [bMain, bPre] = b.split('-')
+  const aParts = aMain.split('.').map(Number)
+  const bParts = bMain.split('.').map(Number)
+
+  for (let i = 0; i < 3; i += 1) {
+    if (aParts[i] !== bParts[i]) return aParts[i] - bParts[i]
+  }
+  if (aPre === bPre) return 0
+  if (aPre === undefined) return 1
+  if (bPre === undefined) return -1
+  return byCodeUnit(aPre, bPre)
 }
 
 async function walk(dir) {
@@ -116,7 +134,11 @@ function buildItem({ name, type, files, fileType, version, extraRegistry = [] })
     /* one version covers the whole registry, and a hash answers whether a single file moved */
     sley: {
       version,
-      url: `${BASE}/${name}.json`,
+      /*
+       * the immutable copy of these exact bytes. the lockfile records it, and the three
+       * way merge reads its base from there after the flat path has moved on.
+       */
+      url: `${BASE}/${version}/${name}.json`,
       files: files.map((file) => ({
         path: file.target,
         hash: hash(file.content),
@@ -124,6 +146,57 @@ function buildItem({ name, type, files, fileType, version, extraRegistry = [] })
       })),
     },
   }
+}
+
+function buildIndex(items, version, base) {
+  const index = items.map(({ name, type, title: label, dependencies, registryDependencies }) => ({
+    name,
+    type,
+    title: label,
+    dependencies,
+    registryDependencies,
+    url: `${base}/${name}.json`,
+  }))
+  return { $schema: SCHEMA, name: 'sley-ui', version, homepage: BASE, items: index }
+}
+
+async function writeTree(dir, items, version, base) {
+  await mkdir(dir, { recursive: true })
+  for (const item of items) {
+    await writeFile(join(dir, `${item.name}.json`), `${JSON.stringify(item, null, 2)}\n`)
+  }
+  await writeFile(join(dir, 'index.json'), `${JSON.stringify(buildIndex(items, version, base), null, 2)}\n`)
+}
+
+async function frozenVersions() {
+  if (!existsSync(releases)) return []
+  const entries = await readdir(releases)
+  return entries.filter((name) => name.endsWith('.json')).map((name) => name.replace(/\.json$/, ''))
+}
+
+async function readRelease(version) {
+  return JSON.parse(await readFile(join(releases, `${version}.json`), 'utf8'))
+}
+
+/*
+ * a published version is immutable. a lockfile written against it names files by hash,
+ * so replacing the bytes under one would report every file as edited.
+ */
+async function guardFrozen(version, items) {
+  const bundle = await readRelease(version)
+  if (JSON.stringify(bundle.items) === JSON.stringify(items)) return
+  throw new Error(`Version ${version} is frozen and the source has moved. Raise the version in package.json.`)
+}
+
+async function freeze(version, items) {
+  const path = join(releases, `${version}.json`)
+  if (existsSync(path)) {
+    console.log(`version ${version} is already frozen`)
+    return
+  }
+  await mkdir(releases, { recursive: true })
+  await writeFile(path, `${JSON.stringify({ version, items }, null, 2)}\n`)
+  console.log(`froze ${items.length} items at version ${version}`)
 }
 
 async function main() {
@@ -161,22 +234,26 @@ async function main() {
     )
   }
 
-  for (const item of items) {
-    await writeFile(join(out, `${item.name}.json`), `${JSON.stringify(item, null, 2)}\n`)
+  const frozen = await frozenVersions()
+  if (frozen.includes(version)) await guardFrozen(version, items)
+
+  /* the flat path is what a user installs from, and it only ever holds the newest */
+  await writeTree(out, items, version, BASE)
+  await writeTree(join(out, version), items, version, `${BASE}/${version}`)
+
+  for (const past of frozen) {
+    if (past === version) continue
+    const bundle = await readRelease(past)
+    await writeTree(join(out, past), bundle.items, past, `${BASE}/${past}`)
   }
 
-  const index = items.map(({ name, type, title: label, dependencies, registryDependencies, sley }) => ({
-    name,
-    type,
-    title: label,
-    dependencies,
-    registryDependencies,
-    url: sley.url,
-  }))
-  const manifest = { $schema: SCHEMA, name: 'sley-ui', version, homepage: BASE, items: index }
-  await writeFile(join(out, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`)
+  const published = [...new Set([version, ...frozen])].sort((a, b) => compareVersions(b, a))
+  await writeFile(join(out, 'versions.json'), `${JSON.stringify({ latest: version, versions: published }, null, 2)}\n`)
 
   console.log(`wrote ${items.length} registry items at version ${version} to ${out}`)
+  console.log(`serving ${published.length} version(s): ${published.join(', ')}`)
+
+  if (process.argv.includes('--freeze')) await freeze(version, items)
 }
 
 await main()
