@@ -1,0 +1,61 @@
+name: Bug report
+description: Something in a component, the CLI or the registry does not behave as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Two version numbers move separately here. The registry names a release of the components,
+        the CLI a release of the tool, so please give both.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reach it
+      description: The commands you ran, or the props you passed. A small snippet beats a description.
+    validations:
+      required: true
+
+  - type: input
+    id: registry
+    attributes:
+      label: Registry version
+      description: The version beside the component in your `sley.lock`.
+      placeholder: "0.2.1"
+    validations:
+      required: true
+
+  - type: input
+    id: cli
+    attributes:
+      label: CLI version
+      description: The output of `npx sley-ui --version`.
+      placeholder: "0.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework
+      options:
+        - Vite
+        - Next
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Only for something you can see. Name the browser and the version.
+      placeholder: "Chrome 140"
