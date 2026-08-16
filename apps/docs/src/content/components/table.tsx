@@ -2,21 +2,36 @@ import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { Table } from '@/components/ui/table/Table'
 import { runColumns } from '@demo/columns'
-import { longRuns, runs } from '@demo/runs'
+import { longRuns, runs, type Run } from '@demo/runs'
 import { Demo } from '../../site/Demo'
 import { Code, P } from '../../site/Prose'
 import type { ComponentDoc } from '../types'
 
+const SHORT = runs.slice(0, 9)
+const LONG_ROWS = 1000
+const LOAD_MS = 450
+
 const TableDemo = () => {
   const [loading, setLoading] = useState(false)
   const [long, setLong] = useState(false)
+  const [rows, setRows] = useState<readonly Run[]>(SHORT)
   const columns = useMemo(() => runColumns(() => {}), [])
-  const rows = useMemo(() => (long ? longRuns(5000) : runs.slice(0, 9)), [long])
+
+  /* the batch is built in memory, and the pause stands in for the fetch a real application makes */
+  const toggleLong = () => {
+    const next = !long
+    setLong(next)
+    setLoading(true)
+    window.setTimeout(() => {
+      setRows(next ? longRuns(LONG_ROWS) : SHORT)
+      setLoading(false)
+    }, LOAD_MS)
+  }
 
   return (
     <Demo
       bleed
-      caption="Drag a divider to resize. Click a head to sort, three times to get the original order back. At 5000 rows the body holds about 30 of them and the rest is spacer height."
+      caption="Drag a divider to resize. Click a head to sort, three times to get the original order back. At 1000 rows the body holds about 30 of them and the rest is spacer height."
     >
       <Table
         rows={rows}
@@ -27,7 +42,7 @@ const TableDemo = () => {
         loading={loading}
         actions={
           <>
-            <Button onClick={() => setLong((current) => !current)}>{long ? 'Back to 9 rows' : 'Load 5000 rows'}</Button>
+            <Button onClick={toggleLong}>{long ? `Back to ${SHORT.length} rows` : `Load ${LONG_ROWS} rows`}</Button>
             <Button onClick={() => setLoading((current) => !current)}>
               {loading ? 'Show the rows' : 'Show the loading state'}
             </Button>
@@ -112,10 +127,16 @@ export const doc: ComponentDoc = {
   ],
   measured: [
     {
-      value: '84.4ms to 18.4ms',
-      what: 'The median scroll step at 5000 rows, before and after the row window',
+      value: '1000 rows to 31',
+      what: 'What the body actually holds at the size the demo above loads',
       detail:
-        'Compact, ten columns. Without the window the body holds 5000 rows and 60,000 cells. With it, 30 rows and 349 cells. Ten scroll steps of 400px, median taken.',
+        'Compact, ten columns: 12,000 cells become 350. The median scroll step only falls from 22.5ms to 19.6ms at this size, because a browser scrolls 1000 rows perfectly well. The window is buying headroom here, not speed.',
+    },
+    {
+      value: '84.4ms to 18.4ms',
+      what: 'Where that headroom pays, at 5000 rows',
+      detail:
+        'Same method, five times the data. Without the window: 5000 rows, 60,000 cells. With it: 30 rows, 349 cells. Ten scroll steps of 400px, median taken.',
     },
     {
       value: '0px',
