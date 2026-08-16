@@ -62,11 +62,51 @@ export const Updates = () => (
       </Note>
     </Section>
 
+    <Section id="merge" title="What the merge does">
+      <P>
+        <Code>sley update</Code> fetches two things: the version your lockfile names, from its frozen
+        path, and the newest one. With your file on disk that makes the three inputs, and the rest is
+        a line-based diff3 written into the CLI. There is no shell out to git, because the one feature
+        that defines this tool should not need another tool installed to work.
+      </P>
+      <CodeBlock
+        code={`npx sley-ui update            every item in the lockfile
+npx sley-ui update table      one of them
+npx sley-ui update --dry-run  what would change, writing nothing`}
+      />
+      <P>
+        Four things can happen to a file. If you never touched it, it takes the new version outright.
+        If I did not touch it, yours stays exactly as you wrote it. If we both did, the merge runs. If
+        you deleted it, the item stops and tells you. A file I add is written, and a file I drop is
+        reported and never deleted, because your code may still import it.
+      </P>
+      <P>
+        An item moves whole or not at all. A half-written item would record a base that no file on
+        disk ever came from, and every later update would read that base as the truth.
+      </P>
+    </Section>
+
+    <Section id="conflicts" title="When we edit the same lines">
+      <P>
+        Nothing is written. The command names the files that need you to decide and stops, so your
+        project still builds. Passing <Code>--conflicts</Code> writes the usual markers into those
+        files instead, which is the escape hatch when you would rather resolve it in your editor.
+      </P>
+      <Note>
+        With the markers written, the lock moves too. It has to: if the base stayed at the old
+        version, the file you resolved by hand would conflict against it again on every later run, and
+        the item could never advance. I got that wrong first, and only found it by running the real
+        command against a real second release.
+      </Note>
+    </Section>
+
     <Section id="status" title="Where this stands">
       <P>
-        The lockfile and the versioned registry are built and working. The merge itself is the next
-        piece of work. I wrote the hashes in from the first release rather than retrofitting them,
-        so nobody who installs early is left without a base to merge against.
+        Built and published in <Code>sley-ui@0.2.0</Code>. I wrote the hashes in from the first
+        release rather than retrofitting them, so nobody who installed early is left without a base to
+        merge against, and the merge has been run across three real releases on this registry: a
+        project sitting on an older version, carrying its own edits to a substantially rewritten file,
+        came out with both my changes and its own and still compiled.
       </P>
     </Section>
   </article>
