@@ -2,31 +2,36 @@ import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { Table } from '@/components/ui/table/Table'
 import { runColumns } from '@demo/columns'
-import { runs } from '@demo/runs'
+import { longRuns, runs } from '@demo/runs'
 import { Demo } from '../../site/Demo'
 import { Code, P } from '../../site/Prose'
 import type { ComponentDoc } from '../types'
 
 const TableDemo = () => {
   const [loading, setLoading] = useState(false)
+  const [long, setLong] = useState(false)
   const columns = useMemo(() => runColumns(() => {}), [])
+  const rows = useMemo(() => (long ? longRuns(5000) : runs.slice(0, 9)), [long])
 
   return (
     <Demo
       bleed
-      caption="Drag a divider to resize. Click a head to sort, three times to get the original order back."
+      caption="Drag a divider to resize. Click a head to sort, three times to get the original order back. At 5000 rows the body holds about 30 of them and the rest is spacer height."
     >
       <Table
-        rows={runs.slice(0, 9)}
+        rows={rows}
         columns={columns}
         rowId={(run) => run.id}
         title="Sequencing runs"
         noun={['run', 'runs']}
         loading={loading}
         actions={
-          <Button onClick={() => setLoading((current) => !current)}>
-            {loading ? 'Show the rows' : 'Show the loading state'}
-          </Button>
+          <>
+            <Button onClick={() => setLong((current) => !current)}>{long ? 'Back to 9 rows' : 'Load 5000 rows'}</Button>
+            <Button onClick={() => setLoading((current) => !current)}>
+              {loading ? 'Show the rows' : 'Show the loading state'}
+            </Button>
+          </>
         }
       />
     </Demo>
