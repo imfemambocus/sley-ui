@@ -408,7 +408,7 @@ export const Table = <T,>({
   }
 
   return (
-    <section className={cx('@container border border-reed bg-raised', className)}>
+    <section className={cx('@container isolate border border-reed bg-raised', className)}>
       <header className="flex items-center justify-between gap-(--stack) border-b border-reed px-(--cell-x) py-(--stack)">
         <h2 className="font-medium">{title}</h2>
         <div className="flex items-center gap-(--stack)">
