@@ -1,4 +1,13 @@
-import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+  type UIEvent,
+} from 'react'
 import { Checkbox, type CheckedState } from '@/components/ui/checkbox/Checkbox'
 import { EmptyState } from '@/components/ui/empty-state/EmptyState'
 import { Tooltip } from '@/components/ui/tooltip/Tooltip'
@@ -29,6 +38,13 @@ const KEY_STEP = 8
 
 /* the 7px mark and its 6px gap: two characters cover both in every density */
 const SORT_CHARS = 2
+
+/*
+ * below this many rows the whole body is rendered. the widest viewport shows about 20
+ * rows at the dense height, so this leaves several screens before a window is worth it.
+ */
+const WINDOW_MIN = 100
+const OVERSCAN = 6
 
 /* doubles as the left offset of the pinned column beside it */
 const GUTTER = 'calc(var(--cell-x) * 2 + var(--ctl-box))'
@@ -169,6 +185,13 @@ const WarpRows = ({ span }: { readonly span: number }) => (
   </>
 )
 
+/* the rows outside the window still take their height, so the scrollbar tells the truth */
+const Spacer = ({ span, height }: { readonly span: number; readonly height: number }) => (
+  <tr aria-hidden="true">
+    <td colSpan={span} style={{ height, padding: 0, border: 0 }} />
+  </tr>
+)
+
 interface EmptyRowProps {
   readonly span: number
   readonly message: string
@@ -188,10 +211,12 @@ interface RowProps<T> {
   readonly columns: readonly Column<T>[]
   readonly selected: boolean
   readonly onToggle: (id: string) => void
+  readonly rowIndex: number
 }
 
-const Row =<T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (
+const Row = <T,>({ row, id, columns, selected, onToggle, rowIndex }: RowProps<T>) => (
   <tr
+    aria-rowindex={rowIndex}
     className="bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash"
     data-selected={selected ? '' : undefined}
   >
@@ -285,6 +310,56 @@ export const Table = <T,>({
     return 'indeterminate'
   }, [active, rows.length])
 
+  /*
+   * every row is exactly --row-h, so the window is arithmetic and needs no per row
+   * measurement. the height is read off a real row rather than the token, which keeps
+   * it right when the density changes under the component.
+   */
+  const scroller = useRef<HTMLDivElement>(null)
+  const headRow = useRef<HTMLTableRowElement>(null)
+  const [metrics, setMetrics] = useState({ rowHeight: 0, viewport: 0 })
+  const [scrollTop, setScrollTop] = useState(0)
+
+  const long = ordered.length > WINDOW_MIN
+
+  /*
+   * the head row carries the same --row-h and keeps its identity for the life of the
+   * table, so it is the one element that can be observed. a body row is re-keyed on
+   * every scroll, which leaves the observer watching a detached node.
+   */
+  useEffect(() => {
+    const box = scroller.current
+    const head = headRow.current
+    if (!box || !head || !long) return undefined
+
+    const read = () => setMetrics({ rowHeight: head.getBoundingClientRect().height, viewport: box.clientHeight })
+    read()
+
+    const observer = new ResizeObserver(read)
+    observer.observe(box)
+    observer.observe(head)
+    return () => observer.disconnect()
+  }, [long])
+
+  const view = useMemo(() => {
+    const whole = { start: 0, end: ordered.length, before: 0, after: 0 }
+    if (!long || metrics.rowHeight === 0) return whole
+
+    const visible = Math.ceil(metrics.viewport / metrics.rowHeight)
+    const start = Math.max(0, Math.floor(scrollTop / metrics.rowHeight) - OVERSCAN)
+    const end = Math.min(ordered.length, start + visible + OVERSCAN * 2)
+    return {
+      start,
+      end,
+      before: start * metrics.rowHeight,
+      after: (ordered.length - end) * metrics.rowHeight,
+    }
+  }, [long, metrics, scrollTop, ordered.length])
+
+  const onScroll = (event: UIEvent<HTMLDivElement>) => {
+    if (long) setScrollTop(event.currentTarget.scrollTop)
+  }
+
   const applySelection = (next: ReadonlySet<string>) => {
     setSelected(next)
     onSelectionChange?.(new Set([...next].filter((id) => onScreen.has(id))))
@@ -309,10 +384,27 @@ export const Table = <T,>({
   const renderBody = () => {
     if (loading) return <WarpRows span={span} />
     if (ordered.length === 0) return <EmptyRow span={span} message={emptyMessage} />
-    return ordered.map((row) => {
-      const id = rowId(row)
-      return <Row key={id} row={row} id={id} columns={columns} selected={selected.has(id)} onToggle={toggleRow} />
-    })
+    return (
+      <>
+        {view.before > 0 && <Spacer span={span} height={view.before} />}
+        {ordered.slice(view.start, view.end).map((row, offset) => {
+          const id = rowId(row)
+          return (
+            <Row
+              key={id}
+              /* the head is row 1, and aria counts from there whatever the window shows */
+              rowIndex={view.start + offset + 2}
+              row={row}
+              id={id}
+              columns={columns}
+              selected={selected.has(id)}
+              onToggle={toggleRow}
+            />
+          )
+        })}
+        {view.after > 0 && <Spacer span={span} height={view.after} />}
+      </>
+    )
   }
 
   return (
@@ -331,11 +423,15 @@ export const Table = <T,>({
         </div>
       </header>
 
-      <div className="reed-scroll max-h-130 overflow-auto">
+      <div ref={scroller} onScroll={onScroll} className="reed-scroll max-h-130 overflow-auto">
         {/* separate borders: a pinned cell paints its background over a collapsed one */}
-        <table aria-busy={loading} className="w-full table-fixed border-separate border-spacing-0 text-left">
+        <table
+          aria-busy={loading}
+          aria-rowcount={ordered.length + 1}
+          className="w-full table-fixed border-separate border-spacing-0 text-left"
+        >
           <thead className="sticky top-0 z-(--z-sticky)">
-            <tr className="bg-raised select-none">
+            <tr ref={headRow} aria-rowindex={1} className="bg-raised select-none">
               <th
                 scope="col"
                 className="reed-edge warp-line-end sticky left-0 z-(--z-pinned) bg-raised px-(--cell-x)"
