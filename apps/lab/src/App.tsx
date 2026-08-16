@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { CommandPalette, type Command } from '@/components/ui/command-palette/CommandPalette'
 import { FilterBar, type FilterValues } from '@/components/ui/filter-bar/FilterBar'
@@ -19,6 +19,9 @@ const THEMES = ['dark', 'light'] as const
 type Theme = (typeof THEMES)[number]
 
 const KNOBS = ['--row-h', '--cell-x', '--ui-text', '--ctl-h', '--stack', '--reed-pitch'] as const
+
+const LONG_ROWS = 1000
+const LOAD_MS = 450
 
 interface Knob {
   readonly name: string
@@ -57,6 +60,7 @@ export const App = () => {
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [long, setLong] = useState(false)
+  const [source, setSource] = useState<readonly Run[]>(runs)
   const [knobs, setKnobs] = useState<readonly Knob[]>([])
   const [detail, setDetail] = useState<Run | null>(null)
   const [pending, setPending] = useState<Run | null>(null)
@@ -82,7 +86,17 @@ export const App = () => {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  const source = useMemo(() => (long ? longRuns(5000) : runs), [long])
+  /* the batch is built in memory, and the pause stands in for the fetch a real application makes */
+  const toggleLong = useCallback(() => {
+    const next = !long
+    setLong(next)
+    setLoading(true)
+    window.setTimeout(() => {
+      setSource(next ? longRuns(LONG_ROWS) : runs)
+      setLoading(false)
+    }, LOAD_MS)
+  }, [long])
+
   const visible = useMemo(() => source.filter((run) => matchesFilters(run, query, values)), [source, query, values])
 
   const exportable = useMemo(() => visible.filter((run) => selected.has(run.id)).length, [visible, selected])
@@ -149,8 +163,8 @@ export const App = () => {
       {
         id: 'table-long',
         group: 'Table',
-        label: 'Toggle 5000 rows',
-        run: () => setLong((current) => !current),
+        label: `Toggle ${LONG_ROWS} rows`,
+        run: () => toggleLong(),
       },
       {
         id: 'table-columns',
@@ -165,7 +179,7 @@ export const App = () => {
         run: () => setDetail(runs[0]),
       },
     ],
-    [],
+    [toggleLong],
   )
 
   return (
