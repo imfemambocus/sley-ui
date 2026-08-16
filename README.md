@@ -37,7 +37,7 @@ You own the code, so a normal registry cannot update it. Sley UI records the sou
 
 ## Status
 
-Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state. `init` and `add` work on a fresh Vite app and a fresh Next app. The docs site is built and carries a running demo application. Nothing is deployed yet, and neither the package nor the registry is published, so the commands above do not run outside this repo. `update` comes next. Expect breaking changes.
+Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.1.0, and `init` and `add` install from it on a fresh Vite app and a fresh Next app. The CLI itself is not published yet, so the commands above do not run until it is. `update` comes next. Expect breaking changes.
 
 To read the docs locally, clone this repo and run `npm install && npm run dev -w docs`.
 
