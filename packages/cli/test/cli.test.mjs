@@ -45,6 +45,8 @@ async function project(files) {
 
 const TAILWIND = '@import "tailwindcss";\n'
 
+const TOUCHED = ['tsconfig.app.json', 'vite.config.ts', 'src/index.css']
+
 /* a fresh vite template splits its options out and holds comments in the file */
 function viteProject(prefix = '@') {
   return project({
@@ -199,4 +201,17 @@ test('an edited file is kept until overwrite is asked for', async () => {
 test('add refuses to run before init', async () => {
   const cwd = await viteProject()
   assert.throws(() => sley(cwd, ['add', 'table']), /components\.json/)
+})
+
+test('init that refuses a project leaves every file of it alone', async () => {
+  const cwd = await viteProject()
+  await writeFile(join(cwd, 'src/index.css'), 'body { margin: 0 }\n')
+  const original = await Promise.all(TOUCHED.map((path) => readFile(join(cwd, path), 'utf8')))
+
+  assert.throws(() => sley(cwd, ['init']), /Tailwind/)
+
+  const current = await Promise.all(TOUCHED.map((path) => readFile(join(cwd, path), 'utf8')))
+  assert.deepEqual(current, original)
+  assert.equal(existsSync(join(cwd, 'components.json')), false)
+  assert.equal(existsSync(join(cwd, 'sley.lock')), false)
 })

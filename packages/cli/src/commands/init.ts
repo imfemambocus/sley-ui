@@ -52,6 +52,9 @@ export async function init(options: InitOptions) {
   const tsconfigPath = await findTsconfig(cwd)
   const notes: string[] = []
 
+  // every precondition runs before the first write, so a refusal leaves the project alone
+  const cssEntry = await findCssEntry(cwd)
+
   let alias = await readAlias(tsconfigPath)
   if (!alias) {
     const sourceDir = exists(join(cwd, 'src')) ? join(cwd, 'src') : cwd
@@ -70,7 +73,6 @@ export async function init(options: InitOptions) {
     )
   }
 
-  const cssEntry = await findCssEntry(cwd)
   const project: Project = {
     cwd,
     framework,
