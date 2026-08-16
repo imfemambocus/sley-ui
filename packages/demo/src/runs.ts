@@ -47,3 +47,21 @@ export const runs: readonly Run[] = [
   { id: 'R-4796', sample: 'LCS-0877-B', assay: 'Exome', status: 'failed', reads: 0.4, q30: 48.9, coverage: 0, started: '2026-08-06T18:31', duration: 4, owner: 'J. Müller' },
   { id: 'R-4795', sample: 'LCS-0876-C', assay: 'Methyl', status: 'complete', reads: 231.5, q30: 78.4, coverage: 19.8, started: '2026-08-06T05:14', duration: 492, owner: 'K. Lentz' },
 ]
+
+/*
+ * a batch large enough for the table to window its rows. the ids keep counting down from
+ * the last real run, and the reads and duration drift, so no two rows read as a copy.
+ */
+export function longRuns(count: number): readonly Run[] {
+  const oldest = Number(runs[runs.length - 1].id.slice(2))
+  return Array.from({ length: count }, (_, index) => {
+    const seed = runs[index % runs.length]
+    return {
+      ...seed,
+      id: `R-${oldest - index - 1}`,
+      sample: `LCS-${String(2000 + index).padStart(4, '0')}-${'ABCDE'[index % 5]}`,
+      reads: Math.round((seed.reads + (index % 37) * 1.7) * 10) / 10,
+      duration: seed.duration + (index % 53),
+    }
+  })
+}
