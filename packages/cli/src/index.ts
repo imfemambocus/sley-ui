@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { parseArgs } from 'node:util'
 import { add } from './commands/add.js'
 import { init } from './commands/init.js'
+import { update, type UpdateStatus, type UpdatedItem } from './commands/update.js'
 import type { AppliedFile } from './lib/apply.js'
 import { parseJsonc } from './lib/files.js'
 
@@ -13,11 +14,14 @@ const HELP = `sley - add Sley UI components to your project
 Usage
   sley init [options]
   sley add <component>... [options]
+  sley update [component]... [options]
 
 Options
   --cwd <dir>          the project directory. the default is the current one
   --registry <source>  a url or a directory. the default is ${DEFAULT_REGISTRY}
   --overwrite          replace a file that you edited
+  --conflicts          on update, write the conflict markers into the file
+  --dry-run            on update, report what would change and write nothing
   --no-install         do not install the npm dependencies
   --version            print the version
   --help               print this text
@@ -33,6 +37,38 @@ function report(files: readonly AppliedFile[]) {
   for (const file of files) {
     console.log(`${MARK[file.status]} ${file.path}`)
   }
+}
+
+const UPDATE_MARK: Record<UpdateStatus, string> = {
+  updated: '  +',
+  merged: '  ~',
+  conflicted: '  !',
+  kept: '  =',
+  added: '  +',
+  missing: '  ?',
+  dropped: '  -',
+}
+
+const pathsWhere = (items: readonly UpdatedItem[], status: UpdateStatus) =>
+  items.flatMap((item) => item.files.filter((file) => file.status === status).map((file) => file.path))
+
+function warnConflicted(items: readonly UpdatedItem[]) {
+  const held = items.filter((item) => !item.applied)
+  const marked = pathsWhere(items.filter((item) => item.applied), 'conflicted')
+
+  if (marked.length > 0) {
+    console.log(`\nThe conflict markers are in: ${marked.join(', ')}. Resolve them before you build.`)
+  }
+  if (held.length === 0) return
+
+  const undecided = pathsWhere(held, 'conflicted')
+  const missing = pathsWhere(held, 'missing')
+
+  console.log(`\n${held.length} item(s) were not updated, and their lock entries did not move.`)
+  if (undecided.length > 0) {
+    console.log(`These files need a merge you have to decide: ${undecided.join(', ')}. Run sley update --conflicts to get the markers.`)
+  }
+  if (missing.length > 0) console.log(`These files are gone from the project: ${missing.join(', ')}.`)
 }
 
 function warnEdited(files: readonly AppliedFile[]) {
@@ -54,6 +90,8 @@ async function main() {
       cwd: { type: 'string' },
       registry: { type: 'string' },
       overwrite: { type: 'boolean', default: false },
+      conflicts: { type: 'boolean', default: false },
+      'dry-run': { type: 'boolean', default: false },
       'no-install': { type: 'boolean', default: false },
       version: { type: 'boolean', default: false },
       help: { type: 'boolean', default: false },
@@ -76,6 +114,8 @@ async function main() {
     registry: values.registry ?? DEFAULT_REGISTRY,
     overwrite: values.overwrite,
     install: !values['no-install'],
+    conflicts: values.conflicts,
+    dryRun: values['dry-run'],
   }
 
   if (command === 'init') {
@@ -102,6 +142,24 @@ async function main() {
       console.log(result.installed ? `\nInstalled ${line}.` : `\nInstall these yourself: ${line}`)
     }
     warnEdited(result.added.flatMap((item) => item.files))
+    return
+  }
+
+  if (command === 'update') {
+    const result = await update(names, options)
+    for (const item of result.updated) {
+      console.log(item.from === null ? `${item.name} ${item.to}, new` : `${item.name} ${item.from} to ${item.to}`)
+      for (const file of item.files) {
+        console.log(`${UPDATE_MARK[file.status]} ${file.path}`)
+      }
+    }
+    if (result.updated.length === 0) console.log(`Everything is current. ${result.current} item(s) checked.`)
+    if (result.packages.length > 0) {
+      const line = result.packages.join(' ')
+      console.log(result.installed ? `\nInstalled ${line}.` : `\nInstall these yourself: ${line}`)
+    }
+    warnConflicted(result.updated)
+    if (options.dryRun) console.log('\nNothing was written, because of --dry-run.')
     return
   }
 

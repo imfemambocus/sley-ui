@@ -24,7 +24,7 @@ function retarget(content: string, prefix: string) {
  * the lock hashes what was written, not what the registry sent. an alias of its own
  * and the client directive both change the file.
  */
-function transform(content: string, prefix: string, client: boolean) {
+export function transform(content: string, prefix: string, client: boolean) {
   const retargeted = retarget(content, prefix)
   if (!client || retargeted.startsWith("'use") || retargeted.startsWith('"use')) return retargeted
   return CLIENT_DIRECTIVE + retargeted
