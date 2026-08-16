@@ -9,7 +9,7 @@ import { ColumnMenu } from '@demo/ColumnMenu'
 import { RunPanel } from '@demo/RunPanel'
 import { runColumns } from '@demo/columns'
 import { RUN_GROUPS, matchesFilters } from '@demo/filters'
-import { runs, type Run } from '@demo/runs'
+import { longRuns, runs, type Run } from '@demo/runs'
 import { toaster } from '@demo/toaster'
 
 const DENSITIES = ['comfortable', 'compact', 'dense'] as const
@@ -56,6 +56,7 @@ export const App = () => {
   const [values, setValues] = useState<FilterValues>({})
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [long, setLong] = useState(false)
   const [knobs, setKnobs] = useState<readonly Knob[]>([])
   const [detail, setDetail] = useState<Run | null>(null)
   const [pending, setPending] = useState<Run | null>(null)
@@ -81,7 +82,8 @@ export const App = () => {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  const visible = useMemo(() => runs.filter((run) => matchesFilters(run, query, values)), [query, values])
+  const source = useMemo(() => (long ? longRuns(5000) : runs), [long])
+  const visible = useMemo(() => source.filter((run) => matchesFilters(run, query, values)), [source, query, values])
 
   const exportable = useMemo(() => visible.filter((run) => selected.has(run.id)).length, [visible, selected])
 
@@ -143,6 +145,12 @@ export const App = () => {
         group: 'Table',
         label: 'Toggle the loading state',
         run: () => setLoading((current) => !current),
+      },
+      {
+        id: 'table-long',
+        group: 'Table',
+        label: 'Toggle 5000 rows',
+        run: () => setLong((current) => !current),
       },
       {
         id: 'table-columns',
