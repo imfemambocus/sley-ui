@@ -83,6 +83,12 @@ const Notes = () => (
       this switches on, a browser searching ten thousand rows was not helping anyone either.
     </P>
     <P>
+      The frame owns its stacking context. The head at <Code>--z-sticky</Code> and the pinned cells
+      under it are ranked inside the table, so neither can tie with the sticky header of the
+      application around them. Two elements at one rank are settled by document order, and a table is
+      usually the last thing on the page, which decides it the wrong way round.
+    </P>
+    <P>
       The loading state is the loom threaded and standing still: the warp in the reed with no weft
       through it. Each row adds one <Code>--dur-instant</Code> of delay, so the beat travels down the
       list. The empty state uses the same field and does not move.
