@@ -24,7 +24,7 @@
     "url": "https://github.com/imfemambocus/sley-ui/issues"
   },
   "bin": {
-    "sley": "./dist/index.js"
+    "sley": "dist/index.js"
   },
   "files": [
     "dist"
