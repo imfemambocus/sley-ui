@@ -1,7 +1,9 @@
 {
   "buildCommand": "npm run build -w @sley-ui/registry && npm run build -w docs",
   "outputDirectory": "apps/docs/dist",
-  "rewrites": [{ "source": "/((?!r/|assets/|favicon).*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/((?!r/|assets/|favicon|og.png|robots.txt|sitemap.xml).*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/r/:version(\\d+\\.\\d+\\.\\d+[^/]*)/:file*",

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sley-ui.dev/sitemap.xml
