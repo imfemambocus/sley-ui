@@ -39,7 +39,7 @@ Where your edit and mine land on the same lines, nothing is written. It tells yo
 
 ## Status
 
-Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.1.0, and the CLI is published at the same version, so the commands above run today on a fresh Vite app and a fresh Next app. `update` is built but not published yet: the CLI on npm is `init` and `add` only, and the next release carries the merge. Expect breaking changes.
+Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.1.0, and the CLI is on npm at 0.2.0, so every command above runs today on a fresh Vite app and a fresh Next app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes.
 
 To read the docs locally, clone this repo and run `npm install && npm run dev -w docs`.
 
