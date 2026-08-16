@@ -124,6 +124,28 @@ export const doc: ComponentDoc = {
       type: '(selected: ReadonlySet<string>) => void',
       detail: 'Reports only the selected rows that are currently on screen.',
     },
+    { name: 'key (Column)', type: 'string', required: true, detail: 'Identifies the column for sorting and resizing.' },
+    { name: 'label (Column)', type: 'string', required: true, detail: 'The head text.' },
+    {
+      name: 'chars (Column)',
+      type: 'number',
+      required: true,
+      detail: 'The widest plausible value in characters. The density turns it into a width, so never give pixels.',
+    },
+    {
+      name: 'render (Column)',
+      type: '(row: T) => ReactNode',
+      required: true,
+      detail: 'The cell. A function, so a page that declares columns is a client component in Next.',
+    },
+    { name: 'unit (Column)', type: 'string', detail: 'Stated once in the head, never repeated in a cell.' },
+    { name: 'hint (Column)', type: 'string', detail: 'A tooltip on the head button that is already there.' },
+    { name: 'numeric (Column)', type: 'boolean', detail: 'Right aligns and sets the data face with tabular figures.' },
+    {
+      name: 'sortValue (Column)',
+      type: '(row: T) => string | number',
+      detail: 'Sorts the model, never the text in the cell. Without it the head draws no control.',
+    },
   ],
   measured: [
     {
