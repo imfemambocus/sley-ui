@@ -24,7 +24,7 @@ export const Header = ({ onOpenPalette, onOpenNav }: HeaderProps) => {
   return (
     <header className="reed-edge sticky top-0 z-(--z-sticky) bg-ground/85 backdrop-blur-md">
       <div className="mx-auto flex h-15 max-w-360 items-center gap-5 px-4 sm:px-6">
-        <Link href="/" aria-label="Sley UI, home">
+        <Link href="/" aria-label="Sley UI, home" className="flex items-center">
           <Wordmark />
         </Link>
 
