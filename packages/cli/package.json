@@ -35,7 +35,7 @@
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc -b",
-    "test": "node --test test/cli.test.mjs",
+    "test": "node --test test/cli.test.mjs test/merge.test.mjs test/update.test.mjs",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
