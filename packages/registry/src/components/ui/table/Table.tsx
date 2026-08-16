@@ -50,6 +50,12 @@ function ariaSort<T>(sort: Sort | null, column: Column<T>) {
   return sort.direction === 'asc' ? 'ascending' : 'descending'
 }
 
+/* a plural noun alone reads "1 rows" at a count of one, so a caller can give both forms */
+function countNoun(noun: string | readonly [one: string, many: string], count: number) {
+  if (typeof noun === 'string') return noun
+  return count === 1 ? noun[0] : noun[1]
+}
+
 function clampWidth(value: number) {
   return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, Math.round(value)))
 }
@@ -218,7 +224,7 @@ interface TableProps<T> {
   readonly columns: readonly Column<T>[]
   readonly rowId: (row: T) => string
   readonly title: string
-  readonly noun?: string
+  readonly noun?: string | readonly [one: string, many: string]
   readonly emptyMessage?: string
   readonly loading?: boolean
   readonly actions?: ReactNode
@@ -316,7 +322,9 @@ export const Table = <T,>({
         <div className="flex items-center gap-(--stack)">
           {!loading && (
             <p className="text-weft-dim tnum">
-              {active.size > 0 ? `${active.size} of ${rows.length} selected` : `${rows.length} ${noun}`}
+              {active.size > 0
+                ? `${active.size} of ${rows.length} selected`
+                : `${rows.length} ${countNoun(noun, rows.length)}`}
             </p>
           )}
           {actions}
@@ -333,7 +341,7 @@ export const Table = <T,>({
                 className="reed-edge warp-line-end sticky left-0 z-(--z-pinned) bg-raised px-(--cell-x)"
                 style={{ height: 'var(--row-h)', width: GUTTER }}
               >
-                <Checkbox checked={headerState} onCheckedChange={toggleAll} label={`Select all ${noun}`} />
+                <Checkbox checked={headerState} onCheckedChange={toggleAll} label={`Select all ${countNoun(noun, 2)}`} />
               </th>
               {columns.map((column, index) => (
                 <th
