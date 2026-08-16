@@ -80,7 +80,7 @@ export const Home = () => (
       <RunConsole />
     </section>
 
-    <section className="mx-auto grid w-full max-w-360 gap-x-12 gap-y-8 px-4 pb-8 sm:px-6 md:grid-cols-3">
+    <section className="mx-auto grid w-full max-w-360 gap-x-12 gap-y-8 px-4 pb-8 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
       <Pitch title="Density is the design problem">
         Three modes on the root element, and six custom properties behind them. Row height, cell
         padding, control height, text size, stack gap and the pitch of the reed all move together, so
@@ -91,9 +91,14 @@ export const Home = () => (
         rather than a hyphen. A value under its threshold carries the reed under its own digits, and
         the units live in the column head where they are stated once.
       </Pitch>
+      <Pitch title="It holds at volume too">
+        Past a hundred rows the table renders only what the viewport holds, and two spacers keep the
+        scrollbar honest. The density scale already fixes the row height, so the window is arithmetic
+        rather than measurement: no dependency, and nothing to configure.
+      </Pitch>
       <Pitch title="You own the code">
         A command copies the source into your project and you keep it. The lockfile records the
-        version and the hash of every file it wrote, so an update can merge my changes into yours
+        version and the hash of every file it wrote, so an update merges my changes into yours
         instead of overwriting them.
       </Pitch>
     </section>
