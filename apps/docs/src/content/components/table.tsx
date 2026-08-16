@@ -55,6 +55,14 @@ const Notes = () => (
       judgement, not the component's.
     </P>
     <P>
+      Past a hundred rows the body renders only what the viewport holds, plus a small buffer, with
+      two spacer rows carrying the height of everything else. Below that count nothing changes at
+      all. Every row is exactly <Code>--row-h</Code>, so the window is arithmetic rather than
+      measurement, which is a payoff of the density scale I did not expect when I set it. Find in
+      page will not reach a row that is not rendered, and that is the honest cost. At the sizes where
+      this switches on, a browser searching ten thousand rows was not helping anyone either.
+    </P>
+    <P>
       The loading state is the loom threaded and standing still: the warp in the reed with no weft
       through it. Each row adds one <Code>--dur-instant</Code> of delay, so the beat travels down the
       list. The empty state uses the same field and does not move.
@@ -98,6 +106,18 @@ export const doc: ComponentDoc = {
     },
   ],
   measured: [
+    {
+      value: '84.4ms to 18.4ms',
+      what: 'The median scroll step at 5000 rows, before and after the row window',
+      detail:
+        'Compact, ten columns. Without the window the body holds 5000 rows and 60,000 cells. With it, 30 rows and 349 cells. Ten scroll steps of 400px, median taken.',
+    },
+    {
+      value: '0px',
+      what: 'How far the scroll height is out after a density change, at every density',
+      detail:
+        'The spacers hold the height of the rows outside the window, so the scrollbar tells the truth. 200040px at comfortable, 160032px at compact, 125025px at dense, all exact. The row height is read off the head row, which keeps its identity; a body row is re-keyed on every scroll and left the observer watching a detached node.',
+    },
     {
       value: '609px',
       what: 'How far the demo above scrolls at 390px wide, in compact',
