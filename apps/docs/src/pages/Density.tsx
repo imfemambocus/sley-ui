@@ -58,7 +58,7 @@ const LiveTable = () => {
         columns={columns}
         rowId={(run) => run.id}
         title="Sequencing runs"
-        noun="runs"
+        noun={['run', 'runs']}
       />
     </Demo>
   )

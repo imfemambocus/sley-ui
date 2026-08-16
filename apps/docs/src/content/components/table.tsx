@@ -21,7 +21,7 @@ const TableDemo = () => {
         columns={columns}
         rowId={(run) => run.id}
         title="Sequencing runs"
-        noun="runs"
+        noun={['run', 'runs']}
         loading={loading}
         actions={
           <Button onClick={() => setLoading((current) => !current)}>
@@ -83,7 +83,11 @@ export const doc: ComponentDoc = {
     },
     { name: 'rowId', type: '(row: T) => string', required: true, detail: 'A stable id. Selection is keyed off it.' },
     { name: 'title', type: 'string', required: true, detail: 'The heading in the table header.' },
-    { name: 'noun', type: 'string', detail: 'What the count calls a row. It defaults to "rows".' },
+    {
+      name: 'noun',
+      type: "string | [one, many]",
+      detail: 'What the count calls a row. Give both forms, or one count reads "1 rows". It defaults to "rows".',
+    },
     { name: 'loading', type: 'boolean', detail: 'Swaps the rows for the unwoven warp and hides the count.' },
     { name: 'emptyMessage', type: 'string', detail: 'The title of the empty state when no row survives the filters.' },
     { name: 'actions', type: 'ReactNode', detail: 'Controls in the table header, beside the count.' },

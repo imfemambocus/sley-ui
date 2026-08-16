@@ -80,7 +80,7 @@ export const RunConsole = () => {
         columns={columns}
         rowId={(run) => run.id}
         title="Sequencing runs"
-        noun="runs"
+        noun={['run', 'runs']}
         emptyMessage="No run matches the filters."
         loading={loading}
         onSelectionChange={setSelected}
