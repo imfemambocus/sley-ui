@@ -1,0 +1,572 @@
+{
+  "version": "0.1.0",
+  "items": [
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "tokens",
+      "type": "registry:style",
+      "title": "Tokens",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "styles/tokens.css",
+          "target": "styles/tokens.css",
+          "type": "registry:file",
+          "content": "@custom-variant dense (&:where(:root[data-density='dense'] *));\n\n/* every name comes from the loom. the semantic colours are dyes. */\n@theme {\n  --font-ui: 'Archivo', ui-sans-serif, system-ui, sans-serif;\n  --font-data: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;\n\n  --color-ground: var(--p-ground);\n  --color-raised: var(--p-raised);\n  --color-sunken: var(--p-sunken);\n  --color-shed: var(--p-shed);\n  --color-reed: var(--p-reed);\n  --color-reed-lit: var(--p-reed-lit);\n\n  --color-weft: var(--p-weft);\n  --color-weft-dim: var(--p-weft-dim);\n  --color-weft-faint: var(--p-weft-faint);\n\n  --color-indigo: var(--p-indigo);\n  --color-indigo-wash: var(--p-indigo-wash);\n  --color-jade: var(--p-jade);\n  --color-madder: var(--p-madder);\n  --color-weld: var(--p-weld);\n}\n\n/* the shed is the opening a loom makes and closes: the row under the pointer */\n:root {\n  --p-ground: #0b0d14;\n  --p-raised: #12151f;\n  --p-sunken: #070910;\n  --p-shed: #191d29;\n  --p-reed: #1c2030;\n  --p-reed-lit: #2b3145;\n\n  --p-weft: #e9e5db;\n  --p-weft-dim: #9b9789;\n  --p-weft-faint: #6a6759;\n\n  --p-indigo: #5f72ef;\n  --p-indigo-wash: #1a1f42;\n  --p-jade: #4fa88b;\n  --p-madder: #d2624f;\n  --p-weld: #c9a227;\n\n  --shadow-layer: 0 18px 44px -16px rgb(0 0 0 / 0.62);\n}\n\n:root[data-theme='light'] {\n  --p-ground: #f2f1ec;\n  --p-raised: #faf9f5;\n  --p-sunken: #e8e6df;\n  --p-shed: #f1efe8;\n  --p-reed: #dcd9d0;\n  --p-reed-lit: #c2beb2;\n\n  --p-weft: #14161d;\n  --p-weft-dim: #5c594f;\n  --p-weft-faint: #8a8779;\n\n  --p-indigo: #3a49c4;\n  --p-indigo-wash: #e4e5f7;\n  --p-jade: #2f7a61;\n  --p-madder: #b04430;\n  --p-weld: #8a6f12;\n\n  --shadow-layer: 0 18px 44px -16px rgb(26 24 20 / 0.24);\n}\n\n/*\n * a control reads these and defines none of its own, so one attribute on the root\n * retunes the whole interface.\n */\n:root,\n:root[data-density='compact'] {\n  --row-h: 32px;\n  --cell-x: 10px;\n  --ui-text: 13px;\n  --ctl-h: 28px;\n  --stack: 8px;\n  --reed-pitch: 5px;\n}\n\n:root[data-density='comfortable'] {\n  --row-h: 40px;\n  --cell-x: 14px;\n  --ui-text: 14px;\n  --ctl-h: 34px;\n  --stack: 10px;\n  --reed-pitch: 6px;\n}\n\n:root[data-density='dense'] {\n  --row-h: 25px;\n  --cell-x: 7px;\n  --ui-text: 12px;\n  --ctl-h: 23px;\n  --stack: 6px;\n  --reed-pitch: 4px;\n}\n\n/*\n * a duration is named for what it moves. every layer that leaves the flow declares\n * its rank here: a sticky header makes a stacking context and paints over any layer\n * with no rank.\n */\n:root {\n  --reed-tick: 1px;\n  --ctl-box: 13px;\n\n  /*\n   * vertical-align: middle centres on the x-height. every value here is digits and\n   * capitals, so the band runs baseline to cap height. this is half the difference,\n   * for the data face.\n   */\n  --ctl-lift: 0.091em;\n\n  /* the advance of the data face. a column width can then be a character count. */\n  --data-adv: 0.6em;\n\n  --z-grip: 1;\n  --z-pinned: 5;\n  --z-sticky: 10;\n  /* the panel keeps the page usable: a popover opened inside it paints above it */\n  --z-panel: 20;\n  --z-popover: 30;\n  --z-backdrop: 40;\n  --z-modal: 50;\n\n  --dur-instant: 90ms;\n  --dur-local: 160ms;\n  --dur-overlay: 240ms;\n\n  --ease-beat: cubic-bezier(0.2, 0.9, 0.24, 1);\n  --ease-glide: cubic-bezier(0.33, 0, 0.15, 1);\n  --ease-exit: cubic-bezier(0.5, 0, 0.9, 0.4);\n}\n\n@media (prefers-reduced-motion: reduce) {\n  :root {\n    --dur-instant: 0ms;\n    --dur-local: 0ms;\n    --dur-overlay: 0ms;\n  }\n}\n\n@layer base {\n  body {\n    background-color: var(--color-ground);\n    color: var(--color-weft);\n    font-family: var(--font-ui);\n    font-size: var(--ui-text);\n    -webkit-font-smoothing: antialiased;\n  }\n\n  /* the second selector: a control whose focus lands on a child, like a field with an icon */\n  :focus-visible,\n  .focus-ring:has(:focus-visible) {\n    outline: 2px solid var(--color-indigo);\n    outline-offset: 1px;\n  }\n\n  ::selection {\n    background-color: var(--color-indigo);\n    color: #fff;\n  }\n}\n\n@utility tnum {\n  font-variant-numeric: tabular-nums;\n}\n\n/* a utility, for a state variant to dye a part that ark controls */\n@utility selvedge-on {\n  --selvedge: var(--color-indigo);\n}\n\n/*\n * ark positions its floating parts with an inline `z-index: var(--z-index)` beside\n * an inline `--z-index: auto`. an inline custom property outranks a stylesheet, so\n * this has to be important to reach it. parts ark does not position take a class.\n */\n[data-part='positioner']:not([data-scope='dialog']) {\n  --z-index: var(--z-popover) !important;\n}\n\n@layer components {\n  /* the reed: the evenly spaced slots that hold the warp on a loom */\n  .reed-edge {\n    position: relative;\n  }\n\n  .reed-edge::after {\n    content: '';\n    position: absolute;\n    inset-inline: 0;\n    bottom: 0;\n    height: 2px;\n    background-image: repeating-linear-gradient(\n      90deg,\n      var(--color-reed-lit) 0 var(--reed-tick),\n      transparent var(--reed-tick) var(--reed-pitch)\n    );\n  }\n\n  /*\n   * the same pitch turned a quarter. a cell takes the leading line and a pinned cell\n   * takes the trailing one: the next cell's leading line travels away under it.\n   */\n  .warp-line,\n  .warp-line-end {\n    position: relative;\n  }\n\n  .warp-line::before,\n  .warp-line-end::before {\n    content: '';\n    position: absolute;\n    inset-block: 0;\n    width: 1px;\n    background-image: repeating-linear-gradient(\n      0deg,\n      var(--color-reed) 0 var(--reed-tick),\n      transparent var(--reed-tick) var(--reed-pitch)\n    );\n  }\n\n  /* under the digits, never on the divider: a divider cannot name which value is low */\n  .reed-under {\n    background-image: repeating-linear-gradient(\n      90deg,\n      var(--color-madder) 0 var(--reed-tick),\n      transparent var(--reed-tick) var(--reed-pitch)\n    );\n    background-position: bottom;\n    background-size: 100% 1px;\n    background-repeat: no-repeat;\n  }\n\n  /* the selvedge is the finished edge of a cloth. it marks a choice; the shed marks a position. */\n  .selvedge {\n    position: relative;\n    --selvedge: transparent;\n  }\n\n  .selvedge::after {\n    content: '';\n    position: absolute;\n    inset-block: 0;\n    inset-inline-start: 0;\n    width: 2px;\n    background-image: repeating-linear-gradient(\n      0deg,\n      var(--selvedge) 0 var(--reed-tick),\n      transparent var(--reed-tick) var(--reed-pitch)\n    );\n  }\n\n  /* the same edge turned a quarter, for a list of choices that runs across */\n  .selvedge-bottom::after {\n    inset-block: auto 0;\n    inset-inline: 0;\n    width: auto;\n    height: 2px;\n    background-image: repeating-linear-gradient(\n      90deg,\n      var(--selvedge) 0 var(--reed-tick),\n      transparent var(--reed-tick) var(--reed-pitch)\n    );\n  }\n\n  /* zag places the mark and reads these two names for the slide from tab to tab */\n  .tab-mark {\n    --transition-duration: var(--dur-local);\n    --transition-timing-function: var(--ease-beat);\n  }\n\n  /* every surface that leaves the flow draws the same edge and the same shadow */\n  .layer {\n    border: 1px solid var(--color-reed-lit);\n    background-color: var(--color-raised);\n    box-shadow: var(--shadow-layer);\n  }\n\n  /*\n   * zag gives a toast its offset, its height and its opacity as custom properties,\n   * and the transition between two of its positions belongs to the stylesheet.\n   */\n  .toast {\n    translate: var(--x) var(--y);\n    height: var(--height, auto);\n    opacity: var(--opacity);\n    transition:\n      translate var(--dur-overlay) var(--ease-beat),\n      height var(--dur-overlay) var(--ease-beat),\n      opacity var(--dur-overlay) var(--ease-beat);\n    will-change: translate, opacity;\n  }\n\n  /*\n   * three ticks, and the order of the heights is the direction. tighter than the\n   * pitch, because a head reserves this width and a narrow column cannot pay a full one.\n   */\n  .reed-sort {\n    display: inline-block;\n    width: 7px;\n    height: 7px;\n    background-image:\n      linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor),\n      linear-gradient(currentColor, currentColor);\n    background-size: var(--reed-tick) 3px, var(--reed-tick) 5px, var(--reed-tick) 7px;\n    background-position: left bottom, center bottom, right bottom;\n    background-repeat: no-repeat;\n  }\n\n  .reed-sort-down {\n    background-size: var(--reed-tick) 7px, var(--reed-tick) 5px, var(--reed-tick) 3px;\n  }\n\n  /* a control beside a row of values aligns on the cap band */\n  .ctl-align {\n    vertical-align: middle;\n    translate: 0 calc(-1 * var(--ctl-lift));\n  }\n\n  /* the surface that every control shares */\n  .ctl {\n    display: inline-flex;\n    align-items: center;\n    gap: 0.375rem;\n    border: 1px solid var(--color-reed);\n    background-color: var(--color-ground);\n    padding-inline: var(--cell-x);\n    color: var(--color-weft);\n    transition: border-color var(--dur-instant) var(--ease-beat);\n  }\n\n  .ctl:hover {\n    border-color: var(--color-reed-lit);\n  }\n\n  /* one tick of the reed stands where a value is absent */\n  .reed-mark {\n    display: inline-block;\n    width: var(--reed-tick);\n    height: var(--reed-pitch);\n    background-color: var(--color-reed-lit);\n    vertical-align: middle;\n  }\n\n  .warp-line::before {\n    left: 0;\n  }\n\n  .warp-line-end::before {\n    right: 0;\n  }\n\n  /*\n   * the grip straddles the column boundary, and the reed inside it is the divider the\n   * head would draw anyway. currentColor, because a gradient cannot transition.\n   */\n  .reed-grip {\n    position: absolute;\n    inset-block: 0;\n    right: -4px;\n    z-index: var(--z-grip);\n    width: 8px;\n    color: var(--color-reed-lit);\n    cursor: col-resize;\n    touch-action: none;\n    transition: color var(--dur-instant) var(--ease-beat);\n  }\n\n  .reed-grip::before {\n    content: '';\n    position: absolute;\n    inset-block: 0;\n    left: 4px;\n    width: 1px;\n    background-image: repeating-linear-gradient(\n      0deg,\n      currentColor 0 var(--reed-tick),\n      transparent var(--reed-tick) var(--reed-pitch)\n    );\n  }\n\n  .reed-grip:hover,\n  .reed-grip:focus-visible,\n  .reed-grip[data-dragging] {\n    color: var(--color-indigo);\n  }\n\n  /* an unwoven warp: the threads sit in the reed and no weft has arrived */\n  .reed-warp {\n    background-image: repeating-linear-gradient(\n      90deg,\n      var(--color-reed) 0 var(--reed-tick),\n      transparent var(--reed-tick) var(--reed-pitch)\n    );\n  }\n\n  /* only the loading state moves */\n  .reed-warp-beat {\n    animation: beat 1.2s var(--ease-glide) infinite;\n  }\n\n  /*\n   * the cover layer is attached to the content, so it arrives at the edge and hides\n   * the reed at the end of the list. a short list needs no cover: the scrollable area\n   * is then the padding box and the two layers land together.\n   */\n  .reed-scroll {\n    background-image:\n      linear-gradient(var(--color-raised), var(--color-raised)),\n      repeating-linear-gradient(\n        90deg,\n        var(--color-reed-lit) 0 var(--reed-tick),\n        transparent var(--reed-tick) var(--reed-pitch)\n      );\n    background-position: bottom;\n    background-size: 100% 2px;\n    background-repeat: no-repeat;\n    background-attachment: local, scroll;\n    scrollbar-width: thin;\n    scrollbar-color: var(--color-reed-lit) transparent;\n  }\n\n  /* the standard properties above win where supported, so these reach safari only */\n  .reed-scroll::-webkit-scrollbar {\n    width: 8px;\n    height: 8px;\n  }\n\n  .reed-scroll::-webkit-scrollbar-track {\n    background-color: transparent;\n  }\n\n  .reed-scroll::-webkit-scrollbar-thumb {\n    background-color: var(--color-reed-lit);\n  }\n\n  .reed-scroll::-webkit-scrollbar-thumb:hover {\n    background-color: var(--color-indigo);\n  }\n\n  .beat {\n    animation: beat 1.6s var(--ease-glide) infinite;\n  }\n}\n\n@keyframes beat {\n  0%,\n  100% {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0.25;\n  }\n}\n\n@keyframes fade {\n  from {\n    opacity: 0;\n  }\n}\n\n@keyframes fade-out {\n  to {\n    opacity: 0;\n  }\n}\n\n@keyframes rise {\n  from {\n    opacity: 0;\n    transform: translateY(-6px) scale(0.99);\n  }\n}\n\n@keyframes rise-out {\n  to {\n    opacity: 0;\n    transform: translateY(-6px) scale(0.99);\n  }\n}\n\n/* the panel arrives from the edge that holds it, which sets --slide-from */\n@keyframes slide {\n  from {\n    opacity: 0;\n    transform: translateX(var(--slide-from));\n  }\n}\n\n/* it leaves the way it came, and it leaves faster, on the exit curve */\n@keyframes slide-out {\n  to {\n    opacity: 0;\n    transform: translateX(var(--slide-from));\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .beat,\n  .reed-warp-beat {\n    animation: none;\n  }\n}\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/tokens.json",
+        "files": [
+          {
+            "path": "styles/tokens.css",
+            "hash": "sha256-HC3iXWvQk6fCbyY/VIYG48G0eH8KTs61oIDDgt5ONvA=",
+            "client": false
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "cx",
+      "type": "registry:lib",
+      "title": "Cx",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "lib/cx.ts",
+          "target": "lib/cx.ts",
+          "type": "registry:lib",
+          "content": "import { clsx, type ClassValue } from 'clsx'\nimport { twMerge } from 'tailwind-merge'\n\n/*\n * the stylesheet order decides between two utilities for one property, so a plain\n * join lets an override fail with no message.\n */\nexport function cx(...classes: ClassValue[]) {\n  return twMerge(clsx(classes))\n}\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/cx.json",
+        "files": [
+          {
+            "path": "lib/cx.ts",
+            "hash": "sha256-nCgIrhJMREr99PRsI+he7LXaUaFBBdwZSWpHWqK/JBo=",
+            "client": false
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "dependencies": [],
+      "registryDependencies": [
+        "cx",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/button/Button.tsx",
+          "target": "components/ui/button/Button.tsx",
+          "type": "registry:ui",
+          "content": "import type { ComponentPropsWithoutRef } from 'react'\nimport { cx } from '@/lib/cx'\n\nexport type ButtonVariant = 'default' | 'primary' | 'danger' | 'quiet'\n\ninterface ButtonProps extends ComponentPropsWithoutRef<'button'> {\n  readonly variant?: ButtonVariant\n}\n\nconst VARIANT: Record<ButtonVariant, string> = {\n  default: 'ctl',\n  primary: 'border border-indigo bg-indigo text-ground hover:bg-indigo/90',\n  danger: 'border border-madder bg-madder text-ground hover:bg-madder/90',\n  quiet: 'text-weft-dim hover:text-weft',\n}\n\nexport const Button = ({ variant = 'default', type = 'button', className, ...props }: ButtonProps) => (\n  <button\n    type={type}\n    className={cx(\n      'inline-flex h-(--ctl-h) cursor-pointer items-center justify-center gap-1.5 px-(--cell-x) transition-colors duration-(--dur-instant) ease-(--ease-beat) disabled:cursor-not-allowed disabled:opacity-50',\n      VARIANT[variant],\n      className,\n    )}\n    {...props}\n  />\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/button.json",
+        "files": [
+          {
+            "path": "components/ui/button/Button.tsx",
+            "hash": "sha256-U7D99UXvaDnReNcv5X6HIclmrSIDrhLErZn8DP2vxEc=",
+            "client": false
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "icons",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/checkbox/Checkbox.tsx",
+          "target": "components/ui/checkbox/Checkbox.tsx",
+          "type": "registry:ui",
+          "content": "import { Checkbox as ArkCheckbox } from '@ark-ui/react/checkbox'\nimport type { ReactNode } from 'react'\nimport { CheckIcon } from '@/components/ui/icons/Icons'\nimport { cx } from '@/lib/cx'\n\nexport type CheckedState = boolean | 'indeterminate'\n\ninterface CheckboxProps {\n  readonly checked: CheckedState\n  readonly onCheckedChange: (checked: CheckedState) => void\n  readonly children?: ReactNode\n  /* names a box that shows no text */\n  readonly label?: string\n  readonly className?: string\n}\n\nconst CONTROL =\n  'grid size-(--ctl-box) shrink-0 place-items-center border border-reed-lit text-ground transition-colors duration-(--dur-instant) ease-(--ease-beat) data-[state=checked]:border-indigo data-[state=checked]:bg-indigo data-[state=indeterminate]:border-indigo data-[state=indeterminate]:bg-indigo'\n\n/* the ark root is a label element, so the text inside it toggles the box */\nexport const Checkbox = ({ checked, onCheckedChange, children, label, className }: CheckboxProps) => (\n  <ArkCheckbox.Root\n    checked={checked}\n    onCheckedChange={(details) => onCheckedChange(details.checked)}\n    className={cx('ctl-align inline-flex cursor-pointer items-center gap-2', className)}\n  >\n    <ArkCheckbox.Control className={CONTROL}>\n      <ArkCheckbox.Indicator>\n        <CheckIcon className=\"size-2.75\" />\n      </ArkCheckbox.Indicator>\n      <ArkCheckbox.Indicator indeterminate>\n        <span className=\"block h-px w-1.75 bg-current\" />\n      </ArkCheckbox.Indicator>\n    </ArkCheckbox.Control>\n    {children !== undefined && <ArkCheckbox.Label>{children}</ArkCheckbox.Label>}\n    <ArkCheckbox.HiddenInput aria-label={children === undefined ? label : undefined} />\n  </ArkCheckbox.Root>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/checkbox.json",
+        "files": [
+          {
+            "path": "components/ui/checkbox/Checkbox.tsx",
+            "hash": "sha256-KUJ+kUgBjws/gJiEecaRJXavYOLRUnXP5jGYTAUaf1o=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "command-palette",
+      "type": "registry:ui",
+      "title": "Command Palette",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "icons",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/command-palette/CommandPalette.tsx",
+          "target": "components/ui/command-palette/CommandPalette.tsx",
+          "type": "registry:ui",
+          "content": "import { Dialog } from '@ark-ui/react/dialog'\nimport { Portal } from '@ark-ui/react/portal'\nimport { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'\nimport { SearchIcon } from '@/components/ui/icons/Icons'\n\nexport interface Command {\n  readonly id: string\n  readonly label: string\n  readonly group: string\n  readonly hint?: string\n  readonly run: () => void\n}\n\ninterface CommandPaletteProps {\n  readonly open: boolean\n  readonly onOpenChange: (open: boolean) => void\n  readonly commands: readonly Command[]\n  readonly placeholder?: string\n}\n\ninterface Entry {\n  readonly command: Command\n  readonly index: number\n}\n\nfunction groupCommands(commands: readonly Command[]) {\n  const groups = new Map<string, Entry[]>()\n  commands.forEach((command, index) => {\n    const bucket = groups.get(command.group)\n    if (bucket) {\n      bucket.push({ command, index })\n    } else {\n      groups.set(command.group, [{ command, index }])\n    }\n  })\n  return [...groups]\n}\n\nexport const CommandPalette = ({\n  open,\n  onOpenChange,\n  commands,\n  placeholder = 'Run a command',\n}: CommandPaletteProps) => {\n  const [query, setQuery] = useState('')\n  const [active, setActive] = useState(0)\n  const listRef = useRef<HTMLDivElement>(null)\n  const inputRef = useRef<HTMLInputElement>(null)\n\n  const matches = useMemo(() => {\n    const needle = query.trim().toLowerCase()\n    if (needle === '') return commands\n    return commands.filter((command) => `${command.group} ${command.label}`.toLowerCase().includes(needle))\n  }, [commands, query])\n\n  useEffect(() => {\n    setActive(0)\n  }, [query])\n\n  /* clears on the way in: the list must keep its matches while the dialog leaves */\n  useEffect(() => {\n    if (open) setQuery('')\n  }, [open])\n\n  // keyboard navigation moves no pointer, so nothing else scrolls the row into view\n  useEffect(() => {\n    listRef.current?.querySelector('[data-active]')?.scrollIntoView({ block: 'nearest' })\n  }, [active])\n\n  const choose = (command: Command) => {\n    command.run()\n    onOpenChange(false)\n  }\n\n  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {\n    if (matches.length === 0) return\n\n    if (event.key === 'ArrowDown') {\n      event.preventDefault()\n      setActive((current) => (current + 1) % matches.length)\n      return\n    }\n    if (event.key === 'ArrowUp') {\n      event.preventDefault()\n      setActive((current) => (current - 1 + matches.length) % matches.length)\n      return\n    }\n    if (event.key === 'Enter') {\n      event.preventDefault()\n      choose(matches[active])\n    }\n  }\n\n  return (\n    <Dialog.Root\n      open={open}\n      onOpenChange={(details) => onOpenChange(details.open)}\n      initialFocusEl={() => inputRef.current}\n      unmountOnExit\n      lazyMount\n    >\n      <Portal>\n        <Dialog.Backdrop className=\"fixed inset-0 z-(--z-backdrop) bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)] data-[state=closed]:animate-[fade-out_var(--dur-local)_var(--ease-exit)]\" />\n        <Dialog.Positioner className=\"fixed inset-0 z-(--z-modal) grid place-items-start justify-items-center pt-[12vh]\">\n          <Dialog.Content className=\"layer w-[min(560px,92vw)] data-[state=open]:animate-[rise_var(--dur-overlay)_var(--ease-beat)] data-[state=closed]:animate-[rise-out_var(--dur-local)_var(--ease-exit)]\">\n            <Dialog.Title className=\"sr-only\">Command palette</Dialog.Title>\n\n            <div className=\"reed-edge flex items-center gap-2 px-3\" style={{ height: 'calc(var(--ctl-h) + 12px)' }}>\n              <SearchIcon className=\"size-4 text-weft-faint\" />\n              <input\n                ref={inputRef}\n                name=\"command\"\n                value={query}\n                onChange={(event) => setQuery(event.target.value)}\n                onKeyDown={onKeyDown}\n                placeholder={placeholder}\n                aria-label={placeholder}\n                className=\"w-full bg-transparent text-weft placeholder:text-weft-faint focus:outline-none\"\n              />\n              <kbd className=\"font-data text-[11px] text-weft-faint\">esc</kbd>\n            </div>\n\n            <div ref={listRef} className=\"max-h-[46vh] overflow-auto py-1\">\n              {matches.length === 0 && (\n                <p className=\"px-3 py-6 text-center text-weft-dim\">\n                  No command matches {`\"${query}\"`}. Try a shorter word.\n                </p>\n              )}\n\n              {groupCommands(matches).map(([group, items]) => (\n                <div key={group}>\n                  <p className=\"px-3 pt-2 pb-1 font-data text-[11px] tracking-wide text-weft-faint uppercase dense:sr-only\">\n                    {group}\n                  </p>\n                  {items.map(({ command, index }) => {\n                    const isActive = index === active\n                    return (\n                      <button\n                        key={command.id}\n                        type=\"button\"\n                        data-active={isActive ? '' : undefined}\n                        onPointerMove={() => setActive(index)}\n                        onClick={() => choose(command)}\n                        className=\"flex w-full cursor-pointer items-center justify-between gap-3 px-3 text-left text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) data-active:bg-shed data-active:text-weft\"\n                        style={{ height: 'var(--row-h)' }}\n                      >\n                        <span className=\"truncate\">{command.label}</span>\n                        {command.hint && <kbd className=\"font-data text-[11px] text-weft-faint\">{command.hint}</kbd>}\n                      </button>\n                    )\n                  })}\n                </div>\n              ))}\n            </div>\n          </Dialog.Content>\n        </Dialog.Positioner>\n      </Portal>\n    </Dialog.Root>\n  )\n}\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/command-palette.json",
+        "files": [
+          {
+            "path": "components/ui/command-palette/CommandPalette.tsx",
+            "hash": "sha256-fdQd7Fg5S9ZV5cYVKmpCxcoPYD/vitLvMwwpFFNLrbo=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "icons",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/dialog/Dialog.tsx",
+          "target": "components/ui/dialog/Dialog.tsx",
+          "type": "registry:ui",
+          "content": "import { Dialog as ArkDialog, type DialogRootProps } from '@ark-ui/react/dialog'\nimport { Portal } from '@ark-ui/react/portal'\nimport type { ReactNode } from 'react'\nimport { CloseIcon } from '@/components/ui/icons/Icons'\nimport { cx } from '@/lib/cx'\n\n/* ark removes the node when the exit animation ends. both mount options default on. */\nexport const Dialog = ({ unmountOnExit = true, lazyMount = true, ...props }: DialogRootProps) => (\n  <ArkDialog.Root unmountOnExit={unmountOnExit} lazyMount={lazyMount} {...props} />\n)\n\nexport const DialogTrigger = ArkDialog.Trigger\n\ninterface PartProps {\n  readonly children: ReactNode\n  readonly className?: string\n}\n\n/* ark names the dialog from its title, so every dialog carries one */\nexport const DialogContent = ({ children, className }: PartProps) => (\n  <Portal>\n    <ArkDialog.Backdrop className=\"fixed inset-0 z-(--z-backdrop) bg-sunken/70 backdrop-blur-[2px] data-[state=open]:animate-[fade_var(--dur-overlay)_var(--ease-beat)] data-[state=closed]:animate-[fade-out_var(--dur-local)_var(--ease-exit)]\" />\n    <ArkDialog.Positioner className=\"fixed inset-0 z-(--z-modal) grid place-items-center p-6\">\n      <ArkDialog.Content\n        className={cx(\n          'layer flex w-[min(480px,92vw)] flex-col data-[state=open]:animate-[rise_var(--dur-overlay)_var(--ease-beat)] data-[state=closed]:animate-[rise-out_var(--dur-local)_var(--ease-exit)]',\n          className,\n        )}\n      >\n        {children}\n      </ArkDialog.Content>\n    </ArkDialog.Positioner>\n  </Portal>\n)\n\nexport const DialogHeader = ({ children, className }: PartProps) => (\n  <header\n    className={cx('reed-edge flex items-start justify-between gap-4 px-(--cell-x) py-(--stack)', className)}\n  >\n    <div className=\"flex flex-col gap-1\">{children}</div>\n    <ArkDialog.CloseTrigger\n      aria-label=\"Close\"\n      className=\"-mr-1 cursor-pointer p-1 text-weft-faint transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft\"\n    >\n      <CloseIcon className=\"size-3.5\" />\n    </ArkDialog.CloseTrigger>\n  </header>\n)\n\nexport const DialogTitle = ({ children, className }: PartProps) => (\n  <ArkDialog.Title className={cx('font-medium', className)}>{children}</ArkDialog.Title>\n)\n\nexport const DialogDescription = ({ children, className }: PartProps) => (\n  <ArkDialog.Description className={cx('text-weft-dim', className)}>{children}</ArkDialog.Description>\n)\n\nexport const DialogBody = ({ children, className }: PartProps) => (\n  <div className={cx('flex flex-col gap-(--stack) px-(--cell-x) py-4', className)}>{children}</div>\n)\n\nexport const DialogFooter = ({ children, className }: PartProps) => (\n  <footer\n    className={cx('flex items-center justify-end gap-(--stack) border-t border-reed px-(--cell-x) py-(--stack)', className)}\n  >\n    {children}\n  </footer>\n)\n\nexport const DialogClose = ArkDialog.CloseTrigger\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/dialog.json",
+        "files": [
+          {
+            "path": "components/ui/dialog/Dialog.tsx",
+            "hash": "sha256-WYJQSXoupoL8kXZyk/yfr91HkuKPwvJBbNGxLuJjVv4=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "empty-state",
+      "type": "registry:ui",
+      "title": "Empty State",
+      "dependencies": [],
+      "registryDependencies": [
+        "cx",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/empty-state/EmptyState.tsx",
+          "target": "components/ui/empty-state/EmptyState.tsx",
+          "type": "registry:ui",
+          "content": "import type { ReactNode } from 'react'\nimport { cx } from '@/lib/cx'\n\ninterface EmptyStateProps {\n  readonly title: string\n  readonly description?: string\n  readonly action?: ReactNode\n  readonly className?: string\n}\n\n/* the text sits on a patch of cloth. no warp runs behind it. */\nexport const EmptyState = ({ title, description, action, className }: EmptyStateProps) => (\n  <div\n    className={cx('reed-warp flex flex-col items-center justify-center gap-(--stack) p-(--cell-x) text-center', className)}\n    style={{ minHeight: 'calc(var(--row-h) * 4)' }}\n  >\n    <div className=\"flex flex-col gap-1 bg-raised px-(--cell-x)\">\n      <p className=\"text-weft-dim\">{title}</p>\n      {description && <p className=\"text-weft-faint\">{description}</p>}\n    </div>\n    {action}\n  </div>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/empty-state.json",
+        "files": [
+          {
+            "path": "components/ui/empty-state/EmptyState.tsx",
+            "hash": "sha256-Bag74bmIj81j/gjAWETKZdiA20VRuDnQWHsAzca0Nu4=",
+            "client": false
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/field/Field.tsx",
+          "target": "components/ui/field/Field.tsx",
+          "type": "registry:ui",
+          "content": "import { Field as ArkField, type FieldRootProps } from '@ark-ui/react/field'\nimport { Fieldset } from '@ark-ui/react/fieldset'\nimport type { ComponentPropsWithoutRef, ReactNode } from 'react'\nimport { cx } from '@/lib/cx'\n\nexport const Field = ({ className, ...props }: FieldRootProps) => (\n  <ArkField.Root className={cx('flex flex-col gap-1', className)} {...props} />\n)\n\ninterface PartProps {\n  readonly children: ReactNode\n  readonly className?: string\n}\n\nexport const FieldLabel = ({ children, className }: PartProps) => (\n  <ArkField.Label className={cx('flex items-center gap-1 text-weft-dim', className)}>\n    {children}\n    <ArkField.RequiredIndicator className=\"text-weft-faint\" />\n  </ArkField.Label>\n)\n\nconst CONTROL = 'ctl block w-full data-invalid:border-madder disabled:cursor-not-allowed disabled:opacity-50'\n\nexport const FieldInput = ({ className, ...props }: ComponentPropsWithoutRef<'input'>) => (\n  <ArkField.Input className={cx(CONTROL, 'h-(--ctl-h)', className)} {...props} />\n)\n\nexport const FieldTextarea = ({ className, ...props }: ComponentPropsWithoutRef<'textarea'>) => (\n  <ArkField.Textarea className={cx(CONTROL, 'min-h-20 resize-y py-(--stack) leading-relaxed', className)} {...props} />\n)\n\nexport const FieldHint = ({ children, className }: PartProps) => (\n  <ArkField.HelperText className={cx('text-weft-faint dense:sr-only', className)}>{children}</ArkField.HelperText>\n)\n\nexport const FieldError = ({ children, className }: PartProps) => (\n  <ArkField.ErrorText className={cx('text-madder', className)}>{children}</ArkField.ErrorText>\n)\n\ninterface FieldSetProps {\n  readonly legend: string\n  readonly children: ReactNode\n  readonly disabled?: boolean\n  readonly className?: string\n}\n\nexport const FieldSet = ({ legend, children, disabled, className }: FieldSetProps) => (\n  <Fieldset.Root disabled={disabled} className={cx('flex flex-col gap-(--stack)', className)}>\n    <Fieldset.Legend className=\"reed-edge w-full pb-(--stack) font-medium\">{legend}</Fieldset.Legend>\n    {children}\n  </Fieldset.Root>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/field.json",
+        "files": [
+          {
+            "path": "components/ui/field/Field.tsx",
+            "hash": "sha256-0QecmfNTbBtNpM2KS2X/JC+Q6xfMe5lmmysRXQSf30A=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "figure",
+      "type": "registry:ui",
+      "title": "Figure",
+      "dependencies": [],
+      "registryDependencies": [
+        "cx",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/figure/Figure.tsx",
+          "target": "components/ui/figure/Figure.tsx",
+          "type": "registry:ui",
+          "content": "import { cx } from '@/lib/cx'\n\ninterface FigureProps {\n  readonly value: number\n  readonly digits?: number\n  readonly low?: boolean\n  readonly className?: string\n}\n\n/* anything that is not a digit reads one step back */\nexport const Figure = ({ value, digits = 1, low = false, className }: FigureProps) => {\n  if (value === 0) return <span className={cx('reed-mark', className)} aria-hidden=\"true\" />\n\n  const [whole, fraction] = value.toFixed(digits).split('.')\n  return (\n    <span className={cx(low && 'reed-under', className)}>\n      {whole}\n      {fraction !== undefined && <span className=\"text-weft-faint\">.{fraction}</span>}\n      {low && <span className=\"sr-only\"> below threshold</span>}\n    </span>\n  )\n}\n\ninterface ElapsedProps {\n  readonly minutes: number\n  readonly className?: string\n}\n\n/* a head cannot hold two units, so a duration carries them in the cell */\nexport const Elapsed = ({ minutes, className }: ElapsedProps) => (\n  <span className={className}>\n    {Math.trunc(minutes / 60)}\n    <span className=\"text-weft-faint\">h </span>\n    {String(minutes % 60).padStart(2, '0')}\n    <span className=\"text-weft-faint\">m</span>\n  </span>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/figure.json",
+        "files": [
+          {
+            "path": "components/ui/figure/Figure.tsx",
+            "hash": "sha256-5jAVPu0perAN109/cZwmsWbtqYiptBwoMGs5Cj+TXng=",
+            "client": false
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "filter-bar",
+      "type": "registry:ui",
+      "title": "Filter Bar",
+      "dependencies": [],
+      "registryDependencies": [
+        "cx",
+        "icons",
+        "select",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/filter-bar/FilterBar.tsx",
+          "target": "components/ui/filter-bar/FilterBar.tsx",
+          "type": "registry:ui",
+          "content": "import { useMemo } from 'react'\nimport { CloseIcon, SearchIcon } from '@/components/ui/icons/Icons'\nimport {\n  Select,\n  SelectContent,\n  SelectOption,\n  SelectTrigger,\n  createListCollection,\n} from '@/components/ui/select/Select'\nimport { cx } from '@/lib/cx'\n\nexport interface FilterGroup {\n  readonly key: string\n  readonly label: string\n  readonly options: readonly string[]\n}\n\nexport type FilterValues = Readonly<Record<string, readonly string[]>>\n\ninterface FilterSelectProps {\n  readonly group: FilterGroup\n  readonly selected: readonly string[]\n  readonly onSelect: (next: readonly string[]) => void\n}\n\nconst FilterSelect = ({ group, selected, onSelect }: FilterSelectProps) => {\n  const collection = useMemo(\n    () => createListCollection({ items: group.options.map((value) => ({ label: value, value })) }),\n    [group.options],\n  )\n\n  return (\n    <Select\n      collection={collection}\n      multiple\n      value={[...selected]}\n      onValueChange={(details) => onSelect(details.value)}\n    >\n      <SelectTrigger>\n        <span className=\"inline-flex items-baseline gap-1.5\">\n          <span className={selected.length > 0 ? 'text-weft' : 'text-weft-dim'}>{group.label}</span>\n          {selected.length > 0 && <span className=\"tnum font-data text-indigo\">{selected.length}</span>}\n        </span>\n      </SelectTrigger>\n      <SelectContent>\n        {collection.items.map((item) => (\n          <SelectOption key={item.value} item={item} />\n        ))}\n      </SelectContent>\n    </Select>\n  )\n}\n\ninterface Chip {\n  readonly group: FilterGroup\n  readonly value: string\n}\n\ninterface FilterBarProps {\n  readonly query: string\n  readonly onQueryChange: (next: string) => void\n  readonly groups: readonly FilterGroup[]\n  readonly values: FilterValues\n  readonly onValuesChange: (next: FilterValues) => void\n  readonly searchLabel?: string\n  readonly placeholder?: string\n  readonly className?: string\n}\n\nexport const FilterBar = ({\n  query,\n  onQueryChange,\n  groups,\n  values,\n  onValuesChange,\n  searchLabel = 'Search',\n  placeholder = 'Search',\n  className,\n}: FilterBarProps) => {\n  const chips: readonly Chip[] = groups.flatMap((group) =>\n    (values[group.key] ?? []).map((value) => ({ group, value })),\n  )\n\n  const setGroup = (key: string, next: readonly string[]) => onValuesChange({ ...values, [key]: next })\n\n  const removeChip = (chip: Chip) => {\n    setGroup(\n      chip.group.key,\n      (values[chip.group.key] ?? []).filter((value) => value !== chip.value),\n    )\n  }\n\n  return (\n    <search className={cx('flex flex-col gap-(--stack)', className)}>\n      <div className=\"flex flex-wrap items-center gap-(--stack)\">\n        <div className=\"ctl focus-ring h-(--ctl-h) min-w-55 flex-1\">\n          <SearchIcon className=\"size-3.5 text-weft-faint\" />\n          <input\n            type=\"search\"\n            name=\"search\"\n            value={query}\n            onChange={(event) => onQueryChange(event.target.value)}\n            placeholder={placeholder}\n            aria-label={searchLabel}\n            className=\"w-full bg-transparent py-0 placeholder:text-weft-faint focus:outline-none\"\n          />\n        </div>\n\n        {groups.map((group) => (\n          <FilterSelect\n            key={group.key}\n            group={group}\n            selected={values[group.key] ?? []}\n            onSelect={(next) => setGroup(group.key, next)}\n          />\n        ))}\n      </div>\n\n      {chips.length > 0 && (\n        <ul className=\"flex flex-wrap items-center gap-(--stack)\">\n          {chips.map((chip) => (\n            <li key={`${chip.group.key}:${chip.value}`}>\n              <button\n                type=\"button\"\n                onClick={() => removeChip(chip)}\n                className=\"inline-flex h-(--ctl-h) cursor-pointer items-center gap-1.5 border border-indigo/40 bg-indigo-wash px-(--cell-x) text-weft transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:border-indigo\"\n              >\n                <span className=\"inline-flex items-baseline gap-1.5\">\n                  <span className=\"font-data text-weft-dim\">{chip.group.label.toLowerCase()}</span>\n                  {chip.value}\n                </span>\n                <CloseIcon className=\"size-3 text-weft-faint\" />\n              </button>\n            </li>\n          ))}\n          <li>\n            <button\n              type=\"button\"\n              onClick={() => onValuesChange({})}\n              className=\"h-(--ctl-h) cursor-pointer px-(--cell-x) text-weft-dim underline-offset-4 hover:text-weft hover:underline\"\n            >\n              Clear filters\n            </button>\n          </li>\n        </ul>\n      )}\n    </search>\n  )\n}\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/filter-bar.json",
+        "files": [
+          {
+            "path": "components/ui/filter-bar/FilterBar.tsx",
+            "hash": "sha256-lAJgLydXWTY8ooTOU5VnsHEYwlKiFXM8AZ5R2VyOlFM=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "icons",
+      "type": "registry:ui",
+      "title": "Icons",
+      "dependencies": [],
+      "registryDependencies": [
+        "cx",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/icons/Icons.tsx",
+          "target": "components/ui/icons/Icons.tsx",
+          "type": "registry:ui",
+          "content": "import { cx } from '@/lib/cx'\n\ninterface IconProps {\n  readonly className?: string\n}\n\nconst base = 'shrink-0'\n\nexport const CheckIcon = ({ className }: IconProps) => (\n  <svg className={cx(base, className)} viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\" focusable=\"false\">\n    <path d=\"M3.5 8.5 6.5 11.5 12.5 5\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"square\" />\n  </svg>\n)\n\nexport const SearchIcon = ({ className }: IconProps) => (\n  <svg className={cx(base, className)} viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\" focusable=\"false\">\n    <circle cx=\"7\" cy=\"7\" r=\"4.25\" stroke=\"currentColor\" strokeWidth=\"1.5\" />\n    <path d=\"M10.5 10.5 14 14\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" />\n  </svg>\n)\n\nexport const ChevronIcon = ({ className }: IconProps) => (\n  <svg className={cx(base, className)} viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\" focusable=\"false\">\n    <path d=\"m4 6.5 4 4 4-4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n  </svg>\n)\n\nexport const CloseIcon = ({ className }: IconProps) => (\n  <svg className={cx(base, className)} viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\" focusable=\"false\">\n    <path d=\"m4 4 8 8M12 4l-8 8\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" />\n  </svg>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/icons.json",
+        "files": [
+          {
+            "path": "components/ui/icons/Icons.tsx",
+            "hash": "sha256-tKgwm260H+guNo4nhWzwTzjxDl4T+yhQlKJrL/0sqto=",
+            "client": false
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "panel",
+      "type": "registry:ui",
+      "title": "Panel",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "icons",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/panel/Panel.tsx",
+          "target": "components/ui/panel/Panel.tsx",
+          "type": "registry:ui",
+          "content": "import { Dialog } from '@ark-ui/react/dialog'\nimport { Portal } from '@ark-ui/react/portal'\nimport { useEffect, useState, type ReactNode } from 'react'\nimport { CloseIcon } from '@/components/ui/icons/Icons'\nimport { cx } from '@/lib/cx'\n\nexport type PanelSide = 'start' | 'end'\n\n/* below this the panel covers the page and has to behave as a modal */\nconst SHEET = '(max-width: 640px)'\n\nfunction useSheet() {\n  const [sheet, setSheet] = useState(false)\n\n  useEffect(() => {\n    const query = window.matchMedia(SHEET)\n    const apply = () => setSheet(query.matches)\n    apply()\n    query.addEventListener('change', apply)\n    return () => query.removeEventListener('change', apply)\n  }, [])\n\n  return sheet\n}\n\n/* the positioner holds the edge; the border belongs to the part that animates */\nconst SIDE: Record<PanelSide, string> = {\n  start: 'start-0 [--slide-from:-100%]',\n  end: 'end-0 [--slide-from:100%]',\n}\n\ninterface PanelProps {\n  readonly open: boolean\n  readonly onOpenChange: (open: boolean) => void\n  readonly title: string\n  readonly description?: string\n  readonly footer?: ReactNode\n  readonly side?: PanelSide\n  readonly children: ReactNode\n  readonly className?: string\n}\n\n/*\n * not modal while the table stays live: no focus trap, and a click outside picks the\n * next row rather than closing. on a screen it covers, it locks the page.\n */\nexport const Panel = ({\n  open,\n  onOpenChange,\n  title,\n  description,\n  footer,\n  side = 'end',\n  children,\n  className,\n}: PanelProps) => {\n  const sheet = useSheet()\n\n  return (\n    <Dialog.Root\n      open={open}\n      onOpenChange={(details) => onOpenChange(details.open)}\n      modal={sheet}\n      closeOnInteractOutside={false}\n      unmountOnExit\n      lazyMount\n    >\n      <Portal>\n        <Dialog.Positioner className={cx('fixed inset-y-0 z-(--z-panel) flex', SIDE[side])}>\n          <Dialog.Content\n            className={cx(\n              'layer flex h-full w-[min(420px,100vw)] flex-col border-reed-lit data-[state=open]:animate-[slide_var(--dur-overlay)_var(--ease-beat)] data-[state=closed]:animate-[slide-out_var(--dur-local)_var(--ease-exit)]',\n              className,\n            )}\n          >\n            <header className=\"reed-edge flex items-start justify-between gap-4 px-(--cell-x) py-(--stack)\">\n              <div className=\"flex min-w-0 flex-col gap-0.5\">\n                <Dialog.Title className=\"truncate font-medium\">{title}</Dialog.Title>\n                {description && (\n                  <Dialog.Description className=\"truncate text-weft-dim\">{description}</Dialog.Description>\n                )}\n              </div>\n              <Dialog.CloseTrigger\n                aria-label=\"Close the panel\"\n                className=\"-mr-1 cursor-pointer p-1 text-weft-faint transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft\"\n              >\n                <CloseIcon className=\"size-3.5\" />\n              </Dialog.CloseTrigger>\n            </header>\n\n            <div className=\"reed-scroll flex-1 overflow-auto\">{children}</div>\n\n            {footer && (\n              <footer className=\"flex items-center justify-end gap-(--stack) border-t border-reed px-(--cell-x) py-(--stack)\">\n                {footer}\n              </footer>\n            )}\n          </Dialog.Content>\n        </Dialog.Positioner>\n      </Portal>\n    </Dialog.Root>\n  )\n}\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/panel.json",
+        "files": [
+          {
+            "path": "components/ui/panel/Panel.tsx",
+            "hash": "sha256-Cd0o/k4Ne8oueXmqhcfXbkrtnK4RttHYY7DUw8IXyzg=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/popover/Popover.tsx",
+          "target": "components/ui/popover/Popover.tsx",
+          "type": "registry:ui",
+          "content": "import { Popover as ArkPopover } from '@ark-ui/react/popover'\nimport { Portal } from '@ark-ui/react/portal'\nimport type { ReactNode } from 'react'\nimport { cx } from '@/lib/cx'\n\nexport const Popover = ArkPopover.Root\nexport const PopoverTrigger = ArkPopover.Trigger\n\ninterface PartProps {\n  readonly children: ReactNode\n  readonly className?: string\n}\n\n/* the positioner has no rank here: the stylesheet reaches ark's inline value */\nexport const PopoverContent = ({ children, className }: PartProps) => (\n  <Portal>\n    <ArkPopover.Positioner>\n      <ArkPopover.Content\n        className={cx(\n          'layer min-w-52 py-1 focus:outline-none data-[state=open]:animate-[rise_var(--dur-local)_var(--ease-beat)]',\n          className,\n        )}\n      >\n        {children}\n      </ArkPopover.Content>\n    </ArkPopover.Positioner>\n  </Portal>\n)\n\nexport const PopoverTitle = ({ children, className }: PartProps) => (\n  <ArkPopover.Title className={cx('reed-edge px-(--cell-x) pt-1 pb-(--stack) font-medium', className)}>\n    {children}\n  </ArkPopover.Title>\n)\n\nexport const PopoverDescription = ({ children, className }: PartProps) => (\n  <ArkPopover.Description className={cx('px-(--cell-x) py-1 text-weft-dim', className)}>\n    {children}\n  </ArkPopover.Description>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/popover.json",
+        "files": [
+          {
+            "path": "components/ui/popover/Popover.tsx",
+            "hash": "sha256-FG3l9NEZyEnPjfggxNvFja7v6cz6d3N5S21G1EAXaIM=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "icons",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/select/Select.tsx",
+          "target": "components/ui/select/Select.tsx",
+          "type": "registry:ui",
+          "content": "import { Portal } from '@ark-ui/react/portal'\nimport { Select as ArkSelect } from '@ark-ui/react/select'\nimport type { ReactNode } from 'react'\nimport { CheckIcon, ChevronIcon } from '@/components/ui/icons/Icons'\nimport { cx } from '@/lib/cx'\n\nexport { createListCollection } from '@ark-ui/react/select'\n\nexport interface SelectOptionItem {\n  readonly label: string\n  readonly value: string\n}\n\nexport const Select = ArkSelect.Root\n\ninterface PartProps {\n  readonly children: ReactNode\n  readonly className?: string\n}\n\nexport const SelectTrigger = ({ children, className }: PartProps) => (\n  <ArkSelect.Control>\n    <ArkSelect.Trigger className={cx('ctl h-(--ctl-h) cursor-pointer', className)}>\n      {children}\n      <ChevronIcon className=\"size-3 text-weft-faint\" />\n    </ArkSelect.Trigger>\n  </ArkSelect.Control>\n)\n\n/* rank comes from the stylesheet; ark sets it inline on the positioner */\nexport const SelectContent = ({ children, className }: PartProps) => (\n  <Portal>\n    <ArkSelect.Positioner>\n      <ArkSelect.Content className={cx('layer min-w-42 py-1 focus:outline-none', className)}>\n        {children}\n      </ArkSelect.Content>\n    </ArkSelect.Positioner>\n  </Portal>\n)\n\ninterface SelectOptionProps {\n  readonly item: SelectOptionItem\n  readonly className?: string\n}\n\n/* the shed follows the keyboard, the selvedge marks the choice */\nexport const SelectOption = ({ item, className }: SelectOptionProps) => (\n  <ArkSelect.Item\n    item={item}\n    className={cx(\n      'selvedge flex cursor-pointer items-center justify-between gap-3 px-(--cell-x) py-1 text-weft-dim data-highlighted:bg-shed data-highlighted:text-weft data-[state=checked]:bg-indigo-wash data-[state=checked]:text-weft data-[state=checked]:selvedge-on',\n      className,\n    )}\n  >\n    <ArkSelect.ItemText>{item.label}</ArkSelect.ItemText>\n    <ArkSelect.ItemIndicator>\n      <CheckIcon className=\"size-3 text-indigo\" />\n    </ArkSelect.ItemIndicator>\n  </ArkSelect.Item>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/select.json",
+        "files": [
+          {
+            "path": "components/ui/select/Select.tsx",
+            "hash": "sha256-lk5MRYwtnhdIrV+B4J2zCVZUWK3NPwxoFXMDnAaJjqM=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "dependencies": [],
+      "registryDependencies": [
+        "checkbox",
+        "cx",
+        "empty-state",
+        "tokens",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "components/ui/table/Table.tsx",
+          "target": "components/ui/table/Table.tsx",
+          "type": "registry:ui",
+          "content": "import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'\nimport { Checkbox, type CheckedState } from '@/components/ui/checkbox/Checkbox'\nimport { EmptyState } from '@/components/ui/empty-state/EmptyState'\nimport { Tooltip } from '@/components/ui/tooltip/Tooltip'\nimport { cx } from '@/lib/cx'\n\nexport interface Column<T> {\n  readonly key: string\n  readonly label: string\n  readonly unit?: string\n  readonly hint?: string\n  /* the widest plausible value, in characters. the density turns it into a width. */\n  readonly chars: number\n  readonly numeric?: boolean\n  readonly sortValue?: (row: T) => string | number\n  readonly render: (row: T) => ReactNode\n}\n\ntype Direction = 'asc' | 'desc'\n\ninterface Sort {\n  readonly key: string\n  readonly direction: Direction\n}\n\nconst MIN_WIDTH = 56\nconst MAX_WIDTH = 420\nconst KEY_STEP = 8\n\n/* the 7px mark and its 6px gap: two characters cover both in every density */\nconst SORT_CHARS = 2\n\n/* doubles as the left offset of the pinned column beside it */\nconst GUTTER = 'calc(var(--cell-x) * 2 + var(--ctl-box))'\n\n/*\n * a pinned cell hides what travels under it, so it needs an opaque background and a\n * transition of its own. a parent transition does not animate an inherited value.\n */\nconst PINNED = 'warp-line-end bg-inherit px-(--cell-x) transition-colors duration-(--dur-instant) ease-(--ease-beat)'\n\nfunction compare(a: string | number, b: string | number) {\n  if (typeof a === 'number' && typeof b === 'number') return a - b\n  return String(a).localeCompare(String(b))\n}\n\nfunction ariaSort<T>(sort: Sort | null, column: Column<T>) {\n  if (column.sortValue === undefined) return undefined\n  if (sort?.key !== column.key) return 'none'\n  return sort.direction === 'asc' ? 'ascending' : 'descending'\n}\n\nfunction clampWidth(value: number) {\n  return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, Math.round(value)))\n}\n\n/*\n * the head counts too, because a label and its unit can run longer than the value\n * under it. the half character covers the rounding a table layout applies.\n */\nfunction intrinsicWidth<T>(column: Column<T>, sorted: boolean) {\n  const unit = column.unit ? column.unit.length + 1 : 0\n  const head = column.label.length + unit + (sorted ? SORT_CHARS : 0)\n  return `calc(${Math.max(column.chars, head) + 0.5} * var(--data-adv) + var(--cell-x) * 2)`\n}\n\ninterface ColumnGripProps {\n  readonly label: string\n  readonly onResize: (next: number) => void\n}\n\n/* the width on screen. a column that never moved holds no px of its own. */\nconst cellWidth = (grip: HTMLButtonElement) => grip.parentElement?.offsetWidth ?? 0\n\nconst ColumnGrip = ({ label, onResize }: ColumnGripProps) => {\n  const originX = useRef(0)\n  const originWidth = useRef(0)\n  const [dragging, setDragging] = useState(false)\n\n  const onPointerDown = (event: PointerEvent<HTMLButtonElement>) => {\n    event.currentTarget.setPointerCapture(event.pointerId)\n    originX.current = event.clientX\n    originWidth.current = cellWidth(event.currentTarget)\n    setDragging(true)\n  }\n\n  const onPointerMove = (event: PointerEvent<HTMLButtonElement>) => {\n    if (!dragging) return\n    onResize(originWidth.current + event.clientX - originX.current)\n  }\n\n  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {\n    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return\n    event.preventDefault()\n    const from = cellWidth(event.currentTarget)\n    onResize(event.key === 'ArrowLeft' ? from - KEY_STEP : from + KEY_STEP)\n  }\n\n  return (\n    <button\n      type=\"button\"\n      aria-label={`Resize the ${label} column`}\n      className=\"reed-grip\"\n      data-dragging={dragging ? '' : undefined}\n      onPointerDown={onPointerDown}\n      onPointerMove={onPointerMove}\n      onLostPointerCapture={() => setDragging(false)}\n      onKeyDown={onKeyDown}\n    />\n  )\n}\n\nconst SortMark = ({ direction }: { readonly direction: Direction }) => (\n  <span className={cx('reed-sort text-indigo', direction === 'desc' && 'reed-sort-down')} aria-hidden=\"true\" />\n)\n\ninterface ColumnHeadProps<T> {\n  readonly column: Column<T>\n  readonly sort: Sort | null\n  readonly onSort: () => void\n}\n\nconst ColumnHead = <T,>({ column, sort, onSort }: ColumnHeadProps<T>) => {\n  const shell = cx('flex h-full w-full items-center gap-1.5 text-weft-dim', column.numeric && 'justify-end')\n  /* the mark sits inside the baseline group, standing on the baseline of the label */\n  const label = (\n    <span className=\"inline-flex min-w-0 items-baseline gap-1.5\">\n      <span className=\"truncate\">{column.label}</span>\n      {column.unit && <span className=\"font-data text-weft-faint\">{column.unit}</span>}\n      {sort?.key === column.key && <SortMark direction={sort.direction} />}\n    </span>\n  )\n\n  const head = column.sortValue ? (\n    <button\n      type=\"button\"\n      onClick={onSort}\n      className={cx(shell, 'cursor-pointer transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft')}\n    >\n      {label}\n    </button>\n  ) : (\n    <div className={shell}>{label}</div>\n  )\n\n  if (column.hint === undefined) return head\n  return <Tooltip content={column.hint}>{head}</Tooltip>\n}\n\nconst SKELETON_IDS: readonly string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((id) => `warp-${id}`)\n\nconst WarpRows = ({ span }: { readonly span: number }) => (\n  <>\n    {SKELETON_IDS.map((id, index) => (\n      <tr key={id}>\n        <td\n          colSpan={span}\n          className=\"reed-warp reed-warp-beat\"\n          style={{ height: 'var(--row-h)', animationDelay: `calc(var(--dur-instant) * ${index})` }}\n        />\n      </tr>\n    ))}\n  </>\n)\n\ninterface EmptyRowProps {\n  readonly span: number\n  readonly message: string\n}\n\nconst EmptyRow = ({ span, message }: EmptyRowProps) => (\n  <tr>\n    <td colSpan={span} className=\"border-t border-reed/60 p-0\">\n      <EmptyState title={message} />\n    </td>\n  </tr>\n)\n\ninterface RowProps<T> {\n  readonly row: T\n  readonly id: string\n  readonly columns: readonly Column<T>[]\n  readonly selected: boolean\n  readonly onToggle: (id: string) => void\n}\n\nconst Row =<T,>({ row, id, columns, selected, onToggle }: RowProps<T>) => (\n  <tr\n    className=\"bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash\"\n    data-selected={selected ? '' : undefined}\n  >\n    <td\n      className={cx('selvedge sticky left-0 z-(--z-pinned) border-t border-reed/60', PINNED, selected && 'selvedge-on')}\n      style={{ height: 'var(--row-h)' }}\n    >\n      <Checkbox checked={selected} onCheckedChange={() => onToggle(id)} label={`Select row ${id}`} />\n    </td>\n    {columns.map((column, index) => (\n      <td\n        key={column.key}\n        className={cx(\n          'truncate border-t border-reed/60 px-(--cell-x) text-weft-dim',\n          index === 0 && `sticky z-(--z-pinned) ${PINNED}`,\n          index > 1 && 'warp-line',\n          column.numeric && 'tnum text-right font-data text-weft',\n        )}\n        style={{ height: 'var(--row-h)', left: index === 0 ? GUTTER : undefined }}\n      >\n        {column.render(row)}\n      </td>\n    ))}\n    <td className=\"warp-line border-t border-reed/60\" />\n  </tr>\n)\n\ninterface TableProps<T> {\n  readonly rows: readonly T[]\n  readonly columns: readonly Column<T>[]\n  readonly rowId: (row: T) => string\n  readonly title: string\n  readonly noun?: string\n  readonly emptyMessage?: string\n  readonly loading?: boolean\n  readonly actions?: ReactNode\n  readonly onSelectionChange?: (selected: ReadonlySet<string>) => void\n  readonly className?: string\n}\n\nexport const Table = <T,>({\n  rows,\n  columns,\n  rowId,\n  title,\n  noun = 'rows',\n  emptyMessage = 'No row matches the filters.',\n  loading = false,\n  actions,\n  onSelectionChange,\n  className,\n}: TableProps<T>) => {\n  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())\n  /* only a dragged column holds a px width; the rest follow the density */\n  const [widths, setWidths] = useState<Record<string, number | undefined>>({})\n  const [sort, setSort] = useState<Sort | null>(null)\n\n  const span = columns.length + 2\n\n  const resizeColumn = (key: string, next: number) => {\n    setWidths((current) => ({ ...current, [key]: clampWidth(next) }))\n  }\n\n  /* third click restores the order the rows arrived in */\n  const toggleSort = (key: string) => {\n    setSort((current) => {\n      if (current?.key !== key) return { key, direction: 'asc' }\n      if (current.direction === 'asc') return { key, direction: 'desc' }\n      return null\n    })\n  }\n\n  const ordered = useMemo(() => {\n    const column = columns.find((entry) => entry.key === sort?.key)\n    const value = column?.sortValue\n    if (sort === null || value === undefined) return rows\n    const factor = sort.direction === 'asc' ? 1 : -1\n    return [...rows].sort((a, b) => factor * compare(value(a), value(b)))\n  }, [rows, columns, sort])\n\n  /*\n   * a filter can take a selected row off the screen. the count and the head control\n   * read only what is on screen, and the set keeps the rest for when it comes back.\n   */\n  const onScreen = useMemo(() => new Set(rows.map(rowId)), [rows, rowId])\n  const active = useMemo(() => new Set([...selected].filter((id) => onScreen.has(id))), [selected, onScreen])\n\n  const headerState = useMemo<CheckedState>(() => {\n    if (active.size === 0) return false\n    if (active.size === rows.length) return true\n    return 'indeterminate'\n  }, [active, rows.length])\n\n  const applySelection = (next: ReadonlySet<string>) => {\n    setSelected(next)\n    onSelectionChange?.(new Set([...next].filter((id) => onScreen.has(id))))\n  }\n\n  const toggleRow = (id: string) => {\n    const next = new Set(selected)\n    if (!next.delete(id)) next.add(id)\n    applySelection(next)\n  }\n\n  const toggleAll = () => {\n    const next = new Set(selected)\n    if (active.size === rows.length) {\n      onScreen.forEach((id) => next.delete(id))\n    } else {\n      onScreen.forEach((id) => next.add(id))\n    }\n    applySelection(next)\n  }\n\n  const renderBody = () => {\n    if (loading) return <WarpRows span={span} />\n    if (ordered.length === 0) return <EmptyRow span={span} message={emptyMessage} />\n    return ordered.map((row) => {\n      const id = rowId(row)\n      return <Row key={id} row={row} id={id} columns={columns} selected={selected.has(id)} onToggle={toggleRow} />\n    })\n  }\n\n  return (\n    <section className={cx('@container border border-reed bg-raised', className)}>\n      <header className=\"flex items-center justify-between gap-(--stack) border-b border-reed px-(--cell-x) py-(--stack)\">\n        <h2 className=\"font-medium\">{title}</h2>\n        <div className=\"flex items-center gap-(--stack)\">\n          {!loading && (\n            <p className=\"text-weft-dim tnum\">\n              {active.size > 0 ? `${active.size} of ${rows.length} selected` : `${rows.length} ${noun}`}\n            </p>\n          )}\n          {actions}\n        </div>\n      </header>\n\n      <div className=\"reed-scroll max-h-130 overflow-auto\">\n        {/* separate borders: a pinned cell paints its background over a collapsed one */}\n        <table aria-busy={loading} className=\"w-full table-fixed border-separate border-spacing-0 text-left\">\n          <thead className=\"sticky top-0 z-(--z-sticky)\">\n            <tr className=\"bg-raised select-none\">\n              <th\n                scope=\"col\"\n                className=\"reed-edge warp-line-end sticky left-0 z-(--z-pinned) bg-raised px-(--cell-x)\"\n                style={{ height: 'var(--row-h)', width: GUTTER }}\n              >\n                <Checkbox checked={headerState} onCheckedChange={toggleAll} label={`Select all ${noun}`} />\n              </th>\n              {columns.map((column, index) => (\n                <th\n                  key={column.key}\n                  scope=\"col\"\n                  aria-sort={ariaSort(sort, column)}\n                  className={cx(\n                    'reed-edge px-(--cell-x) font-medium',\n                    index === 0 && 'warp-line-end sticky z-(--z-pinned) bg-raised',\n                  )}\n                  style={{\n                    height: 'var(--row-h)',\n                    left: index === 0 ? GUTTER : undefined,\n                    width: widths[column.key] ?? intrinsicWidth(column, sort?.key === column.key),\n                  }}\n                >\n                  <ColumnHead column={column} sort={sort} onSort={() => toggleSort(column.key)} />\n                  <ColumnGrip label={column.label} onResize={(next) => resizeColumn(column.key, next)} />\n                </th>\n              ))}\n              <th scope=\"col\" className=\"reed-edge\">\n                <span className=\"sr-only\">Spare width</span>\n              </th>\n            </tr>\n          </thead>\n\n          <tbody>{renderBody()}</tbody>\n        </table>\n      </div>\n    </section>\n  )\n}\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/table.json",
+        "files": [
+          {
+            "path": "components/ui/table/Table.tsx",
+            "hash": "sha256-H5494nYCriRSS4LvsSy6u5GvXGhwKs/h97GiTVuADMI=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/tabs/Tabs.tsx",
+          "target": "components/ui/tabs/Tabs.tsx",
+          "type": "registry:ui",
+          "content": "import { Tabs as ArkTabs } from '@ark-ui/react/tabs'\nimport type { ReactNode } from 'react'\nimport { cx } from '@/lib/cx'\n\nexport const Tabs = ArkTabs.Root\n\ninterface PartProps {\n  readonly children: ReactNode\n  readonly className?: string\n}\n\n/* ark moves the mark between tabs, and the list is the frame it is placed against */\nexport const TabsList = ({ children, className }: PartProps) => (\n  <ArkTabs.List className={cx('relative flex items-center border-b border-reed', className)}>\n    {children}\n    <ArkTabs.Indicator className=\"selvedge selvedge-bottom selvedge-on tab-mark bottom-0 h-0.5 w-(--width)\" />\n  </ArkTabs.List>\n)\n\ninterface TabsTabProps extends PartProps {\n  readonly value: string\n  readonly disabled?: boolean\n}\n\nexport const TabsTab = ({ value, disabled, children, className }: TabsTabProps) => (\n  <ArkTabs.Trigger\n    value={value}\n    disabled={disabled}\n    className={cx(\n      'h-(--ctl-h) cursor-pointer px-(--cell-x) text-weft-dim transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed hover:text-weft data-selected:text-weft disabled:cursor-not-allowed disabled:opacity-50',\n      className,\n    )}\n  >\n    {children}\n  </ArkTabs.Trigger>\n)\n\ninterface TabsPanelProps extends PartProps {\n  readonly value: string\n}\n\nexport const TabsPanel = ({ value, children, className }: TabsPanelProps) => (\n  <ArkTabs.Content value={value} className={cx('py-(--stack) focus:outline-none', className)}>\n    {children}\n  </ArkTabs.Content>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/tabs.json",
+        "files": [
+          {
+            "path": "components/ui/tabs/Tabs.tsx",
+            "hash": "sha256-A/oKlo9cXHOryZ6k13PtQ8U9JIOudDxJyfD+KrkeTFA=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "icons",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/toast/Toast.tsx",
+          "target": "components/ui/toast/Toast.tsx",
+          "type": "registry:ui",
+          "content": "import { Toast as ArkToast, Toaster as ArkToaster, type CreateToasterReturn } from '@ark-ui/react/toast'\nimport { CloseIcon } from '@/components/ui/icons/Icons'\nimport { cx } from '@/lib/cx'\n\nexport { createToaster } from '@ark-ui/react/toast'\nexport type { CreateToasterReturn }\n\n/* zag names these five types */\nconst TONE: Record<string, string> = {\n  success: 'text-jade',\n  error: 'text-madder',\n  warning: 'text-weld',\n  info: 'text-indigo',\n  loading: 'text-weft-dim',\n}\n\ninterface ToasterProps {\n  readonly toaster: CreateToasterReturn\n  readonly className?: string\n}\n\n/* zag gives the group the highest rank in the document. no token ranks it here. */\nexport const Toaster = ({ toaster, className }: ToasterProps) => (\n  <ArkToaster toaster={toaster}>\n    {(toast) => (\n      <ArkToast.Root className={cx('toast layer flex w-[min(22rem,90vw)] items-start gap-2 p-(--cell-x)', className)}>\n        <div className=\"flex min-w-0 flex-1 flex-col gap-0.5\">\n          <div className={cx('flex items-center gap-1.5', TONE[toast.type ?? 'info'])}>\n            <span className={cx('size-1.25 shrink-0 rounded-full bg-current', toast.type === 'loading' && 'beat')} />\n            <ArkToast.Title className=\"truncate text-weft\">{toast.title}</ArkToast.Title>\n          </div>\n          {toast.description && (\n            <ArkToast.Description className=\"pl-2.75 text-weft-dim\">{toast.description}</ArkToast.Description>\n          )}\n        </div>\n        <ArkToast.CloseTrigger\n          aria-label=\"Dismiss\"\n          className=\"cursor-pointer p-0.5 text-weft-faint transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft\"\n        >\n          <CloseIcon className=\"size-3\" />\n        </ArkToast.CloseTrigger>\n      </ArkToast.Root>\n    )}\n  </ArkToaster>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/toast.json",
+        "files": [
+          {
+            "path": "components/ui/toast/Toast.tsx",
+            "hash": "sha256-pQV9K43M3v3NqflQEF/Pr9tOy1SL1DTAlI+2rGxRI8Y=",
+            "client": true
+          }
+        ]
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "dependencies": [
+        "@ark-ui/react"
+      ],
+      "registryDependencies": [
+        "cx",
+        "tokens"
+      ],
+      "files": [
+        {
+          "path": "components/ui/tooltip/Tooltip.tsx",
+          "target": "components/ui/tooltip/Tooltip.tsx",
+          "type": "registry:ui",
+          "content": "import { Tooltip as ArkTooltip } from '@ark-ui/react/tooltip'\nimport { Portal } from '@ark-ui/react/portal'\nimport type { ReactElement, ReactNode } from 'react'\nimport { cx } from '@/lib/cx'\n\ninterface TooltipProps {\n  readonly content: ReactNode\n  /* asChild: the trigger becomes this element */\n  readonly children: ReactElement\n  readonly openDelay?: number\n  readonly closeDelay?: number\n  readonly className?: string\n}\n\n/* faster than the ark default, for an interface with many small questions */\nexport const Tooltip = ({ content, children, openDelay = 200, closeDelay = 80, className }: TooltipProps) => (\n  <ArkTooltip.Root openDelay={openDelay} closeDelay={closeDelay}>\n    <ArkTooltip.Trigger asChild>{children}</ArkTooltip.Trigger>\n    <Portal>\n      <ArkTooltip.Positioner>\n        <ArkTooltip.Content\n          className={cx(\n            'layer max-w-64 px-2 py-1 text-weft data-[state=open]:animate-[fade_var(--dur-instant)_var(--ease-beat)]',\n            className,\n          )}\n        >\n          {content}\n        </ArkTooltip.Content>\n      </ArkTooltip.Positioner>\n    </Portal>\n  </ArkTooltip.Root>\n)\n"
+        }
+      ],
+      "sley": {
+        "version": "0.1.0",
+        "url": "https://sley-ui.dev/r/0.1.0/tooltip.json",
+        "files": [
+          {
+            "path": "components/ui/tooltip/Tooltip.tsx",
+            "hash": "sha256-r6s5FyUl7r+CXujAMPuhbs3F8zQ6UzVJmPVa2tyq0qA=",
+            "client": true
+          }
+        ]
+      }
+    }
+  ]
+}
