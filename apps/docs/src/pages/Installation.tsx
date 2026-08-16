@@ -84,6 +84,8 @@ export const Installation = () => (
         code={`--cwd <dir>          the project directory
 --registry <source>  a url, or a local directory
 --overwrite          replace a file you edited
+--conflicts          on update, write the conflict markers into the file
+--dry-run            on update, report what would change and write nothing
 --no-install         skip the npm install`}
       />
       <P>
