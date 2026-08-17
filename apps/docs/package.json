@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc -b",
-    "build": "tsc -b && vite build && node sitemap.mjs && node bundle-registry.mjs",
+    "build": "tsc -b && vite build && node sitemap.mjs && node prerender.mjs && node bundle-registry.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
