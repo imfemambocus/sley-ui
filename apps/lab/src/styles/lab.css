@@ -4,3 +4,18 @@
 /* the components and the demo sit outside this app; the scanner needs the paths */
 @source '../../../../packages/registry/src';
 @source '../../../../packages/demo/src';
+
+/*
+ * the palette swaps on one attribute, and the fade is armed only for that moment.
+ * a standing transition would slow every hover and every selection change with it.
+ * the rule stays out of a layer: a layered one loses to the utilities that set
+ * their own transition on the same elements.
+ */
+:root[data-theming] *,
+:root[data-theming] *::before,
+:root[data-theming] *::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, outline-color;
+  transition-duration: var(--dur-overlay);
+  transition-timing-function: var(--ease-glide);
+  transition-delay: 0s;
+}

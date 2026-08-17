@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { CommandPalette, type Command } from '@/components/ui/command-palette/CommandPalette'
 import { FilterBar, type FilterValues } from '@/components/ui/filter-bar/FilterBar'
@@ -35,6 +35,24 @@ interface SegmentedProps<T extends string> {
   readonly onSelect: (next: T) => void
 }
 
+const LoomMark = () => (
+  <svg
+    className="size-7 shrink-0 -translate-y-[0.75px] text-indigo"
+    viewBox="0 0 32 32"
+    fill="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <g stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+      <line x1="5" y1="4" x2="5" y2="28" />
+      <line x1="12" y1="4" x2="12" y2="28" />
+      <line x1="19" y1="4" x2="19" y2="28" />
+      <line x1="26" y1="4" x2="26" y2="28" />
+      <line x1="3" y1="21.5" x2="29" y2="21.5" />
+    </g>
+  </svg>
+)
+
 const Segmented = <T extends string>({ legend, options, value, onSelect }: SegmentedProps<T>) => (
   <fieldset className="flex items-center border border-reed">
     <legend className="sr-only">{legend}</legend>
@@ -66,6 +84,28 @@ export const App = () => {
   const [pending, setPending] = useState<Run | null>(null)
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set())
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())
+  const fading = useRef(0)
+
+  /*
+   * the flag arms the colour transition, and chrome starts no transition when the
+   * flag and the new palette land in one style computation. so the palette waits a
+   * frame, by which time the flag is painted. the flag lifts one instant after the
+   * fade ends. under reduced motion every duration is 0ms and the theme just swaps.
+   */
+  const changeTheme = useCallback((next: Theme) => {
+    const root = document.documentElement
+    const style = getComputedStyle(root)
+    const fade = Number.parseFloat(style.getPropertyValue('--dur-overlay'))
+    if (fade === 0) {
+      setTheme(next)
+      return
+    }
+    const margin = Number.parseFloat(style.getPropertyValue('--dur-instant'))
+    root.dataset.theming = ''
+    window.clearTimeout(fading.current)
+    requestAnimationFrame(() => setTheme(next))
+    fading.current = window.setTimeout(() => delete root.dataset.theming, fade + margin)
+  }, [])
 
   useEffect(() => {
     const root = document.documentElement
@@ -134,7 +174,7 @@ export const App = () => {
         id: `theme-${option}`,
         group: 'Appearance',
         label: `Switch to ${option}`,
-        run: () => setTheme(option),
+        run: () => changeTheme(option),
       })),
       {
         id: 'filter-running',
@@ -179,7 +219,7 @@ export const App = () => {
         run: () => setDetail(runs[0]),
       },
     ],
-    [toggleLong],
+    [toggleLong, changeTheme],
   )
 
   return (
@@ -187,8 +227,14 @@ export const App = () => {
       <div className="mx-auto flex max-w-295 flex-col gap-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="font-ui text-[34px] leading-none font-bold tracking-[-0.045em]">sley</p>
-            <p className="mt-1.5 text-weft-dim">Components for interfaces that hold a lot of data.</p>
+            <div className="flex items-center gap-2">
+              <LoomMark />
+              <div className="flex items-baseline gap-3">
+                <p className="font-ui text-[34px] leading-none font-bold tracking-[-0.045em]">sley</p>
+                <p className="font-data text-[19px] leading-none text-weft-dim">lab</p>
+              </div>
+            </div>
+            <p className="mt-2.5 text-weft-dim">Components for interfaces that hold a lot of data.</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-(--stack)">
@@ -200,7 +246,7 @@ export const App = () => {
               ))}
             </ul>
             <Segmented legend="Density" options={DENSITIES} value={density} onSelect={setDensity} />
-            <Segmented legend="Appearance" options={THEMES} value={theme} onSelect={setTheme} />
+            <Segmented legend="Appearance" options={THEMES} value={theme} onSelect={changeTheme} />
             <Button onClick={() => setPaletteOpen(true)}>
               <span>Commands</span>
               <kbd className="font-data text-[11px] text-weft-faint">⌘K</kbd>
