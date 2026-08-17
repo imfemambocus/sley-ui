@@ -4,10 +4,10 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from 'react'
+import { flushSync } from 'react-dom'
 
 export const DENSITIES = ['comfortable', 'compact', 'dense'] as const
 export type Density = (typeof DENSITIES)[number]
@@ -36,7 +36,6 @@ export const useSettings = () => useContext(SettingsContext)
 export const SettingsProvider = ({ children }: { readonly children: ReactNode }) => {
   const [density, setDensity] = useState<Density>('comfortable')
   const [theme, setTheme] = useState<Theme>('dark')
-  const fading = useRef(0)
 
   useEffect(() => {
     document.documentElement.dataset.density = density
@@ -44,24 +43,21 @@ export const SettingsProvider = ({ children }: { readonly children: ReactNode })
   }, [density, theme])
 
   /*
-   * the flag arms the colour transition, and chrome starts no transition when the
-   * flag and the new palette land in one style computation. so the palette waits a
-   * frame, by which time the flag is painted. the flag lifts one instant after the
-   * fade ends. under reduced motion every duration is 0ms and the theme just swaps.
+   * the cross fade needs the new palette inside its callback, so the state update
+   * is flushed there. reduced motion sets the duration to 0ms and takes the plain
+   * path, which spares the snapshot. a browser with no view transitions swaps.
    */
   const changeTheme = useCallback((next: Theme) => {
-    const root = document.documentElement
-    const style = getComputedStyle(root)
-    const fade = Number.parseFloat(style.getPropertyValue('--dur-overlay'))
-    if (fade === 0) {
+    const fade = Number.parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--dur-overlay'),
+    )
+    if (fade === 0 || !document.startViewTransition) {
       setTheme(next)
       return
     }
-    const margin = Number.parseFloat(style.getPropertyValue('--dur-instant'))
-    root.dataset.theming = ''
-    window.clearTimeout(fading.current)
-    requestAnimationFrame(() => setTheme(next))
-    fading.current = window.setTimeout(() => delete root.dataset.theming, fade + margin)
+    document.startViewTransition(() => {
+      flushSync(() => setTheme(next))
+    })
   }, [])
 
   const value = useMemo(

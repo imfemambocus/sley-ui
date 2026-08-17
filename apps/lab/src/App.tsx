@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Button } from '@/components/ui/button/Button'
 import { CommandPalette, type Command } from '@/components/ui/command-palette/CommandPalette'
 import { FilterBar, type FilterValues } from '@/components/ui/filter-bar/FilterBar'
@@ -84,27 +85,23 @@ export const App = () => {
   const [pending, setPending] = useState<Run | null>(null)
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set())
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())
-  const fading = useRef(0)
 
   /*
-   * the flag arms the colour transition, and chrome starts no transition when the
-   * flag and the new palette land in one style computation. so the palette waits a
-   * frame, by which time the flag is painted. the flag lifts one instant after the
-   * fade ends. under reduced motion every duration is 0ms and the theme just swaps.
+   * the cross fade needs the new palette inside its callback, so the state update
+   * is flushed there. reduced motion sets the duration to 0ms and takes the plain
+   * path, which spares the snapshot. a browser with no view transitions swaps.
    */
   const changeTheme = useCallback((next: Theme) => {
-    const root = document.documentElement
-    const style = getComputedStyle(root)
-    const fade = Number.parseFloat(style.getPropertyValue('--dur-overlay'))
-    if (fade === 0) {
+    const fade = Number.parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--dur-overlay'),
+    )
+    if (fade === 0 || !document.startViewTransition) {
       setTheme(next)
       return
     }
-    const margin = Number.parseFloat(style.getPropertyValue('--dur-instant'))
-    root.dataset.theming = ''
-    window.clearTimeout(fading.current)
-    requestAnimationFrame(() => setTheme(next))
-    fading.current = window.setTimeout(() => delete root.dataset.theming, fade + margin)
+    document.startViewTransition(() => {
+      flushSync(() => setTheme(next))
+    })
   }, [])
 
   useEffect(() => {
