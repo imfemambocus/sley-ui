@@ -1,4 +1,5 @@
 import { CodeBlock } from '../site/CodeBlock'
+import { SANDBOX } from '../site/Header'
 import { Code, Lede, List, Note, P, PageTitle, Section } from '../site/Prose'
 
 export const Installation = () => (
@@ -10,6 +11,27 @@ export const Installation = () => (
         component and everything it imports.
       </Lede>
     </header>
+
+    <Section id="sandbox" title="Try it without installing anything">
+      <P>
+        <a
+          href={SANDBOX}
+          target="_blank"
+          rel="noreferrer"
+          className="text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft"
+        >
+          This sandbox
+        </a>
+        <span>
+          {' '}
+          opens in a new tab and boots a Vite project with Sley UI already in it, with nothing to
+          install and nothing to undo. It is a real install rather than a copy of the library: it
+          carries its own{' '}
+        </span>
+        <Code>sley.lock</Code>
+        <span>, so you can run the update command inside it too.</span>
+      </P>
+    </Section>
 
     <Section id="requirements" title="What you need first">
       <List>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { RunConsole } from '../console/RunConsole'
 import { CodeBlock } from '../site/CodeBlock'
+import { SANDBOX } from '../site/Header'
 import { Link } from '../site/router'
 import { Segmented } from '../site/Segmented'
 import { DENSITIES, useDensityValues, useSettings } from '../site/settings'
@@ -71,6 +72,18 @@ export const Home = () => (
           </Link>
         </div>
         <CodeBlock shell code={'npx sley-ui init\nnpx sley-ui add table'} className="max-w-sm" />
+        <p className="text-weft-dim">
+          <span>Or try it before you run anything: </span>
+          <a
+            href={SANDBOX}
+            target="_blank"
+            rel="noreferrer"
+            className="text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft"
+          >
+            open a working app in your browser
+          </a>
+          <span>. It boots a Vite project with the components already installed, in a new tab.</span>
+        </p>
       </div>
       <div className="reed-band h-0.5 w-full" />
     </section>

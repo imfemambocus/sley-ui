@@ -11,6 +11,7 @@ const LINKS = [
 ]
 
 export const GITHUB = 'https://github.com/imfemambocus/sley-ui'
+export const SANDBOX = 'https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter'
 
 interface HeaderProps {
   readonly onOpenPalette: () => void
