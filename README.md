@@ -12,6 +12,8 @@ The components are not an npm dependency. A command copies the source files into
 
 ## Install
 
+If you would rather see it working first, [open the starter in your browser](https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter). It boots a Vite project with the components already in it, and there is nothing to install and nothing to undo. The same app is in `examples/starter` if you want it locally.
+
 ```sh
 npx sley-ui init
 npx sley-ui add table
