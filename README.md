@@ -39,6 +39,8 @@ You own the code, so a normal registry cannot update it. Sley UI records the sou
 
 Where your edit and mine land on the same lines, nothing is written. It tells you which files need you to decide, and `--conflicts` puts the usual markers in them so you can resolve them in your editor. `--dry-run` shows you the whole thing first.
 
+What each version changed, and why, is written up at [sley-ui.dev/docs/releases](https://sley-ui.dev/docs/releases). That page is built from the frozen release bundles, so it describes the same files the command installs.
+
 ## Status
 
 Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.2.1, and the CLI is on npm at 0.2.0, so every command above runs today on a fresh Vite app and a fresh Next app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
