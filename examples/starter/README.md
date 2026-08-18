@@ -5,7 +5,7 @@ you run anything against your own project.
 
 Open it in the browser, with nothing to install:
 
-https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter
+https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter?file=src%2FApp.tsx
 
 Or locally:
 

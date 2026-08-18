@@ -11,7 +11,9 @@ const LINKS = [
 ]
 
 export const GITHUB = 'https://github.com/imfemambocus/sley-ui'
-export const SANDBOX = 'https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter'
+/* without the file it opens on the readme, and the reader wants the code that drives the table */
+export const SANDBOX =
+  'https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter?file=src%2FApp.tsx'
 
 interface HeaderProps {
   readonly onOpenPalette: () => void
