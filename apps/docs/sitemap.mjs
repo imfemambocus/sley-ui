@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 const SITE = 'https://sley-ui.dev'
 
 /* the pages that are not one component each, in the order the sidebar lists them */
-const PAGES = ['/', '/docs/installation', '/docs/updates', '/docs/releases', '/docs/density', '/docs/motion', '/docs/colour', '/docs/type']
+const PAGES = ['/', '/docs/installation', '/docs/updates', '/docs/releases', '/docs/keyboard', '/docs/density', '/docs/motion', '/docs/colour', '/docs/type']
 
 const root = dirname(fileURLToPath(import.meta.url))
 

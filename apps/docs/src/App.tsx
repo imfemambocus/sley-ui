@@ -5,6 +5,7 @@ import { ComponentPage } from './pages/ComponentPage'
 import { DensityPage } from './pages/Density'
 import { Home } from './pages/Home'
 import { Installation } from './pages/Installation'
+import { Keyboard } from './pages/Keyboard'
 import { MotionPage } from './pages/Motion'
 import { NotFound } from './pages/NotFound'
 import { Releases } from './pages/Releases'
@@ -18,6 +19,7 @@ const DOC_PAGES: Record<string, FC> = {
   '/docs/installation': Installation,
   '/docs/updates': Updates,
   '/docs/releases': Releases,
+  '/docs/keyboard': Keyboard,
   '/docs/density': DensityPage,
   '/docs/motion': MotionPage,
   '/docs/colour': ColourPage,

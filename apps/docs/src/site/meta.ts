@@ -23,6 +23,11 @@ export const PAGE_META: Record<string, { readonly title: string; readonly descri
     description:
       'Every version the registry serves, the files each one moved, and why. Built from the frozen release bundles.',
   },
+  '/docs/keyboard': {
+    title: 'Keyboard',
+    description:
+      'Every control in a dense table reachable without a pointer: sorting, resizing, selection and the command palette.',
+  },
   '/docs/density': {
     title: 'Density',
     description:
