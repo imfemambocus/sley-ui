@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "registry": "https://sley-ui.dev/r",
+  "items": {
+    "tokens": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/tokens.json",
+      "files": [
+        {
+          "path": "src/styles/tokens.css",
+          "hash": "sha256-HC3iXWvQk6fCbyY/VIYG48G0eH8KTs61oIDDgt5ONvA="
+        }
+      ]
+    },
+    "cx": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/cx.json",
+      "files": [
+        {
+          "path": "src/lib/cx.ts",
+          "hash": "sha256-nCgIrhJMREr99PRsI+he7LXaUaFBBdwZSWpHWqK/JBo="
+        }
+      ]
+    },
+    "icons": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/icons.json",
+      "files": [
+        {
+          "path": "src/components/ui/icons/Icons.tsx",
+          "hash": "sha256-tKgwm260H+guNo4nhWzwTzjxDl4T+yhQlKJrL/0sqto="
+        }
+      ]
+    },
+    "checkbox": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/checkbox.json",
+      "files": [
+        {
+          "path": "src/components/ui/checkbox/Checkbox.tsx",
+          "hash": "sha256-KUJ+kUgBjws/gJiEecaRJXavYOLRUnXP5jGYTAUaf1o="
+        }
+      ]
+    },
+    "empty-state": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/empty-state.json",
+      "files": [
+        {
+          "path": "src/components/ui/empty-state/EmptyState.tsx",
+          "hash": "sha256-Bag74bmIj81j/gjAWETKZdiA20VRuDnQWHsAzca0Nu4="
+        }
+      ]
+    },
+    "tooltip": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/tooltip.json",
+      "files": [
+        {
+          "path": "src/components/ui/tooltip/Tooltip.tsx",
+          "hash": "sha256-r6s5FyUl7r+CXujAMPuhbs3F8zQ6UzVJmPVa2tyq0qA="
+        }
+      ]
+    },
+    "table": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/table.json",
+      "files": [
+        {
+          "path": "src/components/ui/table/Table.tsx",
+          "hash": "sha256-AIn3VKS9wiU8LiFek4UU5ifTDKi615FEW7SH8k88F1s="
+        }
+      ]
+    },
+    "select": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/select.json",
+      "files": [
+        {
+          "path": "src/components/ui/select/Select.tsx",
+          "hash": "sha256-lk5MRYwtnhdIrV+B4J2zCVZUWK3NPwxoFXMDnAaJjqM="
+        }
+      ]
+    },
+    "filter-bar": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/filter-bar.json",
+      "files": [
+        {
+          "path": "src/components/ui/filter-bar/FilterBar.tsx",
+          "hash": "sha256-lAJgLydXWTY8ooTOU5VnsHEYwlKiFXM8AZ5R2VyOlFM="
+        }
+      ]
+    },
+    "button": {
+      "version": "0.2.2",
+      "url": "https://sley-ui.dev/r/0.2.2/button.json",
+      "files": [
+        {
+          "path": "src/components/ui/button/Button.tsx",
+          "hash": "sha256-U7D99UXvaDnReNcv5X6HIclmrSIDrhLErZn8DP2vxEc="
+        }
+      ]
+    }
+  }
+}
