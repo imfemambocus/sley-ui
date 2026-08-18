@@ -7,6 +7,7 @@ import { Home } from './pages/Home'
 import { Installation } from './pages/Installation'
 import { MotionPage } from './pages/Motion'
 import { NotFound } from './pages/NotFound'
+import { Releases } from './pages/Releases'
 import { TypePage } from './pages/Type'
 import { Updates } from './pages/Updates'
 import { DEFAULT_DESCRIPTION, PAGE_META, usePageMeta } from './site/meta'
@@ -16,6 +17,7 @@ import { useRoute } from './site/router'
 const DOC_PAGES: Record<string, FC> = {
   '/docs/installation': Installation,
   '/docs/updates': Updates,
+  '/docs/releases': Releases,
   '/docs/density': DensityPage,
   '/docs/motion': MotionPage,
   '/docs/colour': ColourPage,

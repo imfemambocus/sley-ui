@@ -18,6 +18,11 @@ export const PAGE_META: Record<string, { readonly title: string; readonly descri
     description:
       'How sley update merges a new release into files you have edited, across the old version, the new one and yours.',
   },
+  '/docs/releases': {
+    title: 'Releases',
+    description:
+      'Every version the registry serves, the files each one moved, and why. Built from the frozen release bundles.',
+  },
   '/docs/density': {
     title: 'Density',
     description:
