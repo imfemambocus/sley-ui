@@ -54,16 +54,47 @@ export const Installation = () => (
       <CodeBlock shell code={'npx sley-ui add table\nnpx sley-ui add dialog panel toast'} />
       <P>
         Dependencies come with it, and they are written before the file that imports them. Adding the
-        table gives you <Code>cx</Code>, the icons, the checkbox, the empty state, the tooltip and the
-        figure, because that is what the table is built out of. No component declares its
-        dependencies by hand: the build script reads the imports out of the source, so a header
-        nobody maintains cannot go stale.
+        table gives you <Code>cx</Code>, the icons, the checkbox, the empty state and the tooltip,
+        because that is what the table is built out of. No component declares its dependencies by
+        hand: the build script reads the imports out of the source, so a header nobody maintains
+        cannot go stale.
       </P>
       <P>
         If a file already on disk differs from the version you installed, it is kept and marked with
         an exclamation mark rather than replaced. Pass <Code>--overwrite</Code> when you want mine
         back.
       </P>
+    </Section>
+
+    <Section id="written" title="What lands in your project">
+      <P>
+        Everything is a file you can read, and every path is relative to whatever your alias points
+        at, so a Vite project with <Code>@</Code> on <Code>src</Code> gets them under{' '}
+        <Code>src</Code>. Running the two commands above leaves this:
+      </P>
+      <CodeBlock
+        code={`components.json                           init, and shared with shadcn
+sley.lock                                 init, and updated by every add
+styles/tokens.css                         init, imported from your stylesheet
+
+components/ui/table/Table.tsx             add table
+components/ui/checkbox/Checkbox.tsx
+components/ui/empty-state/EmptyState.tsx
+components/ui/icons/Icons.tsx
+components/ui/tooltip/Tooltip.tsx
+lib/cx.ts`}
+      />
+      <P>
+        Three npm packages arrive with that set: <Code>clsx</Code> and <Code>tailwind-merge</Code>{' '}
+        for <Code>cx</Code>, and <Code>@ark-ui/react</Code> for the parts built on a state machine.
+        The table itself declares none. Pass <Code>--no-install</Code> and it writes the files and
+        leaves your package manager alone.
+      </P>
+      <Note>
+        Nothing here is a dependency on Sley UI. Delete <Code>sley.lock</Code> and the files stay
+        exactly as they are, and keep working. The lockfile is what <Code>update</Code> reads, so
+        deleting it costs you the merge and nothing else.
+      </Note>
     </Section>
 
     <Section id="next" title="A note for Next">
