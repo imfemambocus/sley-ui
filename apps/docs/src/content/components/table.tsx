@@ -8,7 +8,7 @@ import { Code, P } from '../../site/Prose'
 import type { ComponentDoc } from '../types'
 
 const SHORT = runs.slice(0, 9)
-const LONG_ROWS = 1000
+const LONG_ROWS = 5000
 const LOAD_MS = 450
 
 const TableDemo = () => {
@@ -31,7 +31,7 @@ const TableDemo = () => {
   return (
     <Demo
       bleed
-      caption="Drag a divider to resize. Click a head to sort, three times to get the original order back. At 1000 rows the body holds about 30 of them and the rest is spacer height."
+      caption="Drag a divider to resize. Click a head to sort, three times to get the original order back. At 5000 rows the body holds about 30 of them and the rest is spacer height."
     >
       <Table
         rows={rows}
@@ -156,13 +156,19 @@ export const doc: ComponentDoc = {
   measured: [
     {
       value: '1000 rows to 31',
-      what: 'What the body actually holds at the size the demo above loads',
+      what: 'What the body holds at 1000 rows, where a browser already copes on its own',
       detail:
         'Compact, ten columns: 12,000 cells become 350. The median scroll step only falls from 22.5ms to 19.6ms at this size, because a browser scrolls 1000 rows perfectly well. The window is buying headroom here, not speed.',
     },
     {
+      value: '1.6s',
+      what: 'What the button above costs when the batch lands',
+      detail:
+        'One off, on the built site, measured from the click to the second paint after it and with the 450ms stand in for a fetch taken off. 334ms at 1000 rows and 1628ms at 5000, so it scales with the row count rather than squaring. The window governs scrolling, and it does not make the first render of a batch free.',
+    },
+    {
       value: '84.4ms to 18.4ms',
-      what: 'Where that headroom pays, at 5000 rows',
+      what: 'Where that headroom pays, and the size the demo above loads',
       detail:
         'Same method, five times the data. Without the window: 5000 rows, 60,000 cells. With it: 30 rows, 349 cells. Ten scroll steps of 400px, median taken.',
     },
