@@ -1,9 +1,20 @@
 /* written by releases.mjs from the frozen bundles. do not edit. */
 import type { ReleaseEntry } from './types'
 
-export const LATEST = '0.2.1'
+export const LATEST = '0.2.2'
 
 export const RELEASES: readonly ReleaseEntry[] = [
+  {
+    version: '0.2.2',
+    items: 18,
+    files: 18,
+    first: false,
+    added: [],
+    changed: [
+      { item: 'panel', path: 'components/ui/panel/Panel.tsx' },
+    ],
+    removed: [],
+  },
   {
     version: '0.2.1',
     items: 18,

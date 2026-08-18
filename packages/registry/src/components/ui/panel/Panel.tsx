@@ -1,6 +1,6 @@
 import { Dialog } from '@ark-ui/react/dialog'
 import { Portal } from '@ark-ui/react/portal'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { CloseIcon } from '@/components/ui/icons/Icons'
 import { cx } from '@/lib/cx'
 
@@ -21,6 +21,30 @@ function useSheet() {
   }, [])
 
   return sheet
+}
+
+/*
+ * zag returns focus from inside its focus trap, and it only runs that trap when the dialog is
+ * modal. so a panel that leaves the page live drops the reader on the body when it closes, and
+ * has to put focus back itself. closing is always started from inside the panel here, by escape
+ * or by the close button, so there is no other claim on focus to weigh.
+ */
+function useReturnFocus(open: boolean, trapped: boolean) {
+  const origin = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (trapped) return
+
+    if (open) {
+      const active = document.activeElement
+      origin.current = active instanceof HTMLElement ? active : null
+      return
+    }
+
+    const element = origin.current
+    origin.current = null
+    if (element?.isConnected) element.focus()
+  }, [open, trapped])
 }
 
 /* the positioner holds the edge; the border belongs to the part that animates */
@@ -55,6 +79,7 @@ export const Panel = ({
   className,
 }: PanelProps) => {
   const sheet = useSheet()
+  useReturnFocus(open, sheet)
 
   return (
     <Dialog.Root

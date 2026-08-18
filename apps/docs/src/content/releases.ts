@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.2.2': {
+    date: '2026-08-18',
+    title: 'The panel gives focus back',
+    body: 'A panel that leaves the page live is not modal, and Zag returns focus from inside its focus trap, which it only runs for a modal dialog. So closing a panel with Escape dropped a keyboard reader on the body instead of the control they opened it from. The panel now records what had focus and puts it back itself. Trapping focus instead would have fixed the same symptom and broken the reason the panel is not modal.',
+  },
   '0.2.1': {
     date: '2026-08-16',
     title: 'The table frame isolates its stacking ranks',
