@@ -12,7 +12,7 @@ The components are not an npm dependency. A command copies the source files into
 
 ## Install
 
-If you would rather see it working first, [open the starter in your browser](https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter?file=src%2FApp.tsx). It boots a Vite project with the components already in it, and there is nothing to install and nothing to undo. The same app is in `examples/starter` if you want it locally.
+If you would rather see it working first, [open the starter in your browser](https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter?file=src%2FApp.tsx). It boots a Vite project with the components already in it, and there is nothing to install and nothing to undo. The same app is in `examples/starter` if you want it locally. If it is the commands you would rather not take on trust, [this sandbox starts empty](https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/blank?file=src%2FApp.tsx) and you run them yourself in its terminal.
 
 ```sh
 npx sley-ui init

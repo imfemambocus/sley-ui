@@ -1,5 +1,5 @@
 import { CodeBlock } from '../site/CodeBlock'
-import { SANDBOX } from '../site/Header'
+import { SANDBOX, SANDBOX_BLANK } from '../site/Header'
 import { Code, Lede, List, Note, P, PageTitle, Section } from '../site/Prose'
 
 export const Installation = () => (
@@ -30,6 +30,24 @@ export const Installation = () => (
         </span>
         <Code>sley.lock</Code>
         <span>, so you can run the update command inside it too.</span>
+      </P>
+      <P>
+        <span>If it is the commands themselves you would rather not take on trust, </span>
+        <a
+          href={SANDBOX_BLANK}
+          target="_blank"
+          rel="noreferrer"
+          className="text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft"
+        >
+          this one starts empty
+        </a>
+        <span>
+          {' '}
+          and opens in a new tab. It is a Vite app with Tailwind and nothing else, and you run the two
+          commands below in its terminal and watch the files arrive. Both were run there on a real
+          container: <Code>init</Code> takes about a second, and <Code>add</Code> takes longer because
+          it installs what the components import.
+        </span>
       </P>
     </Section>
 

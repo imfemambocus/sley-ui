@@ -37,3 +37,6 @@ easy to miss, since every class still resolves and only the sizes stay put.
 
 The fonts come from Google Fonts in `index.html`. Nothing breaks without them, but Archivo and
 IBM Plex Mono carry half the identity, and the data face is the one doing the work.
+
+If you would rather run the install commands yourself and watch them work, `examples/blank` is the
+same thing with nothing installed.
