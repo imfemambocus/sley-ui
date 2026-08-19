@@ -94,7 +94,17 @@ async function readItemFiles(paths, targetOf) {
   return files
 }
 
-function collectDependencies(files, self) {
+/*
+ * the range comes from this package's own dependencies, so a user installs the version
+ * the components were written against. a bare name takes the newest, and one of these
+ * is on a 0.x line where a minor release may break a chart.
+ */
+function withRange(pkg, ranges) {
+  const range = ranges[pkg]
+  return range ? `${pkg}@${range}` : pkg
+}
+
+function collectDependencies(files, self, ranges) {
   const npm = new Set()
   const registry = new Set()
   for (const file of files) {
@@ -104,7 +114,7 @@ function collectDependencies(files, self) {
       if (item && item !== self) registry.add(item)
     }
   }
-  return { npm: [...npm].sort(byCodeUnit), registry: [...registry].sort(byCodeUnit) }
+  return { npm: [...npm].sort(byCodeUnit).map((pkg) => withRange(pkg, ranges)), registry: [...registry].sort(byCodeUnit) }
 }
 
 function title(name) {
@@ -114,8 +124,8 @@ function title(name) {
     .join(' ')
 }
 
-function buildItem({ name, type, files, fileType, version, extraRegistry = [] }) {
-  const { npm, registry } = collectDependencies(files, name)
+function buildItem({ name, type, files, fileType, version, ranges, extraRegistry = [] }) {
+  const { npm, registry } = collectDependencies(files, name, ranges)
   const registryDependencies = [...new Set([...registry, ...extraRegistry])].sort(byCodeUnit)
 
   return {
@@ -203,18 +213,18 @@ async function main() {
   await rm(join(root, 'dist'), { recursive: true, force: true })
   await mkdir(out, { recursive: true })
 
-  const { version } = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
+  const { version, dependencies: ranges } = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
   const items = []
 
   const styleFiles = await readItemFiles([join(src, 'styles', 'tokens.css')], () => 'styles/tokens.css')
   items.push(
-    buildItem({ name: STYLE_ITEM, type: 'registry:style', files: styleFiles, fileType: 'registry:file', version }),
+    buildItem({ name: STYLE_ITEM, type: 'registry:style', files: styleFiles, fileType: 'registry:file', version, ranges }),
   )
 
   for (const path of await walk(join(src, 'lib'))) {
     const name = path.split('/').pop().replace(/\.ts$/, '')
     const files = await readItemFiles([path], (file) => `lib/${file.split('/').pop()}`)
-    items.push(buildItem({ name, type: 'registry:lib', files, fileType: 'registry:lib', version }))
+    items.push(buildItem({ name, type: 'registry:lib', files, fileType: 'registry:lib', version, ranges }))
   }
 
   const uiRoot = join(src, 'components', 'ui')
@@ -229,6 +239,7 @@ async function main() {
         files,
         fileType: 'registry:ui',
         version,
+        ranges,
         extraRegistry: [STYLE_ITEM],
       }),
     )
