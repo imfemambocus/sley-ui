@@ -466,6 +466,12 @@
     color: var(--color-weft-dim);
     font-family: var(--font-data);
     font-size: var(--ui-text);
+    /*
+     * the halo behind a crosshair readout and the fill of a tip. plot declares it
+     * white from a <style> inside the svg, and an unlayered rule outranks a layered
+     * one whatever the specificity says, so this one has to shout.
+     */
+    --plot-background: var(--color-raised) !important;
   }
 
   .sley-plot [aria-label$='grid'] {
@@ -485,6 +491,15 @@
   .sley-plot [aria-label$='axis label'] {
     color: var(--color-weft-dim);
     font-family: var(--font-ui);
+  }
+
+  .sley-plot [aria-label='crosshair rule'] {
+    color: var(--color-reed-lit);
+    stroke-opacity: 1;
+  }
+
+  .sley-plot [aria-label='crosshair text'] {
+    color: var(--color-weft);
   }
 }
 

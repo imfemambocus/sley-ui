@@ -46,6 +46,18 @@ const Notes = () => (
       2.56px to spare at the worst.
     </P>
     <P>
+      A crosshair is a mark you add rather than a prop you set. Plot names its parts{' '}
+      <Code>crosshair rule</Code> and <Code>crosshair text</Code>, so the stylesheet reaches them and
+      any chart that adds one gets the reed colour and the data face without asking for either. The
+      readout is the raw value, which is why a date arrives in full.
+    </P>
+    <P>
+      The halo behind that readout was white, and it stayed white through a rule that should have
+      beaten it. Plot ships a <Code>&lt;style&gt;</Code> element inside the svg, and an unlayered rule
+      outranks a layered one whatever the specificity says. So <Code>--plot-background</Code> is one of
+      the few declarations here that has to shout. It sets the fill of a <Code>Plot.tip</Code> as well.
+    </P>
+    <P>
       Five picks is the ceiling of the series scale. A pick is one pass of the weft through the shed,
       and the banner motif carries five. Past five I cannot tell two lines apart in the dark theme.
     </P>

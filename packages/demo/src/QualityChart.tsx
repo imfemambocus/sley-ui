@@ -36,6 +36,7 @@ export const QualityChart = () => {
         }),
         /* daily readings, so the line joins them straight. a curve would draw a value nobody measured. */
         Plot.lineY(quality, { x: 'day', y: 'q30', stroke: 'assay', strokeWidth: 1.5 }),
+        Plot.crosshairX(quality, { x: 'day', y: 'q30' }),
       ],
     }),
     [],
