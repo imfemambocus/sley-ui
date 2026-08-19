@@ -1,5 +1,6 @@
 import type { ComponentDoc } from '../types'
 import { doc as button } from './button'
+import { doc as chart } from './chart'
 import { doc as checkbox } from './checkbox'
 import { doc as commandPalette } from './command-palette'
 import { doc as dialog } from './dialog'
@@ -18,6 +19,7 @@ import { doc as tooltip } from './tooltip'
 
 export const COMPONENT_DOCS: readonly ComponentDoc[] = [
   button,
+  chart,
   checkbox,
   commandPalette,
   dialog,

@@ -10,6 +10,11 @@ export interface NavGroup {
   readonly items: readonly NavItem[]
 }
 
+/* a chart is its own layer, and it is not one of the twelve controls */
+const CHART_SLUGS: ReadonlySet<string> = new Set(['chart'])
+
+const linkOf = (doc: (typeof COMPONENT_DOCS)[number]) => ({ href: `/components/${doc.slug}`, label: doc.name })
+
 export const NAV: readonly NavGroup[] = [
   {
     label: 'Start',
@@ -32,7 +37,11 @@ export const NAV: readonly NavGroup[] = [
   },
   {
     label: 'Components',
-    items: COMPONENT_DOCS.map((doc) => ({ href: `/components/${doc.slug}`, label: doc.name })),
+    items: COMPONENT_DOCS.filter((doc) => !CHART_SLUGS.has(doc.slug)).map(linkOf),
+  },
+  {
+    label: 'Charts',
+    items: COMPONENT_DOCS.filter((doc) => CHART_SLUGS.has(doc.slug)).map(linkOf),
   },
 ]
 

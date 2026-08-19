@@ -61,7 +61,8 @@ export const Home = () => (
           Tables, filter bars, command palettes, side panels and long forms. I built Sley UI because
           every library I reached for was designed for a marketing page: right with eight elements on
           a screen, and at two hundred the padding eats the viewport. So I started from the dense
-          case instead.
+          case instead. A chart sits beside them, drawn in plain SVG by Observable Plot, which puts
+          it under the same tokens as everything else.
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/docs/installation">
