@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.3.0': {
+    date: '2026-08-19',
+    title: 'A chart, and a version range on every dependency',
+    body: 'Nineteen items. The chart is an Observable Plot frame in the same shell the table uses, and Plot writes plain SVG, so the tokens style it directly instead of through a theme system of its own. Colours go in as var() references and stay that way in the markup, which is what lets a theme switch repaint a chart with no re-render at all. The series scale is five picks and five is the ceiling. Plot brings d3 with it and added 92.13kB gzipped to this site, measured on the production build with and without the page, so the chart sits beside the twelve controls rather than inside them. This release also gives every item the version range its npm dependencies were written against. A bare package name installed the newest, and Plot is on a 0.x line where a minor release can break a chart. The token file moves in this release, so if you have edited your palette this is the first update that merges into it.',
+  },
   '0.2.2': {
     date: '2026-08-18',
     title: 'The panel gives focus back',

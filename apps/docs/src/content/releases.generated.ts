@@ -1,9 +1,22 @@
 /* written by releases.mjs from the frozen bundles. do not edit. */
 import type { ReleaseEntry } from './types'
 
-export const LATEST = '0.2.2'
+export const LATEST = '0.3.0'
 
 export const RELEASES: readonly ReleaseEntry[] = [
+  {
+    version: '0.3.0',
+    items: 19,
+    files: 19,
+    first: false,
+    added: [
+      { item: 'chart', path: 'components/ui/chart/Chart.tsx' },
+    ],
+    changed: [
+      { item: 'tokens', path: 'styles/tokens.css' },
+    ],
+    removed: [],
+  },
   {
     version: '0.2.2',
     items: 18,
