@@ -130,6 +130,13 @@ lib/cx.ts`}
         The table itself declares none. Pass <Code>--no-install</Code> and it writes the files and
         leaves your package manager alone.
       </P>
+      <P>
+        The version in the lockfile is the registry version, not the version of the CLI you ran. It
+        names the release of the components you installed, and npm carries its own number for the
+        tool, so the two move separately. If you open an issue, give me both: the registry version
+        out of <Code>sley.lock</Code>, and the CLI version from{' '}
+        <Code>npx sley-ui --version</Code>.
+      </P>
       <Note>
         Nothing here is a dependency on Sley UI. Delete <Code>sley.lock</Code> and the files stay
         exactly as they are, and keep working. The lockfile is what <Code>update</Code> reads, so
