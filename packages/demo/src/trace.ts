@@ -49,3 +49,9 @@ export function trace(): readonly Sample[] {
   })
   return built
 }
+
+const pad = (value: number) => String(value).padStart(2, '0')
+
+export function clockLabel(at: Date) {
+  return `${pad(at.getUTCHours())}:${pad(at.getUTCMinutes())}:${pad(at.getUTCSeconds())}`
+}

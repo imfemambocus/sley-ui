@@ -2,6 +2,7 @@ import * as Plot from '@observablehq/plot'
 import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { Chart, type ChartOptions } from '@/components/ui/chart/Chart'
+import { crosshairX } from '@/components/ui/chart/crosshair'
 import { dayLabel, quality, Q30_THRESHOLD, snapToDays, SPAN } from './quality'
 
 export type DayRange = readonly [Date, Date]
@@ -67,7 +68,7 @@ export const QualityChart = ({ range, onRangeChange }: QualityChartProps) => {
         }),
         /* daily readings, so the line joins them straight. a curve would draw a value nobody measured. */
         Plot.lineY(shown, { x: 'day', y: 'q30', stroke: 'assay', strokeWidth: 1.5 }),
-        Plot.crosshairX(shown, { x: 'day', y: 'q30' }),
+        crosshairX(shown, { x: 'day', y: 'q30', formatX: (reading) => dayLabel(reading.day) }),
       ],
     }),
     [shown],

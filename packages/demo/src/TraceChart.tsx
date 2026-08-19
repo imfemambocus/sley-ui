@@ -2,8 +2,9 @@ import * as Plot from '@observablehq/plot'
 import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { Chart, type ChartOptions } from '@/components/ui/chart/Chart'
+import { crosshairX } from '@/components/ui/chart/crosshair'
 import { downsample } from '@/components/ui/chart/downsample'
-import { READINGS, trace } from './trace'
+import { clockLabel, READINGS, trace } from './trace'
 
 /* a thousand points across a frame of about a thousand pixels, so one point a column */
 const TARGET = 1000
@@ -24,7 +25,7 @@ export const TraceChart = () => {
       y: { label: null, domain: [20, 35], grid: true },
       marks: [
         Plot.lineY(points, { x: 'at', y: 'celsius', stroke: 'var(--color-pick-1)', strokeWidth: 1.5 }),
-        Plot.crosshairX(points, { x: 'at', y: 'celsius' }),
+        crosshairX(points, { x: 'at', y: 'celsius', formatX: (sample) => clockLabel(sample.at) }),
       ],
     }),
     [points],
