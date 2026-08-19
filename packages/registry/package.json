@@ -1,11 +1,12 @@
 {
   "name": "@sley-ui/registry",
   "private": true,
-  "version": "0.4.1",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
     "freeze": "node build.mjs --freeze",
+    "test": "node --test test/downsample.test.mjs",
     "typecheck": "tsc -b"
   },
   "dependencies": {
