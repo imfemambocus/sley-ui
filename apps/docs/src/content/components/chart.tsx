@@ -60,6 +60,12 @@ const Notes = () => (
       readout is the raw value, which is why a date arrives in full.
     </P>
     <P>
+      While a readout is showing, the tick labels stand down. A halo outlines each glyph rather than
+      covering a line, so a readout landing on a tick label let the tick read through the gaps between
+      the letters: I measured 12.92px of a 17px line box overlapping. The readout carries the exact
+      value the axis was giving, so the axis has nothing to add for as long as it is there.
+    </P>
+    <P>
       The halo behind that readout was white, and it stayed white through a rule that should have
       beaten it. Plot ships a <Code>&lt;style&gt;</Code> element inside the svg, and an unlayered rule
       outranks a layered one whatever the specificity says. So <Code>--plot-background</Code> is one of
@@ -162,10 +168,10 @@ export const doc: ComponentDoc = {
         'The chart reports the dates, the demo widens them to whole days, and the table filters on the run stamp. Clicking once on the plot clears the window and all 27 come back.',
     },
     {
-      value: '374.4827581872605px',
+      value: '374.48px',
       what: 'The window width before and after a resize round trip',
       detail:
-        'Identical to the last decimal. The plot went from 1158px to 878px and back, and the window was repainted from the range the caller holds rather than kept as pixels, so the table never left its 7 rows.',
+        '374.4827581872605px both times, identical to the last decimal. The plot went from 1158px to 878px and back, and the window was repainted from the range the caller holds rather than kept as pixels, so the table never left its 7 rows.',
     },
     {
       value: '6.1ms',
