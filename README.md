@@ -35,7 +35,7 @@ Past a hundred rows the table renders only what the viewport holds. Because the 
 
 A pointer costs the most in a dense table, so everything in one is reachable without it. Sorting, resizing a column, selection, the command palette and the range on the chart all answer keys, and the docs page for it lists every binding I drove in a browser.
 
-The chart is built on the same tokens as everything else. It reads the density knob and the palette, and it draws plain SVG, so your stylesheet reaches it and it needs no theme of its own. Drag across it to select a range, or tab to the plot and move an edge with the arrow keys. Either way it hands the values back to you, and that is how the demo on the home page narrows the table underneath it.
+The chart is built on the same tokens as everything else. It reads the density knob and the palette, and it draws plain SVG, so your stylesheet reaches it and it needs no theme of its own. Drag across it to select a range, or tab to the plot and move an edge with the arrow keys. Either way it hands the values back to you, and that is how the demo on the home page narrows the table underneath it. A line with more points than the frame has pixels gets a cut that keeps its shape: in a fifty thousand point trace the one excursion survives, where taking every fiftieth reading reports the flat part it sits on. The measurements are on the chart page.
 
 Underneath: Ark UI for behaviour, Tailwind CSS v4 for the token layer. Each component is readable TypeScript. There is no runtime style engine.
 
@@ -49,7 +49,7 @@ What each version changed, and why, is written up at [sley-ui.dev/docs/releases]
 
 ## Status
 
-Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state, with a chart beside them. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.4.1, and the CLI is on npm at 0.2.0, so every command above runs today on a fresh Vite app and a fresh Next app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
+Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state, with a chart beside them. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.5.0, and the CLI is on npm at 0.2.0, so every command above runs today on a fresh Vite app and a fresh Next app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
 
 To read the docs locally, clone this repo and run `npm install && npm run dev -w docs`.
 
