@@ -46,6 +46,13 @@ const PALETTE_KEYS: readonly Binding[] = [
   { keys: 'Escape', does: 'Closes it and puts focus back on the control that had it before.' },
 ]
 
+const CHART_KEYS: readonly Binding[] = [
+  { keys: 'Tab', does: 'Reaches the plot itself. The frame is the target, so a chart is one stop and not one for each edge of the window.' },
+  { keys: 'Arrow left, Arrow right', does: 'Moves one edge of the window by one tick of the x axis. The first press anchors on the frame edge it moves away from.' },
+  { keys: 'Home, End', does: 'Takes the moving edge to the left or the right end of the frame. From nothing, either key selects the whole range.' },
+  { keys: 'Escape', does: 'Clears the window. A pointer clears one with a single click, and the keyboard has no click.' },
+]
+
 const LAYER_KEYS: readonly Binding[] = [
   { keys: 'Escape', does: 'Closes a dialog, a panel, a popover or a select.' },
   { keys: 'Tab', does: 'Cycles inside a dialog, which is modal. A panel is not modal above 640px, so Tab leaves it and carries on down the page.' },
@@ -83,6 +90,23 @@ export const Keyboard = () => (
         a cursor rather than focus, so the caret never leaves the input and a search can be refined
         after the cursor has moved.
       </P>
+    </Section>
+
+    <Section id="chart" title="The chart">
+      <Keys rows={CHART_KEYS} caption="Keys the chart brush answers" />
+      <P>
+        The target is the plot area, not a handle on each edge, so a chart is one tab stop and the
+        arrows do the rest. The step is a tick of the x axis because the axis already draws that
+        distance; a step of my own choosing would be a number the reader has no way to see. On the
+        chart page it is two days.
+      </P>
+      <Note>
+        The field is an SVG rect with a <Code>tabindex</Code>, and Chrome reports it as a
+        graphics-symbol instead of a control. The accessible name has to carry the keys, since
+        nothing else on the page can. That is also the limit of what a screen reader gets here: the
+        range goes to the caller and appears in the header, and no announcement follows the window
+        while it moves.
+      </Note>
     </Section>
 
     <Section id="layers" title="Dialogs, panels and popovers">
@@ -127,6 +151,24 @@ export const Keyboard = () => (
             what: 'Focus after a panel closes',
             detail:
               'With the trigger focused, Enter opened the panel and Escape closed it, and focus was back on the trigger. Checked at 1600px where the panel is not modal, and under 640px where it is, since a different mechanism returns it in each case.',
+          },
+          {
+            value: '70.07px',
+            what: 'One arrow press on the chart brush',
+            detail:
+              'The fifteen x axis ticks sit 70.0689697265625px apart on the chart page at 1728px wide, and the second and third presses each moved the edge exactly that far. Two days on that axis.',
+          },
+          {
+            value: 'whole range',
+            what: 'Home or End on an empty plot',
+            detail:
+              'Both gave 14 July to 12 August, the full thirty days, from nothing. Home anchors on the right edge of the frame and End on the left, so whichever key you press first, the other end is already where it needs to be.',
+          },
+          {
+            value: '15 of 27',
+            what: 'Rows left after one press on the home page chart',
+            detail:
+              'End selected the whole month and left all 27 runs in the table. One press of the left arrow ended the window on 10 August and the table fell to 15. Escape brought all 27 back.',
           },
           {
             value: 'returned',
