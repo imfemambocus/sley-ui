@@ -502,6 +502,17 @@
     color: var(--color-weft);
   }
 
+  /*
+   * a readout stands where a tick label already is, and the halo behind it outlines
+   * each glyph rather than covering a line, so the tick reads through the gaps. the
+   * readout carries the exact value, so the axis stands down while it is showing. plot
+   * renders the readout only while the pointer is in the plot, which is the condition.
+   */
+  .sley-plot:has([aria-label='crosshair text'] text) [aria-label$='tick label'] {
+    opacity: 0;
+    transition: opacity var(--dur-instant) var(--ease-beat);
+  }
+
   /* one weft thread travelling across the cloth, and each series follows the one above it */
   .sley-plot .reed-draw {
     stroke-dasharray: var(--draw);
