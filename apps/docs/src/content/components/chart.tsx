@@ -82,6 +82,13 @@ const Notes = () => (
       already there. Creating a window without a pointer is the next thing I want to fix here.
     </P>
     <P>
+      The lines draw in once, on the first mount. A dash cannot be given the length of its own path
+      from a stylesheet, so the wrapper measures each path and hands the number to the animation as a
+      custom property. The three series are staggered by <Code>--dur-instant</Code>, which is what the
+      loading skeleton does to its rows. A resize rebuilds the plot and does not replay it, because a
+      figure that redraws itself every time the window moves reads as a glitch.
+    </P>
+    <P>
       Five picks is the ceiling of the series scale. A pick is one pass of the weft through the shed,
       and the banner motif carries five. Past five I cannot tell two lines apart in the dark theme.
     </P>
@@ -141,6 +148,12 @@ export const doc: ComponentDoc = {
       what: 'What Plot adds to this site, gzipped',
       detail:
         'The docs bundle went from 568.23kB to 839.87kB raw, and from 175.47kB to 267.60kB gzipped, measured on the production build with and without the chart page. Plot brings d3 with it. Add the chart only if you want a chart.',
+    },
+    {
+      value: '240ms, staggered 90ms',
+      what: 'The line draw, sampled once per animation frame while it ran',
+      detail:
+        'The first path travelled its full 1103.68px of dash to 0 over 240ms on the beat curve. The second held at 1111.13 until 90ms and the third at 1212 until 180ms, so the series follow one another and the figure settles at about 420ms. Reduced motion sets every duration to 0ms in one place and the lines simply appear.',
     },
     {
       value: '7 of 27',

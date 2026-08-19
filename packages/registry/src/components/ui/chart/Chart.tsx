@@ -1,6 +1,7 @@
 import * as Plot from '@observablehq/plot'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { attachBrush } from '@/components/ui/chart/brush'
+import { drawLines } from '@/components/ui/chart/motion'
 import { cx } from '@/lib/cx'
 
 /* the stylesheet reaches the generated svg through this one name */
@@ -59,6 +60,9 @@ export function Chart<X = Date>({
   const brushed = useRef(brush)
   brushed.current = brush
 
+  /* the lines draw in once. a resize rebuilds the plot, and replaying it there reads as a glitch. */
+  const drawn = useRef(false)
+
   useEffect(() => {
     window.current?.show(brush)
   }, [brush])
@@ -89,6 +93,11 @@ export function Chart<X = Date>({
     node.append(plot)
 
     const svg = plot instanceof SVGSVGElement ? plot : plot.querySelector('svg')
+    if (svg && !drawn.current) {
+      drawn.current = true
+      drawLines(svg)
+    }
+
     const scale = plot.scale('x')
     if (!svg || !scale?.invert) return () => plot.remove()
 

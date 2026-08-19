@@ -502,6 +502,12 @@
     color: var(--color-weft);
   }
 
+  /* one weft thread travelling across the cloth, and each series follows the one above it */
+  .sley-plot .reed-draw {
+    stroke-dasharray: var(--draw);
+    animation: draw var(--dur-overlay) var(--ease-beat) var(--draw-delay) both;
+  }
+
   .reed-brush-field {
     fill: transparent;
     cursor: crosshair;
@@ -523,6 +529,12 @@
   }
   50% {
     opacity: 0.25;
+  }
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--draw);
   }
 }
 
