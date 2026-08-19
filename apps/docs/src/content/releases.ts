@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.4.0': {
+    date: '2026-08-19',
+    title: 'The chart answers a pointer',
+    body: 'Three things land on the chart. A crosshair reads a value off the line under the pointer, and the tick labels stand down while it is showing, because a halo outlines each glyph rather than covering a line and the tick underneath was reading through the gaps between the letters. A brush selects a range: drag across the plot, click once to clear, and the values come back to you so you can filter a table with them. You hold the range rather than the chart, so a resize repaints the same window instead of losing it, which I checked by pulling the plot from 1158px to 878px and back and reading the same width to the last decimal. And the lines draw in on first mount, one series behind the next by 90ms. A pointer is still the only way to make a selection; clearing one has a control, and the keyboard has none yet.',
+  },
   '0.3.0': {
     date: '2026-08-19',
     title: 'A chart, and a version range on every dependency',
