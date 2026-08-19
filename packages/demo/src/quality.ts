@@ -45,13 +45,22 @@ export function dayLabel(date: Date) {
 }
 
 /*
+ * an axis tick falls on midnight, and a key press lands the edge within a millisecond of
+ * one, on either side of it. the second decides the day, so an edge a millisecond short
+ * of a boundary reads as the day it was reaching for.
+ */
+function toSecond(date: Date) {
+  return new Date(Math.round(date.getTime() / 1000) * 1000)
+}
+
+/*
  * a reading is a whole day, so a window that ends mid afternoon would drop runs the
  * label says it holds. both edges are pushed out to the day they land in.
  */
 export function snapToDays(range: readonly [Date, Date]): readonly [Date, Date] {
-  const from = new Date(range[0])
+  const from = toSecond(range[0])
   from.setUTCHours(0, 0, 0, 0)
-  const to = new Date(range[1])
+  const to = toSecond(range[1])
   to.setUTCHours(23, 59, 59, 999)
   return [from, to]
 }
