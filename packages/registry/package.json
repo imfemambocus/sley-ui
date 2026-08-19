@@ -1,7 +1,7 @@
 {
   "name": "@sley-ui/registry",
   "private": true,
-  "version": "0.2.2",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ark-ui/react": "^5.38.1",
+    "@observablehq/plot": "^0.6.17",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.6.0"
   }
