@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { QualityChart, type DayRange } from '@demo/QualityChart'
+import { TraceChart } from '@demo/TraceChart'
 import { Demo } from '../../site/Demo'
 import { Code, P } from '../../site/Prose'
 import type { ComponentDoc } from '../types'
@@ -16,6 +17,15 @@ const ChartDemo = () => {
     </Demo>
   )
 }
+
+const TraceDemo = () => (
+  <Demo
+    bleed
+    caption="One flow cell, one reading a second for fourteen hours. The header control switches between the thousand points the frame can resolve and all 50,400 of them."
+  >
+    <TraceChart />
+  </Demo>
+)
 
 const Notes = () => (
   <>
@@ -119,6 +129,39 @@ const Notes = () => (
     <P>
       Five picks is the ceiling of the series scale. A pick is one pass of the weft through the shed,
       and the banner motif carries five. Past five I cannot tell two lines apart in the dark theme.
+    </P>
+    <P>
+      The legend in the header is yours, and hiding a series is a filter on your own data. Mine is a
+      row of buttons carrying <Code>aria-pressed</Code>, so a key press reaches it like anything else.
+      It hides a line and nothing more; narrowing the rows underneath is the brush's job, and the
+      console on the home page keeps the two apart. Two scales have to be pinned before any of it
+      works. The colour scale takes its domain from the data it is given, and hiding the middle series
+      then hands its pick to the one below it. Declare <Code>domain</Code> and <Code>range</Code>{' '}
+      together and every line keeps its colour. The x scale does the same, and there it is worse: the
+      frame shrinks to what is left, and a window the reader brushed moves under them. Both are
+      declared from the whole fixture here.
+    </P>
+    <P>
+      A line with more points than the frame has pixels spends its time on detail nobody can resolve.{' '}
+      <Code>downsample</Code> cuts a series to a target count with largest triangle three buckets. It
+      walks the points in equal buckets and keeps whichever one makes the widest triangle with the
+      point it kept last and the average of the group ahead. Taking every nth point is one line of
+      code and it loses the thing you were looking at. The cooler stalled for forty seconds in the
+      trace below and the flow cell reached 34.03. Every fiftieth reading reports 30.08, which is the
+      plateau, because the excursion falls between two samples.
+    </P>
+    <TraceDemo />
+    <P>
+      The extremes are not a guarantee. I ran 181 targets from 200 to 2000 over that fixture: 172 kept
+      the peak to the decimal and 9 lost it, the worst of them reading 32.8. A bucket boundary can
+      split a peak, and the peak then loses to its own shoulder. If a maximum must never move, keep
+      the smallest and largest of each bucket instead and pay for the extra points.
+    </P>
+    <P>
+      The chart does not do this for you, and it cannot: it does not know which of your marks is a
+      line or which field holds the value. It is a function you run over your own data, beside the{' '}
+      <Code>useMemo</Code> you already need to hold the options stable, and it arrives with the chart
+      at <Code>@/components/ui/chart/downsample</Code>.
     </P>
   </>
 )
@@ -225,6 +268,42 @@ export const doc: ComponentDoc = {
       what: 'The focus ring on the plot, which needed no rule of its own',
       detail:
         'The site ring reaches an SVG rect unaided. Read off a screenshot at device pixel ratio 2: four rows of rgb(95,114,239) on all four sides of the field, one CSS pixel outside its box.',
+    },
+    {
+      value: '50,400 to 1,000',
+      what: 'What the downsample keeps, and what the line costs at either size',
+      detail:
+        'The path data went from 733,477 characters to 14,632, which is 50.1 times. On the built site the click to the painted frame was 146.9ms with every reading and 16.8ms downsampled, and the second figure includes the cut itself.',
+    },
+    {
+      value: '34.03',
+      what: 'The peak the cut keeps, where every fiftieth reading reports 30.08',
+      detail:
+        'The cooler stalled for forty seconds and the flow cell reached 34.03. A fixed stride steps over the excursion and reports the plateau it sits on. The widest triangle in that bucket is the excursion, so the cut takes it.',
+    },
+    {
+      value: '172 of 181',
+      what: 'Targets between 200 and 2000 that kept that peak to the decimal',
+      detail:
+        'Nine lost it and the worst read 32.8 against 34.03. A bucket boundary can split a peak, and the peak then loses to its own shoulder. Keep the smallest and largest of each bucket instead if a maximum must never move.',
+    },
+    {
+      value: '8.3ms',
+      what: 'The frame while the crosshair sweeps the trace, at either size',
+      detail:
+        'Thirty pointer moves, one an animation frame, on the built site: 8.3ms median over 1,000 points and 8.3ms over 50,400. Plot looks for the nearest point on every move, and that search is not what costs anything here. The draw is.',
+    },
+    {
+      value: '105.10px',
+      what: 'A brushed window while a series is hidden and shown again',
+      detail:
+        '105.10344787037036px before the legend toggle, while the series was off, and after it came back. Hiding a series rebuilds the plot, so the x domain is declared from the whole fixture and the frame cannot move under a window the reader made.',
+    },
+    {
+      value: '3.0kB',
+      what: 'What this release adds to the site, gzipped, prose and all',
+      detail:
+        'The bundle went from 859.45kB to 867.30kB raw and from 274.7kB to 277.7kB gzipped, which covers the downsampler, the second demo, its fixture and every word on this page. The gzipped figure is quoted to one decimal because publishing it changes it. The fixture is generated rather than shipped, and it is built on first use, because the site ships one bundle and the other twenty five pages have no use for fifty thousand dates.',
     },
     {
       value: '3 of 3',
