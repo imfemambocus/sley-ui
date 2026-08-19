@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.6.0': {
+    date: '2026-08-19',
+    title: 'A chart that can say it has nothing yet',
+    body: "A chart spends part of its life with nothing to draw, and it used to draw an empty frame for that. Setting loading puts the warp field in the plot area and beats it, which is what the table already does to its rows. empty puts the empty state there instead, the loom threaded and standing still. Neither is derived, because the chart cannot read your marks and has no way to know whether there is anything in them. The frame holds still between the three states: 297px, 283px and 270px tall at the three densities, the same in every state, with the plot area keeping the exact height you asked for in all nine readings. The chart now depends on the empty state, so adding it brings that item too, and updating an existing install pulls it in as a new item. The token file moves in this release as well, so if you have edited your palette this update merges into it. The crosshair can be formatted now as well. Plot derives each readout from its source channel inside an initializer, and an initializer's channels are merged over the declared ones, so a text of your own never reaches the mark and a date arrives as a full ISO stamp. crosshairX composes the same two pairs out of Plot's own pointer transform and takes formatX and formatY, each a function of the row. Leave both off and it reads the way Plot's does. The demo on the docs site says 29 Jul where it said 2026-07-29. The bars on a chart now build in the way the lines draw in. Each one scales up out of the axis rather than out of its own box, so a stacked column stays whole while it rises, and the sweep across the columns fits inside one --dur-instant whatever the column count. Six columns settle in 295.8ms.",
+  },
   '0.5.0': {
     date: '2026-08-19',
     title: 'A downsampler for a line with more points than pixels',
