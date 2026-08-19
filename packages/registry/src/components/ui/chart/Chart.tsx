@@ -28,8 +28,8 @@ export interface ChartProps<X> {
   readonly height?: number
   readonly actions?: ReactNode
   /*
-   * drag across the plot to report a range of the x scale, and click once to clear it.
-   * the pointer is the only way in, so pair it with a control the keyboard can reach.
+   * a drag reports a range of the x scale, and an arrow key on the plot moves one edge
+   * of one by a tick of that axis. a single click reports null, and so does escape.
    */
   readonly onBrush?: (range: readonly [X, X] | null) => void
   /* the window the chart paints. hold it in your own state, the way a table's selection works. */
@@ -62,6 +62,9 @@ export function Chart<X = Date>({
 
   /* the lines draw in once. a resize rebuilds the plot, and replaying it there reads as a glitch. */
   const drawn = useRef(false)
+
+  /* a rebuild takes the focused field down with it, so a resize would strand the keyboard */
+  const held = useRef(false)
 
   useEffect(() => {
     window.current?.show(brush)
@@ -117,9 +120,11 @@ export function Chart<X = Date>({
       (range) => report.current?.(range),
     )
     handle.show(brushed.current)
+    if (held.current) handle.restore()
     window.current = handle
 
     return () => {
+      held.current = handle.focused()
       window.current = null
       handle.destroy()
       plot.remove()

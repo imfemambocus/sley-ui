@@ -76,6 +76,9 @@ export function attachBrush<T>(
   let dragging = false
   let live = false
 
+  /* raised for the one paint that answers a report, and read by show below */
+  let reported = false
+
   const xOf = (event: PointerEvent) => clampX(event.clientX - svg.getBoundingClientRect().left)
 
   const clampX = (value: number) => Math.max(frame.left, Math.min(frame.right, value))
@@ -87,6 +90,7 @@ export function attachBrush<T>(
 
   const clear = () => {
     live = false
+    reported = false
     paint(0, 0)
   }
 
@@ -114,6 +118,7 @@ export function attachBrush<T>(
       return
     }
     live = true
+    reported = true
     const from = Math.min(anchor, edge)
     const to = Math.max(anchor, edge)
     report([scale.toValue(from), scale.toValue(to)])
@@ -127,6 +132,7 @@ export function attachBrush<T>(
   const moveEdge = (to: number) => {
     edge = clampX(to)
     live = true
+    reported = true
     paint(anchor, edge)
     report([scale.toValue(Math.min(anchor, edge)), scale.toValue(Math.max(anchor, edge))])
   }
@@ -170,13 +176,30 @@ export function attachBrush<T>(
       }
       const from = clampX(scale.toPixel(range[0]))
       const to = clampX(scale.toPixel(range[1]))
+      live = true
+      paint(from, to)
+
+      /*
+       * a caller may widen what it was given, and the demo here rounds a range out to whole
+       * days. taking the moving edge from that value would add the widening to the next key
+       * press on top of the step, so the paint that answers a report moves no edge.
+       */
+      if (reported) {
+        reported = false
+        return
+      }
 
       /* the moving edge stays the one the reader is moving, or the next key press reverses */
       const forward = edge >= anchor
       anchor = forward ? from : to
       edge = forward ? to : from
-      live = true
-      paint(from, to)
+    },
+    focused() {
+      return document.activeElement === field
+    },
+    /* a rebuild draws a new field, and the reader is still on the old one */
+    restore() {
+      field.focus({ preventScroll: true })
     },
     destroy() {
       field.removeEventListener('pointerdown', onDown)
