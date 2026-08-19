@@ -1,7 +1,8 @@
 import * as Plot from '@observablehq/plot'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { attachBrush } from '@/components/ui/chart/brush'
-import { drawLines } from '@/components/ui/chart/motion'
+import { drawBars, drawLines } from '@/components/ui/chart/motion'
+import { EmptyState } from '@/components/ui/empty-state/EmptyState'
 import { cx } from '@/lib/cx'
 
 /* the stylesheet reaches the generated svg through this one name */
@@ -26,6 +27,10 @@ export interface ChartProps<X> {
   /* hold this stable, or every parent render tears the plot down and builds it again */
   readonly options: ChartOptions
   readonly height?: number
+  readonly loading?: boolean
+  /* a chart cannot read the caller's marks, so an empty result is stated and never derived */
+  readonly empty?: boolean
+  readonly emptyMessage?: string
   readonly actions?: ReactNode
   /*
    * a drag reports a range of the x scale, and an arrow key on the plot moves one edge
@@ -42,11 +47,16 @@ export function Chart<X = Date>({
   unit,
   options,
   height = 260,
+  loading = false,
+  empty = false,
+  emptyMessage = 'No data in this range.',
   actions,
   onBrush,
   brush = null,
   className,
 }: ChartProps<X>) {
+  /* the frame is measured rather than the host, because the host leaves while a state shows */
+  const frame = useRef<HTMLDivElement>(null)
   const host = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
 
@@ -66,12 +76,16 @@ export function Chart<X = Date>({
   /* a rebuild takes the focused field down with it, so a resize would strand the keyboard */
   const held = useRef(false)
 
+  /* loading wins: a chart still waiting on a fetch has nothing to call empty yet */
+  const showEmpty = empty && !loading
+  const plotting = !loading && !showEmpty
+
   useEffect(() => {
     window.current?.show(brush)
   }, [brush])
 
   useEffect(() => {
-    const node = host.current
+    const node = frame.current
     if (!node) return undefined
 
     const observer = new ResizeObserver(([entry]) => setWidth(Math.floor(entry.contentRect.width)))
@@ -99,6 +113,7 @@ export function Chart<X = Date>({
     if (svg && !drawn.current) {
       drawn.current = true
       drawLines(svg)
+      drawBars(svg)
     }
 
     const scale = plot.scale('x')
@@ -129,7 +144,7 @@ export function Chart<X = Date>({
       handle.destroy()
       plot.remove()
     }
-  }, [title, options, width, height])
+  }, [title, options, width, height, plotting])
 
   return (
     <section className={cx('@container border border-reed bg-raised', className)}>
@@ -141,7 +156,15 @@ export function Chart<X = Date>({
         {actions && <div className="flex items-center gap-(--stack)">{actions}</div>}
       </header>
 
-      <div ref={host} className="px-(--cell-x) py-(--stack)" />
+      <div ref={frame} aria-busy={loading} className="px-(--cell-x) py-(--stack)">
+        {plotting && <div ref={host} />}
+        {loading && <div className="reed-warp reed-warp-beat" style={{ height }} />}
+        {showEmpty && (
+          <div style={{ height }}>
+            <EmptyState title={emptyMessage} className="h-full" />
+          </div>
+        )}
+      </div>
     </section>
   )
 }
