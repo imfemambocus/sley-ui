@@ -519,6 +519,12 @@
     animation: draw var(--dur-overlay) var(--ease-beat) var(--draw-delay) both;
   }
 
+  /* the cloth builds column by column, each bar standing up off the axis */
+  .sley-plot .reed-build {
+    transform-origin: 0 var(--build-base);
+    animation: build var(--dur-overlay) var(--ease-beat) var(--build-delay) both;
+  }
+
   .reed-brush-field {
     fill: transparent;
     cursor: crosshair;
@@ -546,6 +552,12 @@
 @keyframes draw {
   from {
     stroke-dashoffset: var(--draw);
+  }
+}
+
+@keyframes build {
+  from {
+    transform: scaleY(0);
   }
 }
 
