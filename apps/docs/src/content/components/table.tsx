@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { startTransition, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { Table } from '@/components/ui/table/Table'
 import { runColumns } from '@demo/columns'
@@ -23,8 +23,12 @@ const TableDemo = () => {
     setLong(next)
     setLoading(true)
     window.setTimeout(() => {
-      setRows(next ? longRuns(LONG_ROWS) : SHORT)
-      setLoading(false)
+      const batch = next ? longRuns(LONG_ROWS) : SHORT
+      /* the first render of a batch this size costs about a second, and a transition leaves the page alive through it */
+      startTransition(() => {
+        setRows(batch)
+        setLoading(false)
+      })
     }, LOAD_MS)
   }
 
