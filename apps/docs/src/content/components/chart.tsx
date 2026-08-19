@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { ChartStates } from '@demo/ChartStates'
 import { QualityChart, type DayRange } from '@demo/QualityChart'
+import { RunMixChart } from '@demo/RunMixChart'
 import { TraceChart } from '@demo/TraceChart'
 import { Demo } from '../../site/Demo'
 import { Code, P } from '../../site/Prose'
@@ -27,6 +29,24 @@ const TraceDemo = () => (
   </Demo>
 )
 
+const RunMixDemo = () => (
+  <Demo
+    bleed
+    caption="The 27 runs the table holds, counted by assay and stacked by status. A band scale has no inverse, so this one takes no brush."
+  >
+    <RunMixChart />
+  </Demo>
+)
+
+const StatesDemo = () => (
+  <Demo
+    bleed
+    caption="The three states of the same chart. The warp field beats while a fetch is out, and stands still when it comes back with nothing."
+  >
+    <ChartStates />
+  </Demo>
+)
+
 const Notes = () => (
   <>
     <P>
@@ -38,6 +58,14 @@ const Notes = () => (
       175.47kB to 267.60kB gzipped. That is why the chart sits beside the twelve controls rather than
       inside them: it should be something you choose, not something a table hands you.
     </P>
+    <P>
+      The wrapper does not know what a line is. It builds the plot, styles it, and gives you the
+      interactions back; the marks are yours. The bars below are this same component over the same 27
+      runs the table holds, coloured by the status dye each row already carries. A band scale cannot
+      be inverted, though, so there is no brush on that one and nothing to tab to. The wrapper asks
+      the x scale for its inverse and leaves the chart alone when there is none.
+    </P>
+    <RunMixDemo />
     <P>
       Plot puts the font and the fill on the root svg as presentation attributes. Any stylesheet rule
       outranks those, so the type comes from the tokens instead. Tick labels are machine values and
@@ -64,10 +92,29 @@ const Notes = () => (
       2.56px to spare at the worst.
     </P>
     <P>
+      Some of a chart's life is spent with nothing to draw yet. Setting <Code>loading</Code> puts the
+      warp field in the plot area and beats it, which is what the table does to its rows.{' '}
+      <Code>empty</Code> puts the empty state there instead, the loom threaded and standing still. If
+      both are set, loading wins: a chart still waiting on a fetch has nothing to call empty yet.
+      Neither state is derived, because the chart cannot read your marks and has no way to know
+      whether there is anything in them. The lines still draw in when the data lands, since the first
+      plot is only built once the skeleton has left.
+    </P>
+    <StatesDemo />
+    <P>
       A crosshair is a mark you add rather than a prop you set. Plot names its parts{' '}
       <Code>crosshair rule</Code> and <Code>crosshair text</Code>, so the stylesheet reaches them and
       any chart that adds one gets the reed colour and the data face without asking for either. The
       readout is the raw value, which is why a date arrives in full.
+    </P>
+    <P>
+      That last part I could not fix from the outside. Plot derives each readout from its source
+      channel inside an initializer, and an initializer's channels are merged over the declared ones,
+      so a <Code>text</Code> of your own is discarded before the mark ever sees it.{' '}
+      <Code>crosshairX</Code>, at <Code>@/components/ui/chart/crosshair</Code>, composes the same two
+      pairs from Plot's own pointer transform and takes <Code>formatX</Code> and <Code>formatY</Code>,
+      each a function of the row. Leave both off and it reads the way Plot's own does. The chart at
+      the top of this page formats the date as 12 Aug; the trace below prints the clock.
     </P>
     <P>
       While a readout is showing, the tick labels stand down. A halo outlines each glyph rather than
@@ -125,6 +172,14 @@ const Notes = () => (
       custom property. The three series are staggered by <Code>--dur-instant</Code>, which is what the
       loading skeleton does to its rows. A resize rebuilds the plot and does not replay it, because a
       figure that redraws itself every time the window moves reads as a glitch.
+    </P>
+    <P>
+      The bars build the same way. Each one scales up out of the axis rather than out of its own box,
+      so a stacked column stays whole while it rises: every rect shares one baseline, the lowest edge
+      any of them reaches. The sweep across the columns fits inside one <Code>--dur-instant</Code>{' '}
+      whatever the column count, so a chart with forty bars sweeps in the same time as one with six.
+      On the bar demo the six columns started at 5, 6.8, 21.5, 37.9, 54.4 and 71.4ms and everything
+      had settled by 295.8ms.
     </P>
     <P>
       Five picks is the ceiling of the series scale. A pick is one pass of the weft through the shed,
@@ -185,6 +240,18 @@ export const doc: ComponentDoc = {
     { name: 'height', type: 'number', detail: 'The plot height in pixels. It defaults to 260.' },
     { name: 'actions', type: 'ReactNode', detail: 'Controls in the chart header. The demo above puts its legend there.' },
     {
+      name: 'loading',
+      type: 'boolean',
+      detail: 'Draws the warp field in the plot area and beats it. It wins over empty when both are set.',
+    },
+    {
+      name: 'empty',
+      type: 'boolean',
+      detail:
+        'Draws the empty state in the plot area. The chart cannot read your marks, so an empty result is stated rather than derived.',
+    },
+    { name: 'emptyMessage', type: 'string', detail: 'The line the empty state carries. It defaults to "No data in this range."' },
+    {
       name: 'brush',
       type: 'readonly [X, X] | null',
       detail: 'The window the chart paints. Hold it in your own state, the way a table selection works.',
@@ -216,6 +283,24 @@ export const doc: ComponentDoc = {
         'Those labels are 25.2px wide, and they narrow to 23.41px and 21.61px as the knob tightens. Every clearance stays positive at all three densities, and the tightest of them is the 2.56px under the dates above.',
     },
     {
+      value: '1, 1, 0',
+      what: 'Brush fields on the two line charts and on the bars',
+      detail:
+        'A band scale has no inverse, so the wrapper asks for one, does not get it, and leaves the chart as a chart. Nothing errors and nothing takes focus.',
+    },
+    {
+      value: '0px',
+      what: 'How far the frame moves between loading, empty and drawn',
+      detail:
+        'The chart is 297px, 283px and 270px tall at comfortable, compact and dense, and each of those holds across all three states. The plot area keeps the 220px that demo asks for in all nine readings, so nothing below the chart shifts when the data lands.',
+    },
+    {
+      value: '29 Jul',
+      what: "The crosshair readout where Plot's own prints 2026-07-29",
+      detail:
+        'The same pointer position on the same chart, one option apart. On the trace below it reads 13:28:40 where Plot gives 2026-08-06T13:28:40Z, 8 characters against 20.',
+    },
+    {
       value: '92.13kB',
       what: 'What Plot adds to this site, gzipped',
       detail:
@@ -226,6 +311,18 @@ export const doc: ComponentDoc = {
       what: 'The line draw, sampled once per animation frame while it ran',
       detail:
         'The first path travelled its full 1103.68px of dash to 0 over 240ms on the beat curve. The second held at 1111.13 until 90ms and the third at 1212 until 180ms, so the series follow one another and the figure settles at about 420ms. Reduced motion sets every duration to 0ms in one place and the lines simply appear.',
+    },
+    {
+      value: '295.8ms',
+      what: 'How long six columns of bars take to build',
+      detail:
+        'They start at 5, 6.8, 21.5, 37.9, 54.4 and 71.4ms, because the sweep across the columns fits inside one --dur-instant however many there are. Sampled once per animation frame from the first frame the bars existed.',
+    },
+    {
+      value: '0.0001px',
+      what: 'The largest gap between two stacked segments while their column rises',
+      detail:
+        'Every rect scales about one baseline, the axis, rather than about its own box, which is what keeps a stacked column whole on the way up. Read over 61 frames while the column travelled from 0 to 164px.',
     },
     {
       value: '7 of 27',
