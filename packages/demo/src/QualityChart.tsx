@@ -15,10 +15,13 @@ const SERIES = ['WGS', 'Exome', 'Methyl']
 const PICKS = ['var(--color-pick-1)', 'var(--color-pick-2)', 'var(--color-pick-3)']
 
 const Legend = () => (
-  <ul className="flex items-center gap-(--stack)">
+  <ul className="flex items-baseline gap-(--stack)">
     {SERIES.map((assay, index) => (
-      <li key={assay} className="flex items-center gap-1.5">
-        <span className="size-[5px] shrink-0 rounded-full" style={{ backgroundColor: PICKS[index] }} />
+      <li key={assay} className="flex items-baseline gap-1.5">
+        <span
+          className="size-1.25 shrink-0 translate-y-[-2px] rounded-full"
+          style={{ backgroundColor: PICKS[index] }}
+        />
         <span className="text-weft-dim">{assay}</span>
       </li>
     ))}
@@ -61,10 +64,13 @@ export const QualityChart = ({ range, onRangeChange }: QualityChartProps) => {
         <>
           {range && (
             <Button onClick={() => onRangeChange(null)}>
-              <span className="font-data">
-                {dayLabel(range[0])} to {dayLabel(range[1])}
+              {/* two faces on one line, so they share a baseline instead of a box centre */}
+              <span className="inline-flex items-baseline gap-1.5">
+                <span className="font-data">
+                  {dayLabel(range[0])} to {dayLabel(range[1])}
+                </span>
+                <span className="text-weft-faint">clear</span>
               </span>
-              <span className="text-weft-faint">clear</span>
             </Button>
           )}
           <Legend />
