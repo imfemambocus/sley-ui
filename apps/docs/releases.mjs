@@ -36,7 +36,7 @@ function fileMap(items) {
   return files
 }
 
-const { latest, versions } = JSON.parse(await readFile(servedPath, 'utf8'))
+const { versions } = JSON.parse(await readFile(servedPath, 'utf8'))
 
 const releases = []
 let previous
@@ -98,7 +98,7 @@ await writeFile(
   `/* written by releases.mjs from the frozen bundles. do not edit. */
 import type { ReleaseEntry } from './types'
 
-export const LATEST = ${quote(latest)}
+export const LATEST = ${quote(releases[0]?.version)}
 
 export const RELEASES: readonly ReleaseEntry[] = [
 ${releases.map(block).join('\n')}
