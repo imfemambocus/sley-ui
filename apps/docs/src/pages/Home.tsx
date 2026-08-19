@@ -17,7 +17,7 @@ const DensityStrip = () => {
         <div className="flex flex-col gap-0.5">
           <p className="font-medium text-weft">One knob, six numbers</p>
           <p className="text-weft-dim">
-            It retunes the table below, the controls above it, and this page.
+            It retunes the chart and the table below, the controls above them, and this page.
           </p>
         </div>
         <Segmented legend="Density" options={DENSITIES} value={density} onSelect={setDensity} />

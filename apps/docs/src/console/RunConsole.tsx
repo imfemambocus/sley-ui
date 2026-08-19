@@ -4,9 +4,11 @@ import { FilterBar, type FilterValues } from '@/components/ui/filter-bar/FilterB
 import { Table } from '@/components/ui/table/Table'
 import { CancelDialog } from '@demo/CancelDialog'
 import { ColumnMenu } from '@demo/ColumnMenu'
+import { QualityChart, type DayRange } from '@demo/QualityChart'
 import { RunPanel } from '@demo/RunPanel'
 import { runColumns } from '@demo/columns'
 import { RUN_GROUPS, matchesFilters } from '@demo/filters'
+import { withinRange } from '@demo/quality'
 import { STATUSES, runs, type Run } from '@demo/runs'
 import { STATUS_TONE } from '@demo/status'
 import { toaster } from '@demo/toaster'
@@ -31,8 +33,12 @@ export const RunConsole = () => {
   const [pending, setPending] = useState<Run | null>(null)
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set())
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())
+  const [range, setRange] = useState<DayRange | null>(null)
 
-  const visible = useMemo(() => runs.filter((run) => matchesFilters(run, query, values)), [query, values])
+  const visible = useMemo(
+    () => runs.filter((run) => matchesFilters(run, query, values) && withinRange(run.started, range)),
+    [query, values, range],
+  )
   const exportable = useMemo(() => visible.filter((run) => selected.has(run.id)).length, [visible, selected])
 
   const allColumns = useMemo(() => runColumns(setDetail), [])
@@ -65,6 +71,8 @@ export const RunConsole = () => {
         </Button>
       </div>
 
+      <QualityChart range={range} onRangeChange={setRange} />
+
       <FilterBar
         query={query}
         onQueryChange={setQuery}
@@ -81,7 +89,7 @@ export const RunConsole = () => {
         rowId={(run) => run.id}
         title="Sequencing runs"
         noun={['run', 'runs']}
-        emptyMessage="No run matches the filters."
+        emptyMessage="No run is left inside the filters and the brushed range."
         loading={loading}
         onSelectionChange={setSelected}
         actions={
