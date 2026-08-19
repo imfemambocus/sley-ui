@@ -7,6 +7,7 @@ import { Table } from '@/components/ui/table/Table'
 import { Toaster } from '@/components/ui/toast/Toast'
 import { CancelDialog } from '@demo/CancelDialog'
 import { ColumnMenu } from '@demo/ColumnMenu'
+import { QualityChart } from '@demo/QualityChart'
 import { RunPanel } from '@demo/RunPanel'
 import { runColumns } from '@demo/columns'
 import { RUN_GROUPS, matchesFilters } from '@demo/filters'
@@ -260,6 +261,8 @@ export const App = () => {
           searchLabel="Search runs"
           placeholder="Search runs, samples, owners"
         />
+
+        <QualityChart />
 
         <Table
           rows={visible}
