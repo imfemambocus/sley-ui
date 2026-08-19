@@ -38,6 +38,9 @@ export const quality: readonly Reading[] = Object.keys(BASE).flatMap((assay, ser
   }),
 )
 
+/* the frame holds still when a series is hidden, so a brushed window stays where it was */
+export const SPAN: readonly [Date, Date] = [quality[0].day, quality[quality.length - 1].day]
+
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 export function dayLabel(date: Date) {

@@ -1,8 +1,8 @@
 import * as Plot from '@observablehq/plot'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { Chart, type ChartOptions } from '@/components/ui/chart/Chart'
-import { dayLabel, quality, Q30_THRESHOLD, snapToDays } from './quality'
+import { dayLabel, quality, Q30_THRESHOLD, snapToDays, SPAN } from './quality'
 
 export type DayRange = readonly [Date, Date]
 
@@ -14,24 +14,44 @@ interface QualityChartProps {
 const SERIES = ['WGS', 'Exome', 'Methyl']
 const PICKS = ['var(--color-pick-1)', 'var(--color-pick-2)', 'var(--color-pick-3)']
 
-const Legend = () => (
+interface LegendProps {
+  readonly hidden: readonly string[]
+  readonly onToggle: (assay: string) => void
+}
+
+const Legend = ({ hidden, onToggle }: LegendProps) => (
   <ul className="flex items-baseline gap-(--stack)">
-    {SERIES.map((assay, index) => (
-      <li key={assay} className="flex items-baseline gap-1.5">
-        <span
-          className="size-1.25 shrink-0 translate-y-[-2px] rounded-full"
-          style={{ backgroundColor: PICKS[index] }}
-        />
-        <span className="text-weft-dim">{assay}</span>
-      </li>
-    ))}
+    {SERIES.map((assay, index) => {
+      const off = hidden.includes(assay)
+      return (
+        <li key={assay} className="flex">
+          <button
+            type="button"
+            aria-pressed={!off}
+            onClick={() => onToggle(assay)}
+            className="flex cursor-pointer items-baseline gap-1.5"
+          >
+            <span
+              className="size-1.25 shrink-0 translate-y-[-2px] rounded-full transition-colors duration-(--dur-instant) ease-(--ease-beat)"
+              style={{ backgroundColor: off ? 'var(--color-reed-lit)' : PICKS[index] }}
+            />
+            <span className={off ? 'text-weft-faint' : 'text-weft-dim'}>{assay}</span>
+          </button>
+        </li>
+      )
+    })}
   </ul>
 )
 
 export const QualityChart = ({ range, onRangeChange }: QualityChartProps) => {
+  const [hidden, setHidden] = useState<readonly string[]>([])
+
+  const shown = useMemo(() => quality.filter((reading) => !hidden.includes(reading.assay)), [hidden])
+
   const options = useMemo<ChartOptions>(
     () => ({
-      x: { type: 'utc', label: null },
+      /* the domain comes from the whole fixture, not from what is drawn, or hiding a line moves the axis */
+      x: { type: 'utc', label: null, domain: SPAN },
       y: { label: null, domain: [70, 100], grid: true },
       color: { domain: SERIES, range: PICKS },
       marks: [
@@ -46,12 +66,15 @@ export const QualityChart = ({ range, onRangeChange }: QualityChartProps) => {
           dx: -2,
         }),
         /* daily readings, so the line joins them straight. a curve would draw a value nobody measured. */
-        Plot.lineY(quality, { x: 'day', y: 'q30', stroke: 'assay', strokeWidth: 1.5 }),
-        Plot.crosshairX(quality, { x: 'day', y: 'q30' }),
+        Plot.lineY(shown, { x: 'day', y: 'q30', stroke: 'assay', strokeWidth: 1.5 }),
+        Plot.crosshairX(shown, { x: 'day', y: 'q30' }),
       ],
     }),
-    [],
+    [shown],
   )
+
+  const toggle = (assay: string) =>
+    setHidden((was) => (was.includes(assay) ? was.filter((name) => name !== assay) : [...was, assay]))
 
   return (
     <Chart<Date>
@@ -73,7 +96,7 @@ export const QualityChart = ({ range, onRangeChange }: QualityChartProps) => {
               </span>
             </Button>
           )}
-          <Legend />
+          <Legend hidden={hidden} onToggle={toggle} />
         </>
       }
     />
