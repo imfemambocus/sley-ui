@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { startTransition, useCallback, useEffect, useMemo, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { Button } from '@/components/ui/button/Button'
 import { CommandPalette, type Command } from '@/components/ui/command-palette/CommandPalette'
@@ -129,8 +129,11 @@ export const App = () => {
     setLong(next)
     setLoading(true)
     window.setTimeout(() => {
-      setSource(next ? longRuns(LONG_ROWS) : runs)
-      setLoading(false)
+      const batch = next ? longRuns(LONG_ROWS) : runs
+      startTransition(() => {
+        setSource(batch)
+        setLoading(false)
+      })
     }, LOAD_MS)
   }, [long])
 
