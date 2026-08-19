@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.5.0': {
+    date: '2026-08-19',
+    title: 'A downsampler for a line with more points than pixels',
+    body: 'The chart item gains downsample, a largest triangle three buckets cut you run over your own data before you hand it to a mark. A fourteen hour trace logged once a second is 50,400 points, and the path drawn from them is 733,477 characters of path data that takes 146.9ms from click to painted frame on the built site. Cut to 1,000 it is 14,632 characters and 16.8ms, and that figure includes the cut. Taking every fiftieth reading instead is one line of code and it reports the plateau where the real peak was 34.03, because a fixed stride steps over a forty second excursion. The extremes are not a guarantee: of 181 targets between 200 and 2000, nine lost the peak, the worst by 1.23 degrees. The chart cannot do this for you, since it has no idea which of your marks is a line, so it is a function rather than a prop.',
+  },
   '0.4.1': {
     date: '2026-08-19',
     title: 'The brush answers the keyboard',
