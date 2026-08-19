@@ -10,7 +10,7 @@ const ChartDemo = () => {
   return (
     <Demo
       bleed
-      caption="Q30 by assay over 30 days. Drag across it to brush a range, and click once to clear. The madder rule is the quality floor the table draws its reed under."
+      caption="Q30 by assay over 30 days. Drag across it to brush a range, or tab to the plot and move an edge with the arrow keys. A click or Escape clears. The madder rule is the quality floor the table draws its reed under."
     >
       <QualityChart range={range} onRangeChange={setRange} />
     </Demo>
@@ -83,9 +83,31 @@ const Notes = () => (
       its 7 rows, and widening it again gave the window back its original width to the last decimal.
     </P>
     <P>
-      A pointer is the only way to make a selection. From the keyboard you can clear one through the
-      control in the header, and narrow the rows with the filter bar, which is the path that was
-      already there. Creating a window without a pointer is the next thing I want to fix here.
+      The plot takes focus, so you can select a window without a pointer. One arrow press moves one
+      edge by one tick of the x axis, 70.07px and two days on this chart. The step is a tick because
+      the axis already draws that distance for the reader; a number of my own would be one nobody can
+      see. Home and End take the moving edge to the ends of the frame, and from nothing either key
+      gives you the whole range. Escape clears. The first press anchors on the frame edge it moves
+      away from, the way a drag anchors wherever the pointer went down.
+    </P>
+    <P>
+      A press reports the range a drag would report, and the demo rounds it out to whole days before
+      it comes back. That widening belongs to the caller, so the chart paints it and leaves its own
+      moving edge where the press put it. Read the edge back out of the range and the widening rides
+      on the next press as well as the step: three days for a two day tick.
+    </P>
+    <P>
+      The field is a rect with a tabindex and a name. Chrome reports it as a{' '}
+      <Code>graphics-symbol</Code>, not as a control, and it carries no value, which leaves the
+      accessible name as the only thing that can say what the keys do. Nothing announces the window
+      while it moves. The header control is the readout, and a reader who cannot see it gets no
+      running commentary.
+    </P>
+    <P>
+      A resize rebuilds the plot and takes the focused field down with it, so the chart puts focus on
+      the one it draws next. The new brush has only the range the caller holds to work from, and that
+      range has been rounded out, which makes the first press after a resize move three days once
+      before the step settles back to two.
     </P>
     <P>
       The lines draw in once, on the first mount. A dash cannot be given the length of its own path
@@ -127,7 +149,8 @@ export const doc: ComponentDoc = {
     {
       name: 'onBrush',
       type: '(range: readonly [X, X] | null) => void',
-      detail: 'Reports a dragged range in the values of the x scale, and null when a click clears it.',
+      detail:
+        'Reports a range in the values of the x scale, from a drag or from an arrow key on the plot, and null when a click or Escape clears it.',
     },
   ],
   measured: [
@@ -178,6 +201,30 @@ export const doc: ComponentDoc = {
       what: 'The median frame while the theme cross fade runs on this page',
       detail:
         'Measured on the built site, not the dev server: 6.1ms into the light and 6.0ms back, with 1 frame of 113 over 16.7ms each way. The chart adds 69 nodes to the snapshot and the fade does not feel them.',
+    },
+    {
+      value: '70.07px',
+      what: 'One arrow press on the plot, which is one tick of the x axis',
+      detail:
+        'The fifteen ticks sit 70.0689697265625px apart at 1728px wide. Three presses grew the window by 105.10px, then 70.07px, then 70.07px. The first is larger because the demo rounds the end out to the last millisecond of the day it lands in, so the window covers three days while the edge moved two.',
+    },
+    {
+      value: '27, 15, 2',
+      what: 'Runs left in the home page table as the left arrow narrows the window',
+      detail:
+        'End took the window to the whole thirty days and all 27 runs stayed. One press of the left arrow ended it on 10 August and left 15, three presses ended it on 6 August and left 2, and Escape brought all 27 back. The runs cluster at the end of the month, which is why one press costs twelve rows.',
+    },
+    {
+      value: 'graphics-symbol',
+      what: 'What the accessibility tree reports for the focusable field',
+      detail:
+        'Chrome maps a named, focusable SVG rect to graphics-symbol. It is not exposed as a control and it holds no value, which is why the name carries the keys: "Select a range on Q30 by assay. Move an edge with the arrow keys. Escape clears." Nothing announces the range while it moves.',
+    },
+    {
+      value: '2px at 1px',
+      what: 'The focus ring on the plot, which needed no rule of its own',
+      detail:
+        'The site ring reaches an SVG rect unaided. Read off a screenshot at device pixel ratio 2: four rows of rgb(95,114,239) on all four sides of the field, one CSS pixel outside its box.',
     },
     {
       value: '3 of 3',
