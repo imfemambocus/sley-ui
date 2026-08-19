@@ -1,7 +1,15 @@
 import * as Plot from '@observablehq/plot'
 import { useMemo } from 'react'
+import { Button } from '@/components/ui/button/Button'
 import { Chart, type ChartOptions } from '@/components/ui/chart/Chart'
-import { quality, Q30_THRESHOLD } from './quality'
+import { dayLabel, quality, Q30_THRESHOLD, snapToDays } from './quality'
+
+export type DayRange = readonly [Date, Date]
+
+interface QualityChartProps {
+  readonly range: DayRange | null
+  readonly onRangeChange: (range: DayRange | null) => void
+}
 
 const SERIES = ['WGS', 'Exome', 'Methyl']
 const PICKS = ['var(--color-pick-1)', 'var(--color-pick-2)', 'var(--color-pick-3)']
@@ -17,7 +25,7 @@ const Legend = () => (
   </ul>
 )
 
-export const QualityChart = () => {
+export const QualityChart = ({ range, onRangeChange }: QualityChartProps) => {
   const options = useMemo<ChartOptions>(
     () => ({
       x: { type: 'utc', label: null },
@@ -42,5 +50,26 @@ export const QualityChart = () => {
     [],
   )
 
-  return <Chart title="Q30 by assay" unit="%" actions={<Legend />} options={options} />
+  return (
+    <Chart<Date>
+      title="Q30 by assay"
+      unit="%"
+      options={options}
+      brush={range}
+      onBrush={(next) => onRangeChange(next && snapToDays(next))}
+      actions={
+        <>
+          {range && (
+            <Button onClick={() => onRangeChange(null)}>
+              <span className="font-data">
+                {dayLabel(range[0])} to {dayLabel(range[1])}
+              </span>
+              <span className="text-weft-faint">clear</span>
+            </Button>
+          )}
+          <Legend />
+        </>
+      }
+    />
+  )
 }

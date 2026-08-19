@@ -1,13 +1,21 @@
-import { QualityChart } from '@demo/QualityChart'
+import { useState } from 'react'
+import { QualityChart, type DayRange } from '@demo/QualityChart'
 import { Demo } from '../../site/Demo'
 import { Code, P } from '../../site/Prose'
 import type { ComponentDoc } from '../types'
 
-const ChartDemo = () => (
-  <Demo bleed caption="Q30 by assay over 30 days. The madder rule is the quality floor the table draws its reed under.">
-    <QualityChart />
-  </Demo>
-)
+const ChartDemo = () => {
+  const [range, setRange] = useState<DayRange | null>(null)
+
+  return (
+    <Demo
+      bleed
+      caption="Q30 by assay over 30 days. Drag across it to brush a range, and click once to clear. The madder rule is the quality floor the table draws its reed under."
+    >
+      <QualityChart range={range} onRangeChange={setRange} />
+    </Demo>
+  )
+}
 
 const Notes = () => (
   <>
@@ -58,6 +66,22 @@ const Notes = () => (
       the few declarations here that has to shout. It sets the fill of a <Code>Plot.tip</Code> as well.
     </P>
     <P>
+      Drag across the plot to brush a range, and click once to clear it. The chart reports the values
+      and you hold them: <Code>brush</Code> paints the window, <Code>onBrush</Code> says when it moved.
+      That is the table's arrangement, where a selection is reported and the caller owns the set.
+    </P>
+    <P>
+      The window is one rect under every mark, so the lines read through it instead of vanishing
+      behind it. Holding the range outside the chart is also what stops a re-render losing it. Pulling
+      the plot from 1158px down to 878px repainted the same range at the new scale, the table stayed on
+      its 7 rows, and widening it again gave the window back its original width to the last decimal.
+    </P>
+    <P>
+      A pointer is the only way to make a selection. From the keyboard you can clear one through the
+      control in the header, and narrow the rows with the filter bar, which is the path that was
+      already there. Creating a window without a pointer is the next thing I want to fix here.
+    </P>
+    <P>
       Five picks is the ceiling of the series scale. A pick is one pass of the weft through the shed,
       and the banner motif carries five. Past five I cannot tell two lines apart in the dark theme.
     </P>
@@ -82,6 +106,16 @@ export const doc: ComponentDoc = {
     },
     { name: 'height', type: 'number', detail: 'The plot height in pixels. It defaults to 260.' },
     { name: 'actions', type: 'ReactNode', detail: 'Controls in the chart header. The demo above puts its legend there.' },
+    {
+      name: 'brush',
+      type: 'readonly [X, X] | null',
+      detail: 'The window the chart paints. Hold it in your own state, the way a table selection works.',
+    },
+    {
+      name: 'onBrush',
+      type: '(range: readonly [X, X] | null) => void',
+      detail: 'Reports a dragged range in the values of the x scale, and null when a click clears it.',
+    },
   ],
   measured: [
     {
@@ -107,6 +141,18 @@ export const doc: ComponentDoc = {
       what: 'What Plot adds to this site, gzipped',
       detail:
         'The docs bundle went from 568.23kB to 839.87kB raw, and from 175.47kB to 267.60kB gzipped, measured on the production build with and without the chart page. Plot brings d3 with it. Add the chart only if you want a chart.',
+    },
+    {
+      value: '7 of 27',
+      what: 'Runs left in the table after brushing 30 July to 8 August',
+      detail:
+        'The chart reports the dates, the demo widens them to whole days, and the table filters on the run stamp. Clicking once on the plot clears the window and all 27 come back.',
+    },
+    {
+      value: '374.4827581872605px',
+      what: 'The window width before and after a resize round trip',
+      detail:
+        'Identical to the last decimal. The plot went from 1158px to 878px and back, and the window was repainted from the range the caller holds rather than kept as pixels, so the table never left its 7 rows.',
     },
     {
       value: '6.1ms',

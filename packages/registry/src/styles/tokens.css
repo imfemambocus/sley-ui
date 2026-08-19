@@ -501,6 +501,19 @@
   .sley-plot [aria-label='crosshair text'] {
     color: var(--color-weft);
   }
+
+  .reed-brush-field {
+    fill: transparent;
+    cursor: crosshair;
+  }
+
+  /* a brush window is what the reader chose, so it takes the selvedge wash */
+  .reed-brush {
+    fill: var(--color-indigo-wash);
+    stroke: var(--color-indigo);
+    stroke-width: 1px;
+    pointer-events: none;
+  }
 }
 
 @keyframes beat {

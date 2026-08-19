@@ -37,3 +37,28 @@ export const quality: readonly Reading[] = Object.keys(BASE).flatMap((assay, ser
     }
   }),
 )
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+export function dayLabel(date: Date) {
+  return `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`
+}
+
+/*
+ * a reading is a whole day, so a window that ends mid afternoon would drop runs the
+ * label says it holds. both edges are pushed out to the day they land in.
+ */
+export function snapToDays(range: readonly [Date, Date]): readonly [Date, Date] {
+  const from = new Date(range[0])
+  from.setUTCHours(0, 0, 0, 0)
+  const to = new Date(range[1])
+  to.setUTCHours(23, 59, 59, 999)
+  return [from, to]
+}
+
+/* the run stamps carry no zone, and the readings are UTC days, so both are read as UTC */
+export function withinRange(started: string, range: readonly [Date, Date] | null) {
+  if (!range) return true
+  const at = Date.parse(`${started}Z`)
+  return at >= range[0].getTime() && at <= range[1].getTime()
+}
