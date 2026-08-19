@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.4.1': {
+    date: '2026-08-19',
+    title: 'The brush answers the keyboard',
+    body: 'The plot area takes focus, so you can select a range without a pointer. One arrow press moves one edge by one tick of the x axis, which is 70.07px and two days on the demo. The step is a tick because the axis already draws that distance for the reader. Home and End take the moving edge to the ends of the frame, so either key gives you the whole range from nothing, and Escape clears. The field names its own keys: a rect with a tabindex is reported as a graphics-symbol, and nothing else on the page can say what the arrows do. Two smaller things went in underneath. A caller that widens the range it is handed, the way the demo rounds a window out to whole days, no longer moves the edge the next press starts from. And a resize puts focus back on the plot it rebuilt.',
+  },
   '0.4.0': {
     date: '2026-08-19',
     title: 'The chart answers a pointer',
