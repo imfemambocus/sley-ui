@@ -97,6 +97,14 @@ const Notes = () => (
       through it. Each row adds one <Code>--dur-instant</Code> of delay, so the beat travels down the
       list. The empty state uses the same field and does not move.
     </P>
+    <P>
+      Tab reaches the body once. The row the cursor is on holds the only stop inside it, so the
+      arrows move between rows and Tab leaves the table rather than walking five thousand of them.
+      Home and End go to the ends, and Space selects the row under the cursor. A row that is not
+      rendered cannot take focus, so past a hundred rows the scroll goes first and focus follows the
+      window that answers it. The bindings and what each one measured are on the{' '}
+      <a href="/docs/keyboard" className="text-indigo underline underline-offset-2">keyboard page</a>.
+    </P>
   </>
 )
 
@@ -158,6 +166,12 @@ export const doc: ComponentDoc = {
     },
   ],
   measured: [
+    {
+      value: '2232 of 2232',
+      what: 'Device columns of the focus band on a row, at DPR 2',
+      detail:
+        'A row cannot wear the outline every other control gets, because its own cells paint over it and a pinned cell hides what is left. The first reading found a fragment of the bottom edge and nothing else. The band is drawn inside the cells instead, which reaches the pinned ones, and it is unbroken on three of its four device rows.',
+    },
     {
       value: '1000 rows to 31',
       what: 'What the body holds at 1000 rows, where a browser already copes on its own',
