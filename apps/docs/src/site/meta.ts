@@ -14,6 +14,26 @@ export const PAGE_META: Record<string, { readonly title: string; readonly descri
     description:
       'Measured on a real table: a row window makes scrolling free at 1000 and 5000 rows, and does nothing at all for the load.',
   },
+  '/notes/alignment': {
+    title: 'Aligning a control to a line of type',
+    description:
+      'Measured: two type faces on one row drift half a pixel, a control sits 1.5px low on the box centre, and the fix is one token.',
+  },
+  '/notes/theme-fade': {
+    title: 'A theme fade that animates five things',
+    description:
+      'A view transition fades the whole page with five animations. Transitioning the colours on every element starts 3164 and misses nine frames in sixty.',
+  },
+  '/notes/row-cursor': {
+    title: 'One tab stop for five thousand rows',
+    description:
+      'A roving tabIndex on the row, no role of grid, and a focus band drawn on the cells so it reaches the pinned ones. Every part measured.',
+  },
+  '/notes/downsampling': {
+    title: 'Largest triangle three buckets, and the peak it loses',
+    description:
+      'Of 1801 targets over 50,400 readings, 1715 keep the peak and 86 lose it. The path data goes from 733,477 characters to 14,632.',
+  },
   '/docs/installation': {
     title: 'Installation',
     description: 'Add Sley UI to a Vite or Next project. The CLI writes the source into your repo and you own it.',

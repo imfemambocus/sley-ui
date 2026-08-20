@@ -1,15 +1,19 @@
 import type { FC } from 'react'
 import { findComponentDoc } from './content/components'
+import { Alignment } from './pages/Alignment'
 import { ColourPage } from './pages/Colour'
 import { ComponentPage } from './pages/ComponentPage'
 import { DensityPage } from './pages/Density'
+import { Downsampling } from './pages/Downsampling'
 import { Home } from './pages/Home'
 import { Installation } from './pages/Installation'
 import { Keyboard } from './pages/Keyboard'
 import { MotionPage } from './pages/Motion'
 import { NotFound } from './pages/NotFound'
 import { Releases } from './pages/Releases'
+import { RowCursor } from './pages/RowCursor'
 import { RowWindow } from './pages/RowWindow'
+import { ThemeFade } from './pages/ThemeFade'
 import { TypePage } from './pages/Type'
 import { Updates } from './pages/Updates'
 import { DEFAULT_DESCRIPTION, PAGE_META, usePageMeta } from './site/meta'
@@ -26,6 +30,10 @@ const DOC_PAGES: Record<string, FC> = {
   '/docs/colour': ColourPage,
   '/docs/type': TypePage,
   '/notes/row-window': RowWindow,
+  '/notes/alignment': Alignment,
+  '/notes/theme-fade': ThemeFade,
+  '/notes/row-cursor': RowCursor,
+  '/notes/downsampling': Downsampling,
 }
 
 const COMPONENT_PREFIX = '/components/'
