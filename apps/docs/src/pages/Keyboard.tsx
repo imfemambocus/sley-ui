@@ -33,10 +33,12 @@ const Keys = ({ rows, caption }: { readonly rows: readonly Binding[]; readonly c
 )
 
 const TABLE_KEYS: readonly Binding[] = [
-  { keys: 'Tab', does: 'Moves through the actions, the select all box, then each column head and the grip beside it.' },
+  { keys: 'Tab', does: 'Moves through the actions, the select all box, then each column head and the grip beside it, then into the body.' },
   { keys: 'Enter, Space', does: 'On a column head, sorts it. Three presses cycle ascending, descending, and back to the order the rows arrived in.' },
   { keys: 'Arrow left, Arrow right', does: 'On a resize grip, moves that column by 8px. The grip is a button, so it needs no pointer.' },
-  { keys: 'Space', does: 'On a row box, selects that row. On the head box, selects and clears every row the filter leaves on screen.' },
+  { keys: 'Arrow down, Arrow up', does: 'On a row, moves the cursor one row and scrolls it into view.' },
+  { keys: 'Home, End', does: 'On a row, goes to the first or the last row of the table, however many rows there are.' },
+  { keys: 'Space', does: 'On a row, or on its box, selects that row. On the head box, selects and clears every row the filter leaves on screen.' },
 ]
 
 const PALETTE_KEYS: readonly Binding[] = [
@@ -76,6 +78,19 @@ export const Keyboard = () => (
         handler, which is the whole reason a key press can reach it. The column head holds two
         buttons side by side, the label and the grip, so <Code>Tab</Code> reaches each one on its own
         and neither is nested in the other.
+      </P>
+      <P>
+        Tab reaches the body once. The row the cursor is on holds the only stop inside it, so leaving
+        the table and coming back returns you to the row you left instead of to the top. The table's
+        role does not change for any of this. It is still a plain table with focusable rows, so a
+        screen reader keeps its own table reading commands rather than being handed a grid widget
+        that takes them away.
+      </P>
+      <P>
+        The hard part is that a row which is not rendered cannot take focus. Past a hundred rows the
+        table draws only what the viewport holds, so <Code>End</Code> has nothing to focus at the
+        moment the key goes down. The scroll happens first, the window draws the row it lands on, and
+        focus follows on the pass after that.
       </P>
       <Note>
         The third press on a column head is worth knowing about. It clears the sort rather than
@@ -128,6 +143,24 @@ export const Keyboard = () => (
     <Section id="measured" title="Measured">
       <Measured
         rows={[
+          {
+            value: 'row 5001',
+            what: 'Where End lands in a table of 5000 rows',
+            detail:
+              'That row did not exist when the key went down. The container scrolled to 199,520 of 200,040, the window drew the row, and focus landed on it inside the frame. The same press works at every density, because the scroll arithmetic reads the row height off the head row: 200,040px, 160,032px and 125,025px of scroll.',
+          },
+          {
+            value: '30 of 30',
+            what: 'Rows moved by thirty presses of the down arrow',
+            detail:
+              'Row 1 to row 31, with the container scrolling from 0 to 760px underneath, and every row sampled along the way sitting inside the frame. The page behind it never moved, because each press is stopped from doing anything else.',
+          },
+          {
+            value: '2232 of 2232',
+            what: 'Device columns of the focus band on a row, at DPR 2',
+            detail:
+              'A row cannot wear the outline every other control gets. Its own cells paint over it and a pinned cell hides what is left, so the first reading found a fragment of the bottom edge and nothing else. The band is drawn inside the cells instead, and it runs unbroken across the row on three of its four device rows. The fourth carries eleven single ticks of the column reed.',
+          },
           {
             value: '8px',
             what: 'One arrow press on a resize grip',
