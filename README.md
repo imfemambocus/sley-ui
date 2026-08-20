@@ -31,7 +31,7 @@ So I started from the dense case. One attribute on the root element moves every 
 
 A narrow screen hides nothing. The table scrolls instead. Which columns matter is your call, not mine.
 
-Past a hundred rows the table renders only what the viewport holds. Because the density scale fixes the row height, the window is arithmetic rather than measurement, so it needs no dependency and nothing to configure. A browser copes with a thousand rows on its own; this is the headroom above that.
+Past a hundred rows the table renders only what the viewport holds. Because the density scale fixes the row height, the window is arithmetic rather than measurement, so it needs no dependency and nothing to configure. A browser copes with a thousand rows on its own; this is the headroom above that. I measured both sizes with the window on and off, including the part it does not help with, and wrote it up at [where a row window starts to pay](https://sley-ui.dev/notes/row-window).
 
 A pointer costs the most in a dense table, so everything in one is reachable without it. Sorting, resizing a column, selection, moving from row to row, the command palette and the range on the chart all answer keys, and the docs page for it lists every binding I drove in a browser.
 
