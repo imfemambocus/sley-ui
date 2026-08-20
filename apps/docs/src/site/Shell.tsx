@@ -9,6 +9,8 @@ import { Link, useRoute } from './router'
 import { Sidebar } from './Sidebar'
 import { DENSITIES, THEMES, useSettings } from './settings'
 
+const FOOTER_LINK = 'transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft'
+
 const Footer = () => (
   <footer className="mt-24 border-t border-reed">
     <div className="mx-auto flex max-w-360 flex-wrap items-center justify-between gap-4 px-4 py-8 text-weft-dim sm:px-6">
@@ -16,9 +18,14 @@ const Footer = () => (
         Built by Isfaaq M. F. Emambocus. MIT licensed, and yours to change once it is in your
         project.
       </p>
-      <a href={GITHUB} className="transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft">
-        Source on GitHub
-      </a>
+      <div className="flex items-center gap-6">
+        <a href="/rss.xml" className={FOOTER_LINK}>
+          Notes feed
+        </a>
+        <a href={GITHUB} className={FOOTER_LINK}>
+          Source on GitHub
+        </a>
+      </div>
     </div>
   </footer>
 )
