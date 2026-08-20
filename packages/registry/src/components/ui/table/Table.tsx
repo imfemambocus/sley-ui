@@ -205,6 +205,8 @@ const EmptyRow = ({ span, message }: EmptyRowProps) => (
   </tr>
 )
 
+const NAV_KEYS: ReadonlySet<string> = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
+
 interface RowProps<T> {
   readonly row: T
   readonly id: string
@@ -212,37 +214,59 @@ interface RowProps<T> {
   readonly selected: boolean
   readonly onToggle: (id: string) => void
   readonly rowIndex: number
+  readonly position: number
+  readonly cursor: boolean
+  readonly onNavigate: (from: number, key: string) => void
 }
 
-const Row = <T,>({ row, id, columns, selected, onToggle, rowIndex }: RowProps<T>) => (
-  <tr
-    aria-rowindex={rowIndex}
-    className="bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash"
-    data-selected={selected ? '' : undefined}
-  >
-    <td
-      className={cx('selvedge sticky left-0 z-(--z-pinned) border-t border-reed/60', PINNED, selected && 'selvedge-on')}
-      style={{ height: 'var(--row-h)' }}
+const Row = <T,>({ row, id, columns, selected, onToggle, rowIndex, position, cursor, onNavigate }: RowProps<T>) => {
+  const onKeyDown = (event: KeyboardEvent<HTMLTableRowElement>) => {
+    /* a key pressed on the checkbox inside the row belongs to the checkbox */
+    if (event.target !== event.currentTarget) return
+
+    if (event.key === ' ') {
+      event.preventDefault()
+      onToggle(id)
+      return
+    }
+
+    if (!NAV_KEYS.has(event.key)) return
+    event.preventDefault()
+    onNavigate(position, event.key)
+  }
+
+  return (
+    <tr
+      aria-rowindex={rowIndex}
+      tabIndex={cursor ? 0 : -1}
+      onKeyDown={onKeyDown}
+      className="focus-row bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash"
+      data-selected={selected ? '' : undefined}
     >
-      <Checkbox checked={selected} onCheckedChange={() => onToggle(id)} label={`Select row ${id}`} />
-    </td>
-    {columns.map((column, index) => (
       <td
-        key={column.key}
-        className={cx(
-          'truncate border-t border-reed/60 px-(--cell-x) text-weft-dim',
-          index === 0 && `sticky z-(--z-pinned) ${PINNED}`,
-          index > 1 && 'warp-line',
-          column.numeric && 'tnum text-right font-data text-weft',
-        )}
-        style={{ height: 'var(--row-h)', left: index === 0 ? GUTTER : undefined }}
+        className={cx('selvedge sticky left-0 z-(--z-pinned) border-t border-reed/60', PINNED, selected && 'selvedge-on')}
+        style={{ height: 'var(--row-h)' }}
       >
-        {column.render(row)}
+        <Checkbox checked={selected} onCheckedChange={() => onToggle(id)} label={`Select row ${id}`} />
       </td>
-    ))}
-    <td className="warp-line border-t border-reed/60" />
-  </tr>
-)
+      {columns.map((column, index) => (
+        <td
+          key={column.key}
+          className={cx(
+            'truncate border-t border-reed/60 px-(--cell-x) text-weft-dim',
+            index === 0 && `sticky z-(--z-pinned) ${PINNED}`,
+            index > 1 && 'warp-line',
+            column.numeric && 'tnum text-right font-data text-weft',
+          )}
+          style={{ height: 'var(--row-h)', left: index === 0 ? GUTTER : undefined }}
+        >
+          {column.render(row)}
+        </td>
+      ))}
+      <td className="warp-line border-t border-reed/60" />
+    </tr>
+  )
+}
 
 interface TableProps<T> {
   readonly rows: readonly T[]
@@ -273,6 +297,10 @@ export const Table = <T,>({
   /* only a dragged column holds a px width; the rest follow the density */
   const [widths, setWidths] = useState<Record<string, number | undefined>>({})
   const [sort, setSort] = useState<Sort | null>(null)
+  const [cursor, setCursor] = useState<string | null>(null)
+
+  /* raised by a key press, so the focus chase below ignores a scroll the pointer made */
+  const chasing = useRef(false)
 
   const span = columns.length + 2
 
@@ -360,6 +388,56 @@ export const Table = <T,>({
     if (long) setScrollTop(event.currentTarget.scrollTop)
   }
 
+  const cursorIndex = useMemo(() => {
+    if (cursor === null) return -1
+    return ordered.findIndex((row) => rowId(row) === cursor)
+  }, [cursor, ordered, rowId])
+
+  /*
+   * the row the cursor is on holds the only tab stop in the body, so leaving the table
+   * and coming back returns to it. a pointer scroll can carry that row out of the
+   * window, and the first rendered row takes the stop until an arrow moves it again.
+   */
+  const stop = cursorIndex >= view.start && cursorIndex < view.end ? cursorIndex : view.start
+
+  const moveCursor = (index: number) => {
+    const next = ordered[Math.min(Math.max(index, 0), ordered.length - 1)]
+    if (next === undefined) return
+    chasing.current = true
+    setCursor(rowId(next))
+  }
+
+  const navigate = (from: number, key: string) => {
+    if (key === 'ArrowDown') moveCursor(from + 1)
+    if (key === 'ArrowUp') moveCursor(from - 1)
+    if (key === 'Home') moveCursor(0)
+    if (key === 'End') moveCursor(ordered.length - 1)
+  }
+
+  /*
+   * a row outside the window does not exist to focus, so the scroll goes first and the
+   * effect runs again on the view it produces. `chasing` keeps it off a pointer scroll,
+   * which must not pull focus.
+   */
+  useEffect(() => {
+    if (!chasing.current || cursorIndex === -1) return
+
+    const box = scroller.current
+    const row = box?.querySelector<HTMLTableRowElement>(`tbody tr[aria-rowindex='${cursorIndex + 2}']`)
+    if (row) {
+      chasing.current = false
+      row.focus({ preventScroll: true })
+      row.scrollIntoView({ block: 'nearest' })
+      return
+    }
+
+    if (box && metrics.rowHeight > 0) {
+      const top = cursorIndex * metrics.rowHeight
+      const above = top < box.scrollTop
+      box.scrollTop = above ? top : top - metrics.viewport + metrics.rowHeight
+    }
+  }, [cursorIndex, view, metrics])
+
   const applySelection = (next: ReadonlySet<string>) => {
     setSelected(next)
     onSelectionChange?.(new Set([...next].filter((id) => onScreen.has(id))))
@@ -394,6 +472,9 @@ export const Table = <T,>({
               key={id}
               /* the head is row 1, and aria counts from there whatever the window shows */
               rowIndex={view.start + offset + 2}
+              position={view.start + offset}
+              cursor={view.start + offset === stop}
+              onNavigate={navigate}
               row={row}
               id={id}
               columns={columns}
