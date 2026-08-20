@@ -7,9 +7,9 @@
 
 /*
  * the palette swaps on one attribute, so the whole page changes colour at once.
- * a transition on every element that reads the palette restyles 1466 of them a
- * frame, which measured 23.1ms a frame against 8.3ms for the cross fade below.
- * cutting the property list did not help: the element count is the cost.
+ * a transition on every element that reads the palette starts 3164 animations on
+ * the home page against five for the cross fade below, and misses nine frames of
+ * sixty against one. cutting the property list does not help: the count is the cost.
  */
 ::view-transition-old(root),
 ::view-transition-new(root) {

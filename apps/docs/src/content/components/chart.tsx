@@ -370,7 +370,7 @@ export const doc: ComponentDoc = {
       value: '50,400 to 1,000',
       what: 'What the downsample keeps, and what the line costs at either size',
       detail:
-        'The path data went from 733,477 characters to 14,632, which is 50.1 times. On the built site the click to the painted frame was 146.9ms with every reading and 16.8ms downsampled, and the second figure includes the cut itself.',
+        'The path data went from 733,477 characters to 14,632, which is 50.1 times. On the built site the click to the painted frame is a median of 142.3ms with every reading and 8.4ms downsampled, and the second figure includes the cut itself. That pair replaces a published 146.9ms against 16.8ms: the slow figure held on re-measurement and the fast one was two frames on a 60Hz panel, where 8.4ms is one frame at 120Hz.',
     },
     {
       value: '34.03',
