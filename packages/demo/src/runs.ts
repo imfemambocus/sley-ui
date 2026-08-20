@@ -49,16 +49,18 @@ export const runs: readonly Run[] = [
 ]
 
 /*
- * a batch large enough for the table to window its rows. the ids keep counting down from
- * the last real run, and the reads and duration drift, so no two rows read as a copy.
+ * a batch large enough for the table to window its rows. the ids start above the newest
+ * real run and count down to it, so they stay four digits at every batch size and none of
+ * them collides with the twenty seven. the reads and duration drift, so no two rows read
+ * as a copy.
  */
 export function longRuns(count: number): readonly Run[] {
-  const oldest = Number(runs[runs.length - 1].id.slice(2))
+  const newest = Number(runs[0].id.slice(2))
   return Array.from({ length: count }, (_, index) => {
     const seed = runs[index % runs.length]
     return {
       ...seed,
-      id: `R-${oldest - index - 1}`,
+      id: `R-${newest + count - index}`,
       sample: `LCS-${String(2000 + index).padStart(4, '0')}-${'ABCDE'[index % 5]}`,
       reads: Math.round((seed.reads + (index % 37) * 1.7) * 10) / 10,
       duration: seed.duration + (index % 53),
