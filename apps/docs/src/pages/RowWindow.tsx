@@ -54,11 +54,35 @@ export const RowWindow = () => (
       </P>
       <P>
         Whatever that second is, it is not the rows, and it is not building the data either: the
-        click handler that makes the batch and sets the state returns in 0.6ms. I have not pinned
-        down where the rest of it goes, and I would rather say that than guess. What I can say is
+        click handler that makes the batch and sets the state returns in 0.6ms. What I can say is
         that a row window is a scrolling optimisation, and if your complaint is that the table takes
         a second to appear, this is not the fix for it.
       </P>
+    </Section>
+
+    <Section id="layout" title="It is layout, and it is one event">
+      <P>
+        The next question is which phase it lands in, so I traced the click. It is layout: a single{' '}
+        <Code>Layout</Code> event of 1254.5ms inside a 1600ms task. Paint is 31.6ms across three
+        events, <Code>PrePaint</Code> 176ms, <Code>Commit</Code> 98ms, and style recalculation 0.0ms.
+      </P>
+      <P>
+        The layout event's own arguments are where my remaining guess died. Chrome records{' '}
+        <Code>dirtyObjects: 19</Code>, <Code>totalObjects: 726</Code> and{' '}
+        <Code>partialLayout: false</Code>, rooted at the document. So 726 layout objects, nineteen of
+        them dirty, and a second and a quarter. Another <Code>Layout</Code> in the same page over the
+        same 726 objects, with 22 dirty, took 0.5ms. Once the table has settled, dirtying the body and
+        forcing a synchronous full document layout gives 0.2ms, then 0ms, then 0ms.
+      </P>
+      <P>
+        So it is not the size of the tree and it is not the shape of the DOM the window produces,
+        which is what I expected to find. Something makes one pass over those 726 objects cost 1.25s
+        and the next pass over the same 726 cost a fifth of a millisecond. I still do not know what.
+      </P>
+      <Note>
+        A trace inflates what it measures. The same block is 1078.2ms untraced against a 1600ms task
+        here, so the split between layout and paint is the finding, not the absolute figures.
+      </Note>
     </Section>
 
     <Section id="portable" title="A frame number measures your display too">
@@ -124,6 +148,12 @@ export const RowWindow = () => (
             what: 'The click handler that builds the batch and sets the state',
             detail:
               'Four presses, 0.5ms to 0.7ms. So the second the table takes to appear is not the data being made, and it is not the rows being drawn either.',
+          },
+          {
+            value: '1254.5ms',
+            what: 'One Layout event, over 726 layout objects with 19 dirty',
+            detail:
+              'Traced from the click. Paint is 31.6ms beside it and style recalculation is 0.0ms. A later full document layout over the same 726 objects takes 0.2ms, so the cost is not the size of the tree.',
           },
         ]}
       />
