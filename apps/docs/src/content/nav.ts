@@ -1,4 +1,5 @@
 import { COMPONENT_DOCS } from './components'
+import { NOTES } from './notes'
 
 export interface NavItem {
   readonly href: string
@@ -28,7 +29,7 @@ export const NAV: readonly NavGroup[] = [
   },
   {
     label: 'Notes',
-    items: [{ href: '/notes/row-window', label: 'The row window' }],
+    items: NOTES.map((note) => ({ href: `/notes/${note.slug}`, label: note.label })),
   },
   {
     label: 'Design language',
