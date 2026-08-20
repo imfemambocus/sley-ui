@@ -278,6 +278,21 @@
     );
   }
 
+  /*
+   * a row cannot wear the base outline. its own cells paint over it, and a pinned cell
+   * covers what is left, so all that survives is a fragment of the bottom edge. the ring
+   * is drawn inside the cells instead, which is the one place a pinned cell cannot hide.
+   */
+  .focus-row:focus-visible {
+    outline: none;
+  }
+
+  .focus-row:focus-visible > td {
+    box-shadow:
+      inset 0 2px 0 var(--color-indigo),
+      inset 0 -2px 0 var(--color-indigo);
+  }
+
   /* zag places the mark and reads these two names for the slide from tab to tab */
   .tab-mark {
     --transition-duration: var(--dur-local);
