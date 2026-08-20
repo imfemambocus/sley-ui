@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.7.0': {
+    date: '2026-08-20',
+    title: 'The table body answers the arrow keys',
+    body: "Reaching a row without a pointer used to mean tabbing through every control inside every row above it, which is not a thing anyone would do to five thousand rows. Tab now reaches the body once, the arrows move a cursor from row to row, Home and End go to the ends, and Space selects the row the cursor is on. The row the cursor is on carries the only tab stop in the body, so leaving the table and coming back returns you to the row you left. Nothing about the table's role changes: it is still a plain table with focusable rows, so a screen reader keeps its own table reading commands instead of being handed a grid widget that takes them away. The row window made this the interesting part. A row that is not rendered cannot take focus, so End scrolls first, lets the window draw the row it lands on, and puts focus there on the pass after. In a table of 5000 rows that is a scroll to 199,520 of 200,040 and focus on row 5000, and it holds at every density because the arithmetic reads the row height off the head. One thing needed drawing rather than declaring. A row cannot wear the outline every other control gets: its own cells paint over it and a pinned cell hides what is left, so the first reading found a fragment of the bottom edge and nothing else. The ring is drawn inside the cells instead, which is the one place a pinned cell cannot cover it. The token file moves in this release, so if you have edited your palette this update merges into it.",
+  },
   '0.6.0': {
     date: '2026-08-19',
     title: 'A chart that can say it has nothing yet',
