@@ -68,11 +68,13 @@ export const RowWindow = () => (
         same sweep gives 16.7 against 8.3, and 78.1 against 8.3.
       </P>
       <P>
-        The unwindowed figures held. The windowed ones did not, and the reason is the screen rather
-        than the code. This machine now drives a 120Hz panel, where a frame with nothing to do costs
-        8.3ms instead of 16.7ms. Both of the old windowed readings were sitting on the 60Hz floor and
-        measuring the display. The unwindowed readings survived because at 78ms a frame the display
-        is nowhere near the limit.
+        The 5000 row pair held on the unwindowed side: 84.4ms became 78.1ms, and at 78ms a frame the
+        display is nowhere near the limit. Neither windowed reading held, and the reason is the screen
+        rather than the code. This machine now drives a 120Hz panel, where a frame with nothing to do
+        costs 8.3ms instead of 16.7ms, and both of the old windowed readings were sitting on the 60Hz
+        floor and measuring the display. The 1000 row pair moved on both sides, 22.5ms to 16.7ms as
+        well as 19.6ms to 8.3ms. 16.7ms is exactly two frames on this panel, so that reading is not
+        far off the floor either.
       </P>
       <Note>
         A frame interval is only a measurement of your code while your code is the slow part. Publish
