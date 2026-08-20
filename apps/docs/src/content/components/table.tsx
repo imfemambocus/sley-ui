@@ -173,22 +173,22 @@ export const doc: ComponentDoc = {
         'A row cannot wear the outline every other control gets, because its own cells paint over it and a pinned cell hides what is left. The first reading found a fragment of the bottom edge and nothing else. The band is drawn inside the cells instead, which reaches the pinned ones, and it is unbroken on three of its four device rows.',
     },
     {
-      value: '1000 rows to 31',
-      what: 'What the body holds at 1000 rows, where a browser already copes on its own',
+      value: '16.7ms to 8.3ms',
+      what: 'A scroll frame at 1000 rows, where a browser already copes on its own',
       detail:
-        'Compact, ten columns: 12,000 cells become 350. The median scroll step only falls from 22.5ms to 19.6ms at this size, because a browser scrolls 1000 rows perfectly well. The window is buying headroom here, not speed.',
+        'Compact, ten columns: 12,051 cells in the body become 401. A free frame on this 120Hz display is 8.3ms, so without the window the table misses every second one and holds 60fps, which nobody would file a bug about. This pair replaces a published 22.5ms against 19.6ms that did not reproduce: those were taken at 60Hz, where the windowed reading was sitting on the frame floor and measuring the display rather than the table.',
     },
     {
-      value: '1.6s',
-      what: 'What the button above costs when the batch lands',
+      value: '1078.2ms',
+      what: 'The longest blocked frame when the batch above lands',
       detail:
-        'One off, on the built site, measured from the click to the second paint after it and with the 450ms stand in for a fetch taken off. 334ms at 1000 rows and 1628ms at 5000, so it scales with the row count rather than squaring. The window governs scrolling, and it does not make the first render of a batch free.',
+        'On the built site, never the dev server. Without the window it is 1083.4ms, and at 1000 rows the pair is 216ms with and 183.4ms without. The window renders 48 rows instead of 5017 and the load does not get cheaper, so a row window is a scrolling optimisation and nothing else. There is a note on this at /notes/row-window.',
     },
     {
-      value: '84.4ms to 18.4ms',
-      what: 'Where that headroom pays, and the size the demo above loads',
+      value: '78.1ms to 8.3ms',
+      what: 'A scroll frame at 5000 rows, which is what the demo above loads',
       detail:
-        'Same method, five times the data. Without the window: 5000 rows, 60,000 cells. With it: 30 rows, 349 cells. Ten scroll steps of 400px, median taken.',
+        'Same method, five times the data: 60,051 cells against 401, with the ninetieth percentile at 81ms and the worst frame at 122.1ms. About thirteen frames a second, which is where the window earns its place. The earlier 84.4ms held on re-measurement; its 18.4ms partner did not, for the display reason above.',
     },
     {
       value: '0px',
