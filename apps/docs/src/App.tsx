@@ -9,6 +9,7 @@ import { Keyboard } from './pages/Keyboard'
 import { MotionPage } from './pages/Motion'
 import { NotFound } from './pages/NotFound'
 import { Releases } from './pages/Releases'
+import { RowWindow } from './pages/RowWindow'
 import { TypePage } from './pages/Type'
 import { Updates } from './pages/Updates'
 import { DEFAULT_DESCRIPTION, PAGE_META, usePageMeta } from './site/meta'
@@ -24,6 +25,7 @@ const DOC_PAGES: Record<string, FC> = {
   '/docs/motion': MotionPage,
   '/docs/colour': ColourPage,
   '/docs/type': TypePage,
+  '/notes/row-window': RowWindow,
 }
 
 const COMPONENT_PREFIX = '/components/'

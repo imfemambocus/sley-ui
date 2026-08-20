@@ -27,6 +27,10 @@ export const NAV: readonly NavGroup[] = [
     ],
   },
   {
+    label: 'Notes',
+    items: [{ href: '/notes/row-window', label: 'The row window' }],
+  },
+  {
     label: 'Design language',
     items: [
       { href: '/docs/density', label: 'Density' },

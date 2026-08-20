@@ -9,6 +9,11 @@ export const DEFAULT_DESCRIPTION =
 
 /* one sentence for each page that is not a component, because a crawler shows this text, not the prose */
 export const PAGE_META: Record<string, { readonly title: string; readonly description: string }> = {
+  '/notes/row-window': {
+    title: 'Where a row window starts to pay',
+    description:
+      'Measured on a real table: a row window makes scrolling free at 1000 and 5000 rows, and does nothing at all for the load.',
+  },
   '/docs/installation': {
     title: 'Installation',
     description: 'Add Sley UI to a Vite or Next project. The CLI writes the source into your repo and you own it.',
