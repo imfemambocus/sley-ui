@@ -98,8 +98,8 @@ export const Installation = () => {
         <li>
           {vue ? (
             <span>
-              A Vite project. Nuxt is not supported yet, and the CLI has to be at <Code>0.3.0</Code>{' '}
-              or newer, because earlier versions know only React.
+              A Vite project or a Nuxt one, and the CLI at <Code>0.3.0</Code> or newer, because
+              earlier versions know only React. Nuxt wants <Code>0.4.0</Code>.
             </span>
           ) : (
             <span>
@@ -131,7 +131,7 @@ export const Installation = () => {
         It finds your framework, your path alias and the stylesheet that pulls Tailwind in. Then it
         writes the whole token block as a file of its own and imports it from that stylesheet. It
         also writes <Code>components.json</Code>, which is shadcn&apos;s config file rather than one
-        of mine, so a project that uses both CLIs needs one file and not two.
+        of mine. A project that uses both CLIs needs one file and not two.
       </P>
       <P>
         <span>
@@ -144,7 +144,8 @@ export const Installation = () => {
           <span>
             {' '}
             A <Code>create-vue</Code> template ships both already, and <Code>init</Code> then says so
-            and leaves them alone.
+            and leaves them alone. Nuxt declares its own <Code>@</Code> and keeps it in a generated
+            file, so there the run edits no config at all.
           </span>
         ) : (
           <span>
@@ -166,8 +167,8 @@ export const Installation = () => {
         Dependencies come with it, and they are written before the file that imports them. Adding the
         table gives you <Code>cx</Code>, the icons, the checkbox, the empty state and the tooltip,
         because that is what the table is built out of. No component declares its dependencies by
-        hand: the build script reads the imports out of the source, so a header nobody maintains
-        cannot go stale, and the same reading is what gives each framework its own Ark package.
+        hand. The build script reads the imports out of the source, which keeps a hand-written
+        header from going stale and gives each framework its own Ark package in the same pass.
       </P>
       <P>
         If a file already on disk differs from the version you installed, it is kept and marked with

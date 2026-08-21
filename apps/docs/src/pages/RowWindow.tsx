@@ -34,7 +34,8 @@ export const RowWindow = () => (
         means neither building the rows nor holding them was ever the cost. Clamping the spacers so
         the scroll container was 1080px instead of 200,040px left the block at 1125.1ms. And a second
         load in the same page had always cost one frame, because the measured height survived from
-        the first load, so the fix was sitting in a reading I had already recorded and not understood.
+        the first load. The fix had been sitting in a reading I recorded weeks ago and never
+        understood.
       </P>
       <Note>
         I have left the original measurements and reasoning below as they were published. I have not
@@ -52,14 +53,14 @@ export const RowWindow = () => (
       <P>
         Everything below comes from the production build served locally. Never the dev server: the
         same 5000 row batch blocks the main thread for 1511ms through Vite's dev server and 1078.2ms
-        from the bundle a user actually gets, so a dev reading overstates it by about 40%.
+        from the bundle a user actually gets. A dev reading overstates it by about 40%.
       </P>
     </Section>
 
     <Section id="scrolling" title="Scrolling">
       <P>
         At 1000 rows with every row in the DOM the body holds 12,051 cells, and a frame during a
-        scroll sweep takes 16.7ms. A free frame on this display is 8.3ms, so the table is missing
+        scroll sweep takes 16.7ms. A free frame on this display is 8.3ms. The table is missing
         every second one and holding 60fps. It is fine. Nobody would file a bug about it.
       </P>
       <P>
@@ -69,7 +70,7 @@ export const RowWindow = () => (
       </P>
       <P>
         With the window on, both sizes put 401 cells in the body and scroll at 8.3ms. That is the
-        display's own floor, so there is nothing left in the measurement to look at.
+        display's own floor. There is nothing left in the measurement to look at.
       </P>
     </Section>
 
@@ -92,7 +93,8 @@ export const RowWindow = () => (
 
     <Section id="layout" title="It is layout, and it is one event">
       <P>
-        The next question is which phase it lands in, so I traced the click. It is layout: a single{' '}
+        The next question was which phase it lands in, and a trace of the click answers it. Layout:
+        a single{' '}
         <Code>Layout</Code> event of 1254.5ms inside a 1600ms task. Paint is 31.6ms across three
         events, <Code>PrePaint</Code> 176ms, <Code>Commit</Code> 98ms, and style recalculation 0.0ms.
       </P>
@@ -112,7 +114,7 @@ export const RowWindow = () => (
       </P>
       <Note>
         A trace inflates what it measures. The same block is 1078.2ms untraced against a 1600ms task
-        here, so the split between layout and paint is the finding, not the absolute figures.
+        here. The split between layout and paint is the finding, and the absolute figures are not.
       </Note>
     </Section>
 
@@ -128,8 +130,8 @@ export const RowWindow = () => (
         rather than the code. This machine now drives a 120Hz panel, where a frame with nothing to do
         costs 8.3ms instead of 16.7ms, and both of the old windowed readings were sitting on the 60Hz
         floor and measuring the display. The 1000 row pair moved on both sides, 22.5ms to 16.7ms as
-        well as 19.6ms to 8.3ms. 16.7ms is exactly two frames on this panel, so that reading is not
-        far off the floor either.
+        well as 19.6ms to 8.3ms. 16.7ms is exactly two frames on this panel. That reading is not far
+        off the floor either.
       </P>
       <Note>
         A frame interval is only a measurement of your code while your code is the slow part. Publish
@@ -146,8 +148,8 @@ export const RowWindow = () => (
       </P>
       <P>
         The row height is read off the head row, not a body row. A body row is re-keyed on every
-        scroll, so a <Code>ResizeObserver</Code> on one ends up watching a node that has already been
-        detached, and the scroll height stops following the density: at comfortable it reported
+        scroll. A <Code>ResizeObserver</Code> on one ends up watching a node that has already been
+        detached, and the scroll height stops following the density. At comfortable it reported
         160,272px where it owed 200,040px. The head row carries the same height and keeps its
         identity for the life of the table.
       </P>

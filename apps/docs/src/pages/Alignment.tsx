@@ -31,7 +31,7 @@ export const Alignment = () => (
     <Section id="probe" title="How to measure a baseline, since this all turns on it">
       <P>
         Put an empty <Code>inline-block</Code> inside the span and read its bottom edge. An empty
-        inline box takes its baseline from its own bottom, so two of them compare exactly. A range
+        inline box takes its baseline from its own bottom, and two of them compare exactly. A range
         rect gives you the ink instead, which rounds, and which a descender moves.
       </P>
       <P>
@@ -50,7 +50,7 @@ export const Alignment = () => (
     <Section id="band" title="A control centres on the cap band, not the box">
       <P>
         <Code>vertical-align: middle</Code> centres a control on the x-height. In a table of ids,
-        counts and timestamps there are no lowercase letters to speak of, so the band a reader sees
+        counts and timestamps there are no lowercase letters to speak of. The band a reader sees
         runs from the baseline to the cap height, and a box centred on the x-height sits low.
       </P>
       <P>
@@ -64,7 +64,7 @@ export const Alignment = () => (
 
     <Section id="cell" title="Inside a table row, the cell decides instead">
       <P>
-        The same control in a table row does not use any of that. The cell centres it, so the answer
+        The same control in a table row does not use any of that. The cell centres it, and the answer
         needs no font metrics at all, and the residue is what the browser leaves when a 13px box is
         centred in a row of 40px, 32px or 25px: 0.046px, 0.145px and 0.252px. It grows as the row
         tightens, and at a quarter of a pixel in dense mode I stopped.

@@ -22,7 +22,7 @@ export const ThemeFade = () => (
         which is the version I wrote first.
       </P>
       <P>
-        A free frame on this display is 8.3ms, so the median is not the interesting number. Watch the
+        A free frame on this display is 8.3ms, which leaves the median uninteresting. Watch the
         count of frames that missed 16.7ms, and watch the worst one.
       </P>
     </Section>
@@ -32,8 +32,8 @@ export const ThemeFade = () => (
         Under the view transition the browser animates snapshots of the whole page, and it holds five
         animations while it does:{' '}
         <Code>::view-transition-group(root)</Code>, and an old and a new for the root, twice over. The
-        page cross fades as a picture, so a gradient fades with everything else rather than snapping,
-        which a property transition cannot do at all: a gradient does not interpolate.
+        page cross fades as a picture. A gradient fades with everything else instead of snapping,
+        which a property transition cannot do at all, because a gradient does not interpolate.
       </P>
       <P>
         The blanket rule instead starts 3164 animations on a page holding 1544 elements. The cost

@@ -88,7 +88,7 @@ npx sley-ui update --dry-run  what would change, writing nothing`}
 
     <Section id="conflicts" title="When we edit the same lines">
       <P>
-        Nothing is written. The command names the files that need you to decide and stops, so your
+        Nothing is written. The command names the files that need you to decide and stops. Your
         project still builds. Passing <Code>--conflicts</Code> writes the usual markers into those
         files instead, which is the escape hatch when you would rather resolve it in your editor.
       </P>

@@ -69,8 +69,8 @@ const Notes = () => (
       Two columns are pinned: the selection gutter and the first data column, because that one names
       the row. A table that scrolls sideways otherwise carries the identity of the row off the screen
       with everything else. Pinning forces the border model, since a pinned cell needs an opaque
-      background and an opaque background hides a collapsed border, so every body cell carries its
-      own top border instead.
+      background and an opaque background hides a collapsed border. Every body cell therefore
+      carries its own top border instead.
     </P>
     <P>
       A narrow screen hides nothing. I built a column drop with width tiers, measured it at 390px,
@@ -81,7 +81,7 @@ const Notes = () => (
     <P>
       Past a hundred rows the body renders only what the viewport holds, plus a small buffer, with
       two spacer rows carrying the height of everything else. Below that count nothing changes at
-      all. Every row is exactly <Code>--row-h</Code>, so the window is arithmetic rather than
+      all. Every row is exactly <Code>--row-h</Code>, which leaves the window arithmetic rather than
       measurement, which is a payoff of the density scale I did not expect when I set it. Find in
       page will not reach a row that is not rendered, and that is the honest cost. At the sizes where
       this switches on, a browser searching ten thousand rows was not helping anyone either.
@@ -94,14 +94,14 @@ const Notes = () => (
     </P>
     <P>
       The loading state is the loom threaded and standing still: the warp in the reed with no weft
-      through it. Each row adds one <Code>--dur-instant</Code> of delay, so the beat travels down the
+      through it. Each row adds one <Code>--dur-instant</Code> of delay and the beat travels down the
       list. The empty state uses the same field and does not move.
     </P>
     <P>
-      Tab reaches the body once. The row the cursor is on holds the only stop inside it, so the
+      Tab reaches the body once. The row the cursor is on holds the only stop inside it. The
       arrows move between rows and Tab leaves the table rather than walking five thousand of them.
       Home and End go to the ends, and Space selects the row under the cursor. A row that is not
-      rendered cannot take focus, so past a hundred rows the scroll goes first and focus follows the
+      rendered cannot take focus. Past a hundred rows the scroll goes first and focus follows the
       window that answers it. The bindings and what each one measured are on the{' '}
       <a href="/docs/keyboard" className="text-indigo underline underline-offset-2">keyboard page</a>.
     </P>

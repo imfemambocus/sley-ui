@@ -66,7 +66,7 @@ export const Keyboard = () => (
     <header className="flex flex-col gap-5">
       <PageTitle>Keyboard</PageTitle>
       <Lede>
-        A dense table is where a pointer costs the most, so everything in it is reachable without one.
+        A dense table is where a pointer costs the most. Everything in it is reachable without one.
         Every binding below was driven in a browser and the result read back off the page.
       </Lede>
     </header>

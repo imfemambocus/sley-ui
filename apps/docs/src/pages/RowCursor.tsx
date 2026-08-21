@@ -26,8 +26,8 @@ export const RowCursor = () => (
         already does.
       </P>
       <P>
-        The cursor holds a row id rather than an index, so sorting the table keeps the cursor on the
-        same row rather than on the same position. Changing the density keeps it too: the cursor was on
+        The cursor holds a row id rather than an index. Sorting the table therefore keeps the cursor
+        on the same row and not on the same position. Density keeps it too: the cursor was on
         row 5001 before and after all three modes.
       </P>
     </Section>
@@ -41,14 +41,14 @@ export const RowCursor = () => (
       </P>
       <P>
         The row count survives the window: <Code>aria-rowcount</Code> is 5001 and every rendered row
-        carries its true <Code>aria-rowindex</Code>, so the position a reader is told is the position
+        carries its true <Code>aria-rowindex</Code>, and the position a reader hears is the position
         in the data and not the position in the 26 rows that happen to exist.
       </P>
     </Section>
 
     <Section id="scroll" title="A row that is not rendered cannot take focus">
       <P>
-        Past a hundred rows the body only renders what the viewport holds, so moving the cursor to row
+        Past a hundred rows the body only renders what the viewport holds. Moving the cursor to row
         5000 means scrolling first and focusing on the next view. <Code>End</Code> lands on row 5001 of
         5001 at every density, and it scrolls the frame to exactly its own bottom each time: 199,520 of
         200,040 at comfortable, 159,512 of 160,032 at compact and 124,505 of 125,025 at dense. Each of
@@ -68,7 +68,7 @@ export const RowCursor = () => (
 
     <Section id="pointer" title="A pointer scroll drops the focus, and that is accepted">
       <P>
-        Scroll with the wheel and the focused row leaves the DOM, so focus falls to the body. Chasing
+        Scroll with the wheel and the focused row leaves the DOM, dropping focus to the body. Chasing
         it would mean a scroll pulling focus around, which is worse. Instead the tab stop falls back to
         the first row a reader can actually see: at 40,000px the table had 25 rows rendered, exactly one
         tab stop, and it was on row 996, the first of them.

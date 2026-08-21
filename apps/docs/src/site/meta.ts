@@ -36,7 +36,7 @@ export const PAGE_META: Record<string, { readonly title: string; readonly descri
   },
   '/docs/installation': {
     title: 'Installation',
-    description: 'Add Sley UI to a Vite or Next project. The CLI writes the source into your repo and you own it.',
+    description: 'Add Sley UI to a Vite, Next or Nuxt project. The CLI writes the source into your repo and you own it.',
   },
   '/docs/vue': {
     title: 'Vue',

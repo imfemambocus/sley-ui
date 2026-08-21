@@ -6,7 +6,7 @@ export const Downsampling = () => (
     <header className="flex flex-col gap-5">
       <PageTitle>Largest triangle three buckets, and the peak it loses</PageTitle>
       <Lede>
-        Fifty thousand readings do not fit in a thousand pixels, so something has to go. Taking every
+        Fifty thousand readings do not fit in a thousand pixels. Something has to go. Taking every
         fiftieth reading loses the one event the chart exists to show. The algorithm that keeps the
         shape mostly keeps that event too, and I can tell you exactly how often it does not.
       </Lede>
@@ -20,8 +20,8 @@ export const Downsampling = () => (
       </P>
       <P>
         A stride keeps 1008 points and reports 30.08 at the moment of the peak. It is not that the
-        excursion is smoothed. It is that no point inside it was chosen, so the chart draws a run that
-        never went off setpoint.
+        excursion is smoothed. It is that no point inside it was chosen at all, and the chart draws
+        a run that never went off setpoint.
       </P>
     </Section>
 
@@ -54,7 +54,7 @@ export const Downsampling = () => (
         The draw is the only thing that gets cheaper, and I expected the pointer to as well. A crosshair
         sweep of thirty pointer moves reads 8.3ms median at both sizes, with a worst frame of 8.9ms
         downsampled and 8.4ms with every reading. Plot's nearest point search over 50,400 points costs
-        nothing I can measure, so the reason to cut is the path and not the interaction.
+        nothing I can measure. The reason to cut is the path and not the interaction.
       </P>
     </Section>
 

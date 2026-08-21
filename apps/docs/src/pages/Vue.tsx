@@ -56,7 +56,7 @@ export const VuePage = () => (
       </P>
       <P>
         The token layer never moved at all. <Code>tokens.css</Code>, <Code>cx</Code> and the three
-        chart helpers are the same bytes in both trees, served from one file, so a density value or a
+        chart helpers are the same bytes in both trees, served from one file. A density value or a
         palette change cannot land in one framework and not the other.
       </P>
     </Section>
@@ -68,12 +68,11 @@ export const VuePage = () => (
           v4 feature.
         </li>
         <li>
-          A Vite project. Nuxt is not supported yet, because its config, its alias and its stylesheet
-          all live somewhere else and I have not driven that path.
+          A Vite project or a Nuxt one. <Code>init</Code> reads which from your dependencies.
         </li>
         <li>
           The CLI at <Code>0.3.0</Code> or newer. Earlier versions know only React, and on a Vue
-          project they would happily write the React files.
+          project they would happily write the React files. Nuxt wants <Code>0.4.0</Code>.
         </li>
       </List>
     </Section>
@@ -95,7 +94,7 @@ export const VuePage = () => (
         <Code>init</Code> looks for <Code>vue</Code> or <Code>react</Code> in your dependencies and
         reads the matching tree from then on. A repository that holds both refuses rather than
         guessing, and names the flag: <Code>--framework vue</Code>. The choice is recorded in{' '}
-        <Code>sley.lock</Code>, so a bug report can be placed without asking you.
+        <Code>sley.lock</Code>, which is how a bug report gets placed without anyone asking you.
       </P>
       <P>
         Underneath, React sits at the root of the registry and Vue in a tree under it, at{' '}
@@ -106,10 +105,36 @@ export const VuePage = () => (
       </P>
     </Section>
 
+    <Section id="nuxt" title="On Nuxt">
+      <P>
+        Nuxt is the one project shape where <Code>init</Code> edits nothing. It declares{' '}
+        <Code>~</Code> and <Code>@</Code> for you, both pointing at <Code>srcDir</Code>, and writes
+        them into a generated tsconfig under <Code>.nuxt</Code> that nobody should be editing by
+        hand. There is no alias to add and no bundler config to reach into. The run says as much. It
+        prints the directory it resolved, writes the token file and the lockfile, and leaves{' '}
+        <Code>tsconfig.json</Code> byte for byte as the template left it.
+      </P>
+      <P>
+        <Code>srcDir</Code> is <Code>app/</Code> from Nuxt 4 and the project root before it, and a
+        value you set in <Code>nuxt.config.ts</Code> wins over both. That is the directory the
+        components land in. A Nuxt 4 project gets{' '}
+        <Code>app/components/ui/table/Table.vue</Code> and a Nuxt 3 one gets it at the root, where
+        the alias was pointing anyway.
+      </P>
+      <P>
+        Two things follow from Nuxt itself and not from here. Its auto-import walks the components
+        directory, and every file the CLI writes therefore picks up a global name like{' '}
+        <Code>UiTableTable</Code> that you have no reason to use. The components also render on the
+        server without complaint. I built a fresh Nuxt 4 app with the table on its page and read the
+        markup back off the node server: the row count and the sort state were in the HTML before
+        any script ran.
+      </P>
+    </Section>
+
     <Section id="props" title="How the props map">
       <P>
         Every prop keeps its name and its meaning. Four rules cover the difference, and they hold
-        across the whole set, so the props table on each component page is read through them.
+        across the whole set. Read the props table on each component page through them.
       </P>
       <List>
         <li>
@@ -133,18 +158,18 @@ export const VuePage = () => (
         </li>
       </List>
       <Note>
-        A wrapper around an Ark root declares almost nothing, so every option Ark takes reaches it as
-        an attribute and none of them had to be listed twice. That is also why the Vue single file
-        component compiler cannot type-check those: it refuses a props type imported from{' '}
-        <Code>node_modules</Code> outright, which is a real limit rather than a choice.
+        A wrapper around an Ark root declares almost nothing, which lets every option Ark takes
+        arrive as an attribute and spares me listing any of them twice. That is also why the Vue
+        single file component compiler cannot type-check those. It refuses a props type imported
+        from <Code>node_modules</Code> outright, and that is a real limit rather than a choice.
       </Note>
     </Section>
 
     <Section id="files" title="One export, one file">
       <P>
-        A single file component holds one component, so a compound control is several files and you
-        import each by its path. There is no index file to re-export them from, which means the two
-        factory functions come from Ark directly: <Code>createListCollection</Code> from{' '}
+        A single file component holds one component. A compound control is therefore several files,
+        and you import each by its path. There is no index file to re-export them from, which is why
+        the two factory functions come from Ark directly: <Code>createListCollection</Code> from{' '}
         <Code>@ark-ui/vue/select</Code> and <Code>createToaster</Code> from{' '}
         <Code>@ark-ui/vue/toast</Code>. Ark is already in your <Code>package.json</Code> by then.
       </P>
@@ -158,12 +183,12 @@ export const VuePage = () => (
       <P>
         This is the one place the two APIs genuinely differ. In React a column carries a{' '}
         <Code>render</Code> function. In Vue a column is data, and the cell comes from a slot named
-        after the column key, so your markup stays in a template where you can read it.
+        after the column key. Your markup stays in a template where you can read it.
       </P>
       <CodeBlock code={COLUMNS} />
       <CodeBlock code={CELL_SLOTS} />
       <P>
-        The slot props are typed, so <Code>row</Code> is your row type and not{' '}
+        The slot props are typed, and <Code>row</Code> is your row type rather than{' '}
         <Code>any</Code>. A column with no slot draws an empty cell, which you see immediately,
         rather than a value that is quietly wrong.
       </P>
@@ -178,8 +203,8 @@ export const VuePage = () => (
       </P>
       <VueIsland load={VUE_CONSOLE} />
       <Note>
-        The site is a React application, so a Vue demo is its own application mounted into one node
-        of it. The import is dynamic, which is why a reader who never asks for Vue never downloads
+        The site is a React application. A Vue demo is its own application mounted into one node of
+        it, behind a dynamic import, which is why a reader who never asks for Vue never downloads
         it.
       </Note>
     </Section>
@@ -228,13 +253,14 @@ export const VuePage = () => (
     <Section id="left" title="What is not there yet">
       <List>
         <li>
-          Nuxt. The components themselves have no server component story to get wrong, since Vue has
-          none, but <Code>init</Code> would not know where to write the alias.
+          A Nuxt module. <Code>init</Code> writes the token file and imports it from the Tailwind
+          stylesheet it finds, and it trusts Nuxt to be loading that stylesheet already. If your
+          entry is not in the <Code>css</Code> array of <Code>nuxt.config.ts</Code>, the import lands
+          in a file nothing reads and the page comes out unstyled.
         </li>
         <li>
-          The extra charts further down the chart page. Those illustrate points in the prose and
-          Observable Plot draws the same SVG whichever framework holds it, so the wrapper is the only
-          difference and the top demo on that page is already the Vue one.
+          A Nuxt 3 build. The source directory rule covers its layout and there is a test on it, but
+          the app I built and read the server markup out of was on Nuxt 4.
         </li>
       </List>
     </Section>
