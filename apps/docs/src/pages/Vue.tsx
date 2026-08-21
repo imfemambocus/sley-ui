@@ -132,8 +132,8 @@ export const VuePage = () => (
         <Code>@ark-ui/vue/toast</Code>. Ark is already in your <Code>package.json</Code> by then.
       </P>
       <P>
-        Switch the mark in the header and every import block on the site rewrites itself, including
-        the ones on the component pages.
+        Switch the framework above the sidebar and every import block on the documentation rewrites
+        itself, including the ones on the component pages.
       </P>
     </Section>
 

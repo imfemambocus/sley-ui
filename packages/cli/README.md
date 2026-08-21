@@ -27,7 +27,7 @@ Node 20.11 or later, and Tailwind CSS v4 in the project you are adding to. React
 
 ## Docs
 
-[sley-ui.dev](https://sley-ui.dev) carries the component set, the design language and a running demo application. The switch in its header rewrites every code block for the framework you pick, and [sley-ui.dev/docs/vue](https://sley-ui.dev/docs/vue) carries the rules that take the props from one to the other.
+[sley-ui.dev](https://sley-ui.dev) carries the component set, the design language and a running demo application. The switch above its sidebar rewrites every code block for the framework you pick, and [sley-ui.dev/docs/vue](https://sley-ui.dev/docs/vue) carries the rules that take the props from one to the other.
 
 ## Licence
 

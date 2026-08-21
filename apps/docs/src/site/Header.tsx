@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button/Button'
-import { FRAMEWORK_MARK } from './FrameworkMark'
-import { DENSITIES, FRAMEWORKS, THEMES, useSettings } from './settings'
+import { DENSITIES, THEMES, useSettings } from './settings'
 import { Link, useRoute } from './router'
 import { Segmented } from './Segmented'
 import { Wordmark } from './Wordmark'
@@ -24,7 +23,7 @@ interface HeaderProps {
 }
 
 export const Header = ({ onOpenPalette, onOpenNav }: HeaderProps) => {
-  const { density, setDensity, theme, setTheme, framework, setFramework } = useSettings()
+  const { density, setDensity, theme, setTheme } = useSettings()
   const { path } = useRoute()
 
   return (
@@ -61,16 +60,6 @@ export const Header = ({ onOpenPalette, onOpenNav }: HeaderProps) => {
             <span>Search</span>
             <kbd className="font-data text-[11px] text-weft-faint">⌘K</kbd>
           </Button>
-          <Segmented
-            legend="Framework"
-            options={FRAMEWORKS}
-            value={framework}
-            onSelect={setFramework}
-            renderOption={(option) => {
-              const Mark = FRAMEWORK_MARK[option]
-              return <Mark />
-            }}
-          />
           <Segmented
             legend="Density"
             options={DENSITIES}
