@@ -6,7 +6,7 @@
 
 ## About
 
-Sley UI is a component registry for React. It covers the interfaces that hold a lot of data: tables, filter bars, command palettes, side panels and long forms.
+Sley UI is a component registry for React and Vue. It covers the interfaces that hold a lot of data: tables, filter bars, command palettes, side panels and long forms.
 
 The components are not an npm dependency. A command copies the source files into your project. You own the code from that point. You can read it, change it, and keep your changes.
 
@@ -21,7 +21,7 @@ npx sley-ui add table
 
 Install it globally and the command shortens to `sley`.
 
-`init` reads your project. It finds the framework, the path alias and the stylesheet that pulls Tailwind in, then writes the token block as a file of its own. Vite and Next are both supported. `add` writes a component and everything it imports. If you have already edited one of those files, it keeps your version and tells you.
+`init` reads your project. It finds the path alias and the stylesheet that pulls Tailwind in, then writes the token block as a file of its own. Vite and Next are both supported for React, and Vite for Vue. It also reads which UI framework you are on out of your dependencies and installs from that tree of the registry, so the commands above are the same either way. `add` writes a component and everything it imports. If you have already edited one of those files, it keeps your version and tells you.
 
 ## Why
 
@@ -37,6 +37,8 @@ A pointer costs the most in a dense table, so everything in one is reachable wit
 
 The chart is built on the same tokens as everything else. It reads the density knob and the palette, and it draws plain SVG, so your stylesheet reaches it and it needs no theme of its own. Drag across it to select a range, or tab to the plot and move an edge with the arrow keys. Either way it hands the values back to you, and that is how the demo on the home page narrows the table underneath it. A line with more points than the frame has pixels gets a cut that keeps its shape: in a fifty thousand point trace the one excursion survives, where taking every fiftieth reading reports the flat part it sits on. It does not always survive, and how often it does not is at [largest triangle three buckets, and the peak it loses](https://sley-ui.dev/notes/downsampling).
 
+Two frameworks are one design language rather than two libraries. Ark UI, which every stateful component is built on, is a layer of state machines with an adapter for each framework, and that is why the Vue port rewrote no behaviour: the parts, the props and the details objects are the same on both sides. The token file, `cx` and the chart helpers are the same bytes in both trees, served from one file, so a density value cannot land in one framework and not the other. One version number covers both. The four rules that carry every prop across, and the one API that genuinely differs, are at [sley-ui.dev/docs/vue](https://sley-ui.dev/docs/vue).
+
 Underneath: Ark UI for behaviour, Tailwind CSS v4 for the token layer. Each component is readable TypeScript. There is no runtime style engine.
 
 ## Updates
@@ -49,7 +51,7 @@ What each version changed, and why, is written up at [sley-ui.dev/docs/releases]
 
 ## Status
 
-Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state, with a chart beside them. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.8.0, and the CLI is on npm at 0.2.0, so every command above runs today on a fresh Vite app and a fresh Next app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
+Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state, with a chart beside them. Every one of them is served for React and for Vue. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application; the switch in its header rewrites every code block for the framework you pick. The registry is served from the same place, at version 0.9.0, and the CLI is on npm at 0.3.0, so every command above runs today on a fresh Vite app, a fresh Next app and a fresh Vue app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
 
 To read the docs locally, clone this repo and run `npm install && npm run dev -w docs`.
 
