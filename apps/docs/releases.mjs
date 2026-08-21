@@ -28,10 +28,19 @@ async function bundle(version) {
   return JSON.parse(await readFile(path, 'utf8'))
 }
 
-function fileMap(items) {
+/*
+ * react sits at the registry root and every other framework in a tree under it, so a vue
+ * path is read here the way the registry serves it. a bundle from before the vue tree
+ * existed holds no such key, which is what leaves every earlier release unchanged.
+ */
+function fileMap(release) {
   const files = new Map()
-  for (const item of items) {
-    for (const file of item.files) files.set(file.path, { item: item.name, content: file.content })
+  for (const [prefix, items] of [['', release.items], ['vue/', release.vue ?? []]]) {
+    for (const item of items) {
+      for (const file of item.files) {
+        files.set(`${prefix}${file.path}`, { item: item.name, content: file.content })
+      }
+    }
   }
   return files
 }
@@ -51,7 +60,7 @@ for (const version of versions.toReversed()) {
     throw new Error(`releases: ${version} is served with no note in src/content/releases.ts`)
   }
 
-  const files = fileMap(frozen.items)
+  const files = fileMap(frozen)
   const moved = { added: [], changed: [], removed: [] }
   if (previous) {
     for (const [path, file] of files) {

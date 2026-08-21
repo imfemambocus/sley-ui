@@ -85,8 +85,9 @@ export const Releases = () => (
 npx sley-ui add table --registry https://sley-ui.dev/r/0.1.0  that release`}
       />
       <Note>
-        One version number covers all eighteen items, so a rise does not mean every component moved.{' '}
-        <Code>sley update</Code> leaves a file that did not move exactly as you wrote it.
+        One version number covers all nineteen items in both frameworks, so a rise does not mean every
+        component moved. <Code>sley update</Code> leaves a file that did not move exactly as you wrote
+        it, and a path under <Code>vue/</Code> is the Vue copy of that item.
       </Note>
     </Section>
 
