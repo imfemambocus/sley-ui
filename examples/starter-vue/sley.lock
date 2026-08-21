@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "registry": "https://sley-ui.dev/r",
+  "items": {
+    "tokens": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/tokens.json",
+      "files": [
+        {
+          "path": "src/styles/tokens.css",
+          "hash": "sha256-hw2XmClfxp8eV1jT9wifq2dsuTZu7JD36ZR8uhngoaU="
+        }
+      ]
+    },
+    "cx": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/cx.json",
+      "files": [
+        {
+          "path": "src/lib/cx.ts",
+          "hash": "sha256-nCgIrhJMREr99PRsI+he7LXaUaFBBdwZSWpHWqK/JBo="
+        }
+      ]
+    },
+    "icons": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/icons.json",
+      "files": [
+        {
+          "path": "src/components/ui/icons/CheckIcon.vue",
+          "hash": "sha256-VK3rxcxw5gdn6WN0QMVVdhcyGesulxsZefoWe8pHbwk="
+        },
+        {
+          "path": "src/components/ui/icons/ChevronIcon.vue",
+          "hash": "sha256-4MW/oPjOosBhiFIv2fUihF2Vf9Th0MUinGmfQp5zHW0="
+        },
+        {
+          "path": "src/components/ui/icons/CloseIcon.vue",
+          "hash": "sha256-c8kywFxwEjcDoqZnCGYpimGh1GuKA52wB8GOWL6vEvo="
+        },
+        {
+          "path": "src/components/ui/icons/SearchIcon.vue",
+          "hash": "sha256-l/ott6twzaKlmTzGjO+WL+yhd77+cNYmKAEkrDqzWGc="
+        }
+      ]
+    },
+    "checkbox": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/checkbox.json",
+      "files": [
+        {
+          "path": "src/components/ui/checkbox/Checkbox.vue",
+          "hash": "sha256-VNnw5iZiEj8C0UlrI7uTGTk0QP1IcQrQcuohH+rT51E="
+        }
+      ]
+    },
+    "empty-state": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/empty-state.json",
+      "files": [
+        {
+          "path": "src/components/ui/empty-state/EmptyState.vue",
+          "hash": "sha256-jI3cGpdcyAp8+1Qw36cijUNPmFy4V5kGOdJC83Myv2g="
+        }
+      ]
+    },
+    "tooltip": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/tooltip.json",
+      "files": [
+        {
+          "path": "src/components/ui/tooltip/Tooltip.vue",
+          "hash": "sha256-fvIkzGQESUAcWZkXZAJKWfNe9dKd1qkyokjee2Xl4nc="
+        }
+      ]
+    },
+    "table": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/table.json",
+      "files": [
+        {
+          "path": "src/components/ui/table/ColumnGrip.vue",
+          "hash": "sha256-NHesQQ1sM3PYYQ/W1EJkjJzMwlkhRwIKx5EOv4oWlAk="
+        },
+        {
+          "path": "src/components/ui/table/ColumnHead.vue",
+          "hash": "sha256-R/p/VBjBG1mfVBUSAeruZoTFGy/j/NZK5JCGH8x918g="
+        },
+        {
+          "path": "src/components/ui/table/Table.vue",
+          "hash": "sha256-rdvwzRWEjNK27AOkb4epByjCfKyqVx8GhptWoGqbXdI="
+        }
+      ]
+    },
+    "select": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/select.json",
+      "files": [
+        {
+          "path": "src/components/ui/select/Select.vue",
+          "hash": "sha256-RKWjjPGQd5fZY9eR7DCCFEzLMn40yFBRIfsfrzvG3dk="
+        },
+        {
+          "path": "src/components/ui/select/SelectContent.vue",
+          "hash": "sha256-XqFRkuZfS8yfGF9vbpYRad8peLM+zg2QjUQnzWEq8Hw="
+        },
+        {
+          "path": "src/components/ui/select/SelectOption.vue",
+          "hash": "sha256-bQNurmytLuPd0VUEZ8Nrm17VH21u2Dd91zlv7L298ow="
+        },
+        {
+          "path": "src/components/ui/select/SelectTrigger.vue",
+          "hash": "sha256-MqsIFvmjAwVjYiKpNewxgaOHdmCVSnpVZSOCu+PCnpM="
+        }
+      ]
+    },
+    "filter-bar": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/filter-bar.json",
+      "files": [
+        {
+          "path": "src/components/ui/filter-bar/FilterBar.vue",
+          "hash": "sha256-mnIJPDcntWJi8Dpxyag3NjrX3/+3wYamrXMxGqlPFE0="
+        }
+      ]
+    },
+    "button": {
+      "version": "0.9.0",
+      "url": "https://sley-ui.dev/r/vue/0.9.0/button.json",
+      "files": [
+        {
+          "path": "src/components/ui/button/Button.vue",
+          "hash": "sha256-jICcULhckOg5goU43LUaIyF1EikyFHOtXSgMjcOMAOc="
+        }
+      ]
+    }
+  },
+  "library": "vue"
+}

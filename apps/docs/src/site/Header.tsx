@@ -16,6 +16,10 @@ export const SANDBOX =
   'https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter?file=src%2FApp.tsx'
 export const SANDBOX_BLANK =
   'https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/blank?file=src%2FApp.tsx'
+export const SANDBOX_VUE =
+  'https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/starter-vue?file=src%2FApp.vue'
+export const SANDBOX_BLANK_VUE =
+  'https://stackblitz.com/github/imfemambocus/sley-ui/tree/main/examples/blank-vue?file=src%2FApp.vue'
 
 interface HeaderProps {
   readonly onOpenPalette: () => void

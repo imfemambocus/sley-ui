@@ -1,5 +1,5 @@
 import { CodeBlock, FrameworkBlock } from '../site/CodeBlock'
-import { SANDBOX, SANDBOX_BLANK } from '../site/Header'
+import { SANDBOX, SANDBOX_BLANK, SANDBOX_BLANK_VUE, SANDBOX_VUE } from '../site/Header'
 import { Code, Lede, List, Note, P, PageTitle, Section } from '../site/Prose'
 import { Link } from '../site/router'
 import { useSettings } from '../site/settings'
@@ -37,6 +37,8 @@ const DOC_LINK =
 export const Installation = () => {
   const { framework } = useSettings()
   const vue = framework === 'vue'
+  const sandbox = vue ? SANDBOX_VUE : SANDBOX
+  const blank = vue ? SANDBOX_BLANK_VUE : SANDBOX_BLANK
 
   return (
   <article className="flex flex-col gap-14">
@@ -51,7 +53,7 @@ export const Installation = () => {
     <Section id="sandbox" title="Try it without installing anything">
       <P>
         <a
-          href={SANDBOX}
+          href={sandbox}
           target="_blank"
           rel="noreferrer"
           className="text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft"
@@ -70,7 +72,7 @@ export const Installation = () => {
       <P>
         <span>If it is the commands themselves you would rather not take on trust, </span>
         <a
-          href={SANDBOX_BLANK}
+          href={blank}
           target="_blank"
           rel="noreferrer"
           className="text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft"
@@ -85,7 +87,6 @@ export const Installation = () => {
           it installs what the components import.
         </span>
       </P>
-      {vue && <Note>Both sandboxes are React projects. A Vue one is not built yet.</Note>}
     </Section>
 
     <Section id="requirements" title="What you need first">
