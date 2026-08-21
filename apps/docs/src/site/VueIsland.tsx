@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { App } from 'vue'
+import { useSettings } from './settings'
 
 interface VueIslandProps {
   /* the module holding the single file component to mount, loaded on demand */
@@ -38,4 +39,17 @@ export const VueIsland = ({ load }: VueIslandProps) => {
   if (failed) return <p className="text-weft-dim">The Vue demo did not load. Reload the page.</p>
   /* the frame comes from the demo itself, so this node holds the height until it arrives */
   return <div ref={host} className="min-h-40" />
+}
+
+interface FrameworkDemoProps {
+  readonly children: ReactNode
+  /* hold this at module scope: the island remounts whenever the loader changes identity */
+  readonly vue: VueIslandProps['load']
+}
+
+/* a page that runs more than one demo picks each of them the way the code blocks pick */
+export const FrameworkDemo = ({ children, vue }: FrameworkDemoProps) => {
+  const { framework } = useSettings()
+  if (framework === 'vue') return <VueIsland load={vue} />
+  return children
 }

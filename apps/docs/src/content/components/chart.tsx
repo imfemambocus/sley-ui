@@ -5,6 +5,9 @@ import { RunMixChart } from '@demo/RunMixChart'
 import { TraceChart } from '@demo/TraceChart'
 import { Demo } from '../../site/Demo'
 import { Code, P } from '../../site/Prose'
+import { useSettings } from '../../site/settings'
+import { FrameworkDemo } from '../../site/VueIsland'
+import { VUE_CHART_STATES, VUE_RUN_MIX, VUE_TRACE } from '../../vue/demos'
 import type { ComponentDoc } from '../types'
 
 const ChartDemo = () => {
@@ -21,33 +24,43 @@ const ChartDemo = () => {
 }
 
 const TraceDemo = () => (
-  <Demo
-    bleed
-    caption="One flow cell, one reading a second for fourteen hours. The header control switches between the thousand points the frame can resolve and all 50,400 of them."
-  >
-    <TraceChart />
-  </Demo>
+  <FrameworkDemo vue={VUE_TRACE}>
+    <Demo
+      bleed
+      caption="One flow cell, one reading a second for fourteen hours. The header control switches between the thousand points the frame can resolve and all 50,400 of them."
+    >
+      <TraceChart />
+    </Demo>
+  </FrameworkDemo>
 )
 
 const RunMixDemo = () => (
-  <Demo
-    bleed
-    caption="The 27 runs the table holds, counted by assay and stacked by status. A band scale has no inverse, so this one takes no brush."
-  >
-    <RunMixChart />
-  </Demo>
+  <FrameworkDemo vue={VUE_RUN_MIX}>
+    <Demo
+      bleed
+      caption="The 27 runs the table holds, counted by assay and stacked by status. A band scale has no inverse, so this one takes no brush."
+    >
+      <RunMixChart />
+    </Demo>
+  </FrameworkDemo>
 )
 
 const StatesDemo = () => (
-  <Demo
-    bleed
-    caption="The three states of the same chart. The warp field beats while a fetch is out, and stands still when it comes back with nothing."
-  >
-    <ChartStates />
-  </Demo>
+  <FrameworkDemo vue={VUE_CHART_STATES}>
+    <Demo
+      bleed
+      caption="The three states of the same chart. The warp field beats while a fetch is out, and stands still when it comes back with nothing."
+    >
+      <ChartStates />
+    </Demo>
+  </FrameworkDemo>
 )
 
-const Notes = () => (
+const Notes = () => {
+  const { framework } = useSettings()
+  const vue = framework === 'vue'
+
+  return (
   <>
     <P>
       Observable Plot writes plain SVG, which is why I picked it over a canvas library. A canvas chart
@@ -55,23 +68,23 @@ const Notes = () => (
     </P>
     <P>
       Plot brings d3 with it, and that is the one real cost. It sits in a chunk of its own on this
-      site, 90.55kB gzipped, which is more than everything else in the registry put together. That is
-      why the chart sits beside the twelve controls rather than inside them: it should be something
-      you choose, not something a table hands you.
+      site, 90.55kB gzipped. Everything else in the registry put together weighs less. The chart
+      therefore sits beside the twelve controls instead of inside them. A table should never hand you
+      a chart library you did not ask for.
     </P>
     <P>
       The wrapper does not know what a line is. It builds the plot, styles it, and gives you the
       interactions back; the marks are yours. The bars below are this same component over the same 27
-      runs the table holds, coloured by the status dye each row already carries. A band scale cannot
-      be inverted, though, so there is no brush on that one and nothing to tab to. The wrapper asks
-      the x scale for its inverse and leaves the chart alone when there is none.
+      runs the table holds, coloured by the status dye each row already carries. That one takes no
+      brush and nothing in it can be tabbed to, because a band scale cannot be inverted. The wrapper
+      asks the x scale for its inverse and, finding none, leaves the chart as a chart.
     </P>
     <RunMixDemo />
     <P>
       Plot puts the font and the fill on the root svg as presentation attributes. Any stylesheet rule
-      outranks those, so the type comes from the tokens instead. Tick labels are machine values and
-      take the data face. An axis label is a human phrase and takes the interface face. The size
-      follows the density knob: 14px, 13px, 12px.
+      outranks those, which is how the type comes from the tokens instead. Tick labels are machine
+      values and take the data face. An axis label is a human phrase and takes the interface face.
+      The size follows the density knob, from 14px down to 13px and 12px.
     </P>
     <P>
       The colours go in as <Code>var()</Code> references and stay that way in the markup. I checked
@@ -81,32 +94,33 @@ const Notes = () => (
       chart keeps the old palette after the fade.
     </P>
     <P>
-      The unit sits in the header. That is the table's rule: a column head carries the unit, and a
-      cell never repeats it. An axis label with a unit on it puts the same repetition somewhere else.
+      The unit sits in the header, which is the table's rule as well. A column head carries the unit
+      and a cell never repeats it. An axis label with a unit on it puts the same repetition somewhere
+      else.
       Plot also points a quantitative axis label with an arrow glyph by default; nothing here carries
       one, and the wrapper turns it off.
     </P>
     <P>
-      A margin is a number and cannot read a density token, so I sized the margins for the largest
-      density and let a denser mode keep the slack. My first set was 1.44px short at comfortable: the
-      date labels hung out of the bottom of the frame. 40px clears them at all three densities, with
-      2.56px to spare at the worst.
+      A margin is a number and cannot read a density token. I sized them for the largest density
+      instead and let a denser mode keep the slack. My first set was 1.44px short at comfortable and
+      the date labels hung out of the bottom of the frame. 40px clears them at all three densities,
+      with 2.56px to spare at the worst.
     </P>
     <P>
       Some of a chart's life is spent with nothing to draw yet. Setting <Code>loading</Code> puts the
       warp field in the plot area and beats it, which is what the table does to its rows.{' '}
-      <Code>empty</Code> puts the empty state there instead, the loom threaded and standing still. If
-      both are set, loading wins: a chart still waiting on a fetch has nothing to call empty yet.
-      Neither state is derived, because the chart cannot read your marks and has no way to know
-      whether there is anything in them. The lines still draw in when the data lands, since the first
-      plot is only built once the skeleton has left.
+      <Code>empty</Code> puts the empty state there instead, the loom threaded and standing still.
+      Loading wins when both are set. A chart still waiting on a fetch has nothing to call empty yet.
+      Neither state is derived. The chart cannot read your marks and has no way of knowing whether
+      there is anything in them. The lines still draw in when the data lands, since the first plot is
+      only built once the skeleton has left.
     </P>
     <StatesDemo />
     <P>
       A crosshair is a mark you add rather than a prop you set. Plot names its parts{' '}
-      <Code>crosshair rule</Code> and <Code>crosshair text</Code>, so the stylesheet reaches them and
-      any chart that adds one gets the reed colour and the data face without asking for either. The
-      readout is the raw value, which is why a date arrives in full.
+      <Code>crosshair rule</Code> and <Code>crosshair text</Code>. The stylesheet reaches them by
+      those names, and any chart that adds one gets the reed colour and the data face without asking
+      for either. The readout is the raw value, which is why a date arrives in full.
     </P>
     <P>
       That last part I could not fix from the outside. Plot derives each readout from its source
@@ -119,9 +133,9 @@ const Notes = () => (
     </P>
     <P>
       While a readout is showing, the tick labels stand down. A halo outlines each glyph rather than
-      covering a line, so a readout landing on a tick label let the tick read through the gaps between
-      the letters: I measured 12.92px of a 17px line box overlapping. The readout carries the exact
-      value the axis was giving, so the axis has nothing to add for as long as it is there.
+      covering a line, so a readout landing on a tick label let the tick read through the gaps
+      between the letters. I measured 12.92px of a 17px line box overlapping. Standing the axis down
+      costs nothing, because the readout is carrying the exact value the axis was giving.
     </P>
     <P>
       The halo behind that readout was white, and it stayed white through a rule that should have
@@ -131,28 +145,29 @@ const Notes = () => (
     </P>
     <P>
       Drag across the plot to brush a range, and click once to clear it. The chart reports the values
-      and you hold them: <Code>brush</Code> paints the window, <Code>onBrush</Code> says when it moved.
-      That is the table's arrangement, where a selection is reported and the caller owns the set.
+      and you hold them. <Code>brush</Code> paints the window and{' '}
+      <Code>{vue ? '@update:brush' : 'onBrush'}</Code> says when it moved, which is the table's
+      arrangement for a selection as well.
     </P>
     <P>
-      The window is one rect under every mark, so the lines read through it instead of vanishing
-      behind it. Holding the range outside the chart is also what stops a re-render losing it. Pulling
+      The window is one rect under every mark. The lines read through it instead of vanishing behind
+      it, and holding the range outside the chart is what stops a re-render losing it. Pulling
       the plot from 1158px down to 878px repainted the same range at the new scale, the table stayed on
       its 7 rows, and widening it again gave the window back its original width to the last decimal.
     </P>
     <P>
-      The plot takes focus, so you can select a window without a pointer. One arrow press moves one
-      edge by one tick of the x axis, 70.07px and two days on this chart. The step is a tick because
-      the axis already draws that distance for the reader; a number of my own would be one nobody can
-      see. Home and End take the moving edge to the ends of the frame, and from nothing either key
-      gives you the whole range. Escape clears. The first press anchors on the frame edge it moves
-      away from, the way a drag anchors wherever the pointer went down.
+      The plot takes focus, which is how you select a window without a pointer. One arrow press moves
+      one edge by one tick of the x axis, 70.07px and two days on this chart. The step is a tick
+      because the axis already draws that distance for the reader; a number of my own would be one
+      nobody can see. Home and End take the moving edge to the ends of the frame, and from nothing
+      either key gives you the whole range. Escape clears. The first press anchors on the frame edge
+      it moves away from, the way a drag anchors wherever the pointer went down.
     </P>
     <P>
       A press reports the range a drag would report, and the demo rounds it out to whole days before
-      it comes back. That widening belongs to the caller, so the chart paints it and leaves its own
+      it comes back. That widening belongs to the caller. The chart paints it and leaves its own
       moving edge where the press put it. Read the edge back out of the range and the widening rides
-      on the next press as well as the step: three days for a two day tick.
+      on the next press as well as the step, which is three days for a two day tick.
     </P>
     <P>
       The field is a rect with a tabindex and a name. Chrome reports it as a{' '}
@@ -162,25 +177,25 @@ const Notes = () => (
       running commentary.
     </P>
     <P>
-      A resize rebuilds the plot and takes the focused field down with it, so the chart puts focus on
-      the one it draws next. The new brush has only the range the caller holds to work from, and that
-      range has been rounded out, which makes the first press after a resize move three days once
-      before the step settles back to two.
+      A resize rebuilds the plot and takes the focused field down with it. The chart puts focus on
+      the one it draws next. That new brush has only the range the caller holds to work from, and
+      that range has been rounded out, which makes the first press after a resize move three days
+      once before the step settles back to two.
     </P>
     <P>
       The lines draw in once, on the first mount. A dash cannot be given the length of its own path
-      from a stylesheet, so the wrapper measures each path and hands the number to the animation as a
-      custom property. The three series are staggered by <Code>--dur-instant</Code>, which is what the
-      loading skeleton does to its rows. A resize rebuilds the plot and does not replay it, because a
-      figure that redraws itself every time the window moves reads as a glitch.
+      from a stylesheet. The wrapper measures each path instead and hands the number to the animation
+      as a custom property. The three series are staggered by <Code>--dur-instant</Code>, which is
+      what the loading skeleton does to its rows. A resize rebuilds the plot and does not replay it:
+      a figure that redraws itself every time the window moves reads as a glitch.
     </P>
     <P>
-      The bars build the same way. Each one scales up out of the axis rather than out of its own box,
-      so a stacked column stays whole while it rises: every rect shares one baseline, the lowest edge
-      any of them reaches. The sweep across the columns fits inside one <Code>--dur-instant</Code>{' '}
-      whatever the column count, so a chart with forty bars sweeps in the same time as one with six.
-      On the bar demo the six columns started at 5, 6.8, 21.5, 37.9, 54.4 and 71.4ms and everything
-      had settled by 295.8ms.
+      The bars build the same way. Each one scales up out of the axis rather than out of its own box.
+      Every rect shares one baseline, the lowest edge any of them reaches, and that is what keeps a
+      stacked column whole while it rises. The sweep across the columns fits inside one{' '}
+      <Code>--dur-instant</Code> whatever the column count, so a chart with forty bars sweeps in the
+      same time as one with six. On the bar demo the six columns started at 5, 6.8, 21.5, 37.9, 54.4
+      and 71.4ms and everything had settled by 295.8ms.
     </P>
     <P>
       Five picks is the ceiling of the series scale. A pick is one pass of the weft through the shed,
@@ -188,39 +203,40 @@ const Notes = () => (
     </P>
     <P>
       The legend in the header is yours, and hiding a series is a filter on your own data. Mine is a
-      row of buttons carrying <Code>aria-pressed</Code>, so a key press reaches it like anything else.
-      It hides a line and nothing more; narrowing the rows underneath is the brush's job, and the
-      console on the home page keeps the two apart. Two scales have to be pinned before any of it
-      works. The colour scale takes its domain from the data it is given, and hiding the middle series
-      then hands its pick to the one below it. Declare <Code>domain</Code> and <Code>range</Code>{' '}
-      together and every line keeps its colour. The x scale does the same, and there it is worse: the
-      frame shrinks to what is left, and a window the reader brushed moves under them. Both are
-      declared from the whole fixture here.
+      row of buttons carrying <Code>aria-pressed</Code>, which a key press reaches like anything
+      else. It hides a line and nothing more; narrowing the rows underneath is the brush's job, and
+      the console on the home page keeps the two apart. Two scales have to be pinned before any of it
+      works. The colour scale takes its domain from the data it is given, and hiding the middle
+      series then hands its pick to the one below it. Declare <Code>domain</Code> and{' '}
+      <Code>range</Code> together and every line keeps its colour. The x scale does the same, and
+      there it is worse. The frame shrinks to what is left, and a window the reader brushed moves
+      under them. Both are declared from the whole fixture here.
     </P>
     <P>
       A line with more points than the frame has pixels spends its time on detail nobody can resolve.{' '}
       <Code>downsample</Code> cuts a series to a target count with largest triangle three buckets. It
       walks the points in equal buckets and keeps whichever one makes the widest triangle with the
       point it kept last and the average of the group ahead. Taking every nth point is one line of
-      code and it loses the thing you were looking at. The cooler stalled for forty seconds in the
-      trace below and the flow cell reached 34.03. Every fiftieth reading reports 30.08, which is the
+      code and it loses the thing you were looking at. In the trace below the cooler stalled for
+      forty seconds and the flow cell reached 34.03. Every fiftieth reading reports 30.08, the
       plateau, because the excursion falls between two samples.
     </P>
     <TraceDemo />
     <P>
-      The extremes are not a guarantee. I ran 181 targets from 200 to 2000 over that fixture: 172 kept
-      the peak to the decimal and 9 lost it, the worst of them reading 32.8. A bucket boundary can
-      split a peak, and the peak then loses to its own shoulder. If a maximum must never move, keep
-      the smallest and largest of each bucket instead and pay for the extra points.
+      The extremes are not a guarantee. I ran 181 targets from 200 to 2000 over that fixture. 172
+      kept the peak to the decimal and 9 lost it, the worst of them reading 32.8. A bucket boundary
+      can split a peak, and the peak then loses to its own shoulder. If a maximum must never move,
+      keep the smallest and largest of each bucket instead and pay for the extra points.
     </P>
     <P>
-      The chart does not do this for you, and it cannot: it does not know which of your marks is a
-      line or which field holds the value. It is a function you run over your own data, beside the{' '}
-      <Code>useMemo</Code> you already need to hold the options stable, and it arrives with the chart
-      at <Code>@/components/ui/chart/downsample</Code>.
+      The chart does not do this for you, and it cannot. It does not know which of your marks is a
+      line or which field holds the value. It is a function you run over your own data, in the{' '}
+      <Code>{vue ? 'computed' : 'useMemo'}</Code> that already holds the options stable. It arrives
+      with the chart, at <Code>@/components/ui/chart/downsample</Code>.
     </P>
   </>
-)
+  )
+}
 
 export const doc: ComponentDoc = {
   slug: 'chart',
@@ -236,7 +252,7 @@ export const doc: ComponentDoc = {
       type: 'ChartOptions',
       required: true,
       detail:
-        'Plot options without width, height and className. Hold it stable with useMemo, or every parent render tears the plot down and builds it again.',
+        'Plot options without width, height and className. Hold it stable, or every parent render tears the plot down and builds it again.',
     },
     { name: 'height', type: 'number', detail: 'The plot height in pixels. It defaults to 260.' },
     { name: 'actions', type: 'ReactNode', detail: 'Controls in the chart header. The demo above puts its legend there.' },
