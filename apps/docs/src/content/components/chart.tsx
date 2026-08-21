@@ -54,9 +54,10 @@ const Notes = () => (
       cannot be reached by the stylesheet that styles everything else on the page.
     </P>
     <P>
-      Plot brings d3 with it, and that is the one real cost. Adding this page took the site from
-      175.47kB to 267.60kB gzipped. That is why the chart sits beside the twelve controls rather than
-      inside them: it should be something you choose, not something a table hands you.
+      Plot brings d3 with it, and that is the one real cost. It sits in a chunk of its own on this
+      site, 90.55kB gzipped, which is more than everything else in the registry put together. That is
+      why the chart sits beside the twelve controls rather than inside them: it should be something
+      you choose, not something a table hands you.
     </P>
     <P>
       The wrapper does not know what a line is. It builds the plot, styles it, and gives you the
@@ -301,10 +302,10 @@ export const doc: ComponentDoc = {
         'The same pointer position on the same chart, one option apart. On the trace below it reads 13:28:40 where Plot gives 2026-08-06T13:28:40Z, 8 characters against 20.',
     },
     {
-      value: '92.13kB',
+      value: '90.55kB',
       what: 'What Plot adds to this site, gzipped',
       detail:
-        'The docs bundle went from 568.23kB to 839.87kB raw, and from 175.47kB to 267.60kB gzipped, measured on the production build with and without the chart page. Plot brings d3 with it. Add the chart only if you want a chart.',
+        'Plot and d3 land in one chunk of the production build, 271.52kB raw and 90.55kB gzipped. An earlier reading of 92.13kB came from measuring a single-file build with and without this page; the two agree within 1.6kB, and the chunk is the figure that reproduces now that the site splits its bundle. Add the chart only if you want a chart.',
     },
     {
       value: '240ms, staggered 90ms',
@@ -398,9 +399,9 @@ export const doc: ComponentDoc = {
     },
     {
       value: '3.0kB',
-      what: 'What this release adds to the site, gzipped, prose and all',
+      what: 'What the downsampler added to the site, gzipped, prose and all',
       detail:
-        'The bundle went from 859.45kB to 867.30kB raw and from 274.7kB to 277.7kB gzipped, which covers the downsampler, the second demo, its fixture and every word on this page. The gzipped figure is quoted to one decimal because publishing it changes it. The fixture is generated rather than shipped, and it is built on first use, because the site ships one bundle and the other twenty five pages have no use for fifty thousand dates.',
+        'Measured on the production build before and after: 7.85kB raw and 3.0kB gzipped, covering the downsampler, the second demo, its fixture and every word on this page. The gzipped figure is quoted to one decimal because publishing it changes it. The absolute bundle figures that reading was taken against no longer describe this build, which is code-split now. The fixture is generated rather than shipped, and it is built on first use, because a page with no chart on it has no use for fifty thousand dates.',
     },
     {
       value: '3 of 3',
