@@ -59,6 +59,31 @@
 }
 
 @layer components {
+  /* the frame every demo sits in, drawn once because two frameworks both draw it */
+  .demo-frame {
+    display: flex;
+    max-width: 100%;
+    flex-direction: column;
+    border: 1px solid var(--color-reed);
+    background-color: var(--color-raised);
+  }
+
+  .demo-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .demo-caption {
+    border-top: 1px solid var(--color-reed);
+    padding: 0.5rem 1rem;
+    font-family: var(--font-data);
+    font-size: 12px;
+    color: var(--color-weft-faint);
+  }
+
   /* the loom seen head on: warp threads standing in the reed, at the current pitch */
   .warp-field {
     background-image: repeating-linear-gradient(

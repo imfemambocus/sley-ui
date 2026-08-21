@@ -10,12 +10,8 @@ interface DemoProps {
 }
 
 export const Demo = ({ children, caption, bleed = false, className }: DemoProps) => (
-  <figure className={cx('flex max-w-full flex-col border border-reed bg-raised', className)}>
-    <div className={cx(bleed ? 'p-0' : 'flex flex-wrap items-center gap-4 p-6')}>{children}</div>
-    {caption && (
-      <figcaption className="border-t border-reed px-4 py-2 font-data text-[12px] text-weft-faint">
-        {caption}
-      </figcaption>
-    )}
+  <figure className={cx('demo-frame', className)}>
+    <div className={bleed ? undefined : 'demo-body'}>{children}</div>
+    {caption && <figcaption className="demo-caption">{caption}</figcaption>}
   </figure>
 )
