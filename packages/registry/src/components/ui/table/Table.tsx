@@ -46,6 +46,12 @@ const SORT_CHARS = 2
 const WINDOW_MIN = 100
 const OVERSCAN = 6
 
+/*
+ * an effect supplies the row height, which leaves the first commit of a long batch without
+ * one. 40 rows covers the 520px body cap at the dense height with the overscan on top.
+ */
+const FIRST_ROWS = 40
+
 /* doubles as the left offset of the pinned column beside it */
 const GUTTER = 'calc(var(--cell-x) * 2 + var(--ctl-box))'
 
@@ -370,8 +376,9 @@ export const Table = <T,>({
   }, [long])
 
   const view = useMemo(() => {
-    const whole = { start: 0, end: ordered.length, before: 0, after: 0 }
-    if (!long || metrics.rowHeight === 0) return whole
+    if (!long) return { start: 0, end: ordered.length, before: 0, after: 0 }
+    /* the spacer height is unknown until the row height arrives, and a short body corrects itself */
+    if (metrics.rowHeight === 0) return { start: 0, end: Math.min(ordered.length, FIRST_ROWS), before: 0, after: 0 }
 
     const visible = Math.ceil(metrics.viewport / metrics.rowHeight)
     const start = Math.max(0, Math.floor(scrollTop / metrics.rowHeight) - OVERSCAN)
