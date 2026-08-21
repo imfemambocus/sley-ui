@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "node --test test/vueApi.test.mjs",
     "typecheck": "tsc -b && node ../../packages/registry/vue-tsc.mjs -p tsconfig.vue.json",
     "build": "node releases.mjs && npm run typecheck && vite build && node sitemap.mjs && node feed.mjs && node prerender.mjs && node bundle-registry.mjs",
     "preview": "vite preview"

@@ -60,6 +60,17 @@ export const doc: ComponentDoc = {
     { name: 'value (tab)', type: 'string', required: true, detail: 'Ties a tab to its panel.' },
     { name: 'disabled (tab)', type: 'boolean', detail: 'Skipped by the keyboard and dimmed, and its panel cannot be reached.' },
   ],
+  /* ark models this one as modelValue, so the pair is a bare v-model and not v-model:value */
+  vueApi: [
+    { name: 'defaultValue', type: 'string', detail: 'Which tab starts open, when you are not controlling it.' },
+    {
+      name: 'v-model',
+      type: 'string',
+      detail: 'The open tab. Ark models it as modelValue, so this one takes no argument.',
+    },
+    { name: 'value (tab)', type: 'string', required: true, detail: 'Ties a tab to its panel.' },
+    { name: 'disabled (tab)', type: 'boolean', detail: 'Skipped by the keyboard and dimmed, and its panel cannot be reached.' },
+  ],
   measured: [
     {
       value: '0.16s',

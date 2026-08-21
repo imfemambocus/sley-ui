@@ -33,7 +33,7 @@
       }
     },
     {
-      "files": ["packages/cli/test/**", "packages/registry/test/**"],
+      "files": ["packages/cli/test/**", "packages/registry/test/**", "apps/docs/test/**"],
       "rules": {
         "typescript/no-floating-promises": "off"
       }

@@ -1,4 +1,5 @@
 import type { ComponentDoc } from '../content/types'
+import { toVueApi } from '../content/vueApi'
 import { Api } from '../site/Api'
 import { CodeBlock, FrameworkBlock } from '../site/CodeBlock'
 import { Measured } from '../site/Measured'
@@ -63,15 +64,15 @@ export const ComponentPage = ({ doc }: { readonly doc: ComponentDoc }) => {
 
       <Section id="props" title="Props">
         <Api
-          rows={framework === 'vue' ? (doc.vueApi ?? doc.api) : doc.api}
+          rows={framework === 'vue' ? (doc.vueApi ?? toVueApi(doc.api)) : doc.api}
           caption={`The props ${doc.name} takes`}
         />
         {framework === 'vue' && doc.vueApi === undefined && (
           <Note>
             <span>
-              The Vue component takes the same props under the same names, with four changes that
-              hold across the whole set: <Code>className</Code> is <Code>class</Code>, a{' '}
-              <Code>children</Code> prop is a slot, a controlled value with a change callback is a
+              Every prop above keeps its meaning in Vue, and the four rules that rename some of them
+              have already been applied to this table: <Code>className</Code> is <Code>class</Code>,
+              a <Code>children</Code> prop is a slot, a controlled value with a change callback is a
               model, and anything else that reports is an event. The four are written out on the{' '}
             </span>
             <Link

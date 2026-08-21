@@ -65,7 +65,7 @@ export const doc: ComponentDoc = {
     {
       name: 'label',
       type: 'string',
-      detail: 'Names a box that shows no text. It is ignored when there are children.',
+      detail: 'Names a box that shows no text. A box that has its own visible text ignores it.',
     },
   ],
   measured: [

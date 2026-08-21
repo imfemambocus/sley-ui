@@ -101,5 +101,22 @@ export const doc: ComponentDoc = {
     { name: 'onValueChange', type: '(details: { value: string[] }) => void', detail: "Ark's shape, passed through." },
     { name: 'positioning', type: 'PositioningOptions', detail: 'Placement, offset and flip behaviour, straight from Ark.' },
   ],
+  /* ark models this one as modelValue, so the pair is a bare v-model and not v-model:value */
+  vueApi: [
+    {
+      name: 'collection',
+      type: 'ListCollection',
+      required: true,
+      detail: 'Built with createListCollection, imported from @ark-ui/vue/select because there is no index file to re-export it from.',
+    },
+    { name: 'multiple', type: 'boolean', detail: 'Lets more than one option carry the selvedge.' },
+    {
+      name: 'v-model',
+      type: 'string[]',
+      detail: 'An array in both modes. A single select holds one entry. Ark models it as modelValue, so this one takes no argument.',
+    },
+    { name: 'v-model:open', type: 'boolean', detail: 'Whether the list is showing. Ark models this one too.' },
+    { name: 'positioning', type: 'PositioningOptions', detail: 'Placement, offset and flip behaviour, straight from Ark.' },
+  ],
   Notes,
 }

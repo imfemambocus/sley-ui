@@ -48,5 +48,18 @@ export const doc: ComponentDoc = {
     { name: 'openDelay', type: 'number', detail: 'Defaults to 200ms.' },
     { name: 'closeDelay', type: 'number', detail: 'Defaults to 80ms.' },
   ],
+  /* the trigger is the default slot here, and the tip text is a prop with a slot beside it */
+  vueApi: [
+    { name: 'content', type: 'string', required: true, detail: 'What the tip says. Use the content slot instead when it needs markup.' },
+    { name: '#content', type: 'slot', detail: 'The tip body, for anything a string cannot carry.' },
+    {
+      name: 'default slot',
+      type: 'slot',
+      required: true,
+      detail: 'One element. It becomes the trigger through as-child, so it must accept the attributes Ark puts on it.',
+    },
+    { name: 'openDelay', type: 'number', detail: 'Defaults to 200ms.' },
+    { name: 'closeDelay', type: 'number', detail: 'Defaults to 80ms.' },
+  ],
   Notes,
 }
