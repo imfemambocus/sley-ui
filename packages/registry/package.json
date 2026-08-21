@@ -7,12 +7,18 @@
     "build": "node build.mjs",
     "freeze": "node build.mjs --freeze",
     "test": "node --test test/downsample.test.mjs",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b && node vue-tsc.mjs -p tsconfig.vue.json"
   },
   "dependencies": {
     "@ark-ui/react": "^5.38.1",
+    "@ark-ui/vue": "^5.38.2",
     "@observablehq/plot": "^0.6.17",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@typescript/old": "npm:typescript@^6.0.0",
+    "vue": "^3.5.41",
+    "vue-tsc": "^3.3.10"
   }
 }
