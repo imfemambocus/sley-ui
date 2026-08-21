@@ -40,6 +40,24 @@
   }
 }
 
+/*
+ * the two framework marks in their own colours, which is the one place on the site that
+ * carries a colour the palette does not own. a mark is a mark of somebody else's, and a
+ * reader recognises it by its colour or not at all. react's cyan has too little contrast
+ * on the light ground, so it takes the darker blue react's own documentation uses there.
+ */
+:root {
+  --brand-react: #61dafb;
+  --brand-vue: #41b883;
+  --brand-vue-shade: #35495e;
+}
+
+:root[data-theme='light'] {
+  --brand-react: #087ea4;
+  --brand-vue: #41b883;
+  --brand-vue-shade: #34495e;
+}
+
 @layer components {
   /* the loom seen head on: warp threads standing in the reed, at the current pitch */
   .warp-field {

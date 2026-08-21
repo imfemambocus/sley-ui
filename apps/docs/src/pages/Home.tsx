@@ -4,8 +4,9 @@ import { RunConsole } from '../console/RunConsole'
 import { CodeBlock } from '../site/CodeBlock'
 import { SANDBOX } from '../site/Header'
 import { Link } from '../site/router'
+import { FRAMEWORK_LABEL, FRAMEWORK_MARK } from '../site/FrameworkMark'
 import { Segmented } from '../site/Segmented'
-import { DENSITIES, useDensityValues, useSettings } from '../site/settings'
+import { DENSITIES, FRAMEWORKS, useDensityValues, useSettings } from '../site/settings'
 
 const DensityStrip = () => {
   const { density, setDensity } = useSettings()
@@ -72,7 +73,21 @@ export const Home = () => (
             <Button>Browse the components</Button>
           </Link>
         </div>
-        <CodeBlock shell code={'npx sley-ui init\nnpx sley-ui add table'} className="max-w-sm" />
+        <div className="flex flex-wrap items-center gap-8">
+          <CodeBlock shell code={'npx sley-ui init\nnpx sley-ui add table'} className="max-w-sm" />
+          {/* the marks carry their own colours here, which no other surface on the site does */}
+          <ul className="flex flex-col gap-2">
+            {FRAMEWORKS.map((option) => {
+              const Mark = FRAMEWORK_MARK[option]
+              return (
+                <li key={option} className="flex items-center gap-2.5 text-weft-dim">
+                  <Mark brand size="display" />
+                  <span>{FRAMEWORK_LABEL[option]}</span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
         <p className="text-weft-dim">
           <span>Or try it before you run anything: </span>
           <a
