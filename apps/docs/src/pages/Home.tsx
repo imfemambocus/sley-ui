@@ -4,7 +4,7 @@ import { RunConsole } from '../console/RunConsole'
 import { CodeBlock } from '../site/CodeBlock'
 import { SANDBOX } from '../site/Header'
 import { Link } from '../site/router'
-import { FRAMEWORK_LABEL, FRAMEWORK_MARK } from '../site/FrameworkMark'
+import { FRAMEWORK_MARK } from '../site/FrameworkMark'
 import { Segmented } from '../site/Segmented'
 import { DENSITIES, FRAMEWORKS, useDensityValues, useSettings } from '../site/settings'
 
@@ -52,8 +52,15 @@ export const Home = () => (
     <section className="relative overflow-hidden">
       <div className="warp-field pointer-events-none absolute inset-x-0 top-0 h-64 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
       <div className="relative mx-auto flex max-w-360 flex-col gap-8 px-4 pt-20 pb-14 sm:px-6">
-        <p className="font-data text-[11px] tracking-[0.18em] text-weft-faint uppercase">
-          A React and Vue component registry
+        <p className="flex items-center gap-2.5 font-data text-[11px] tracking-[0.18em] text-weft-faint uppercase">
+          {/* the only surface on the site that carries a colour the palette does not own */}
+          <span className="flex items-center gap-2">
+            {FRAMEWORKS.map((option) => {
+              const Mark = FRAMEWORK_MARK[option]
+              return <Mark key={option} brand size="eyebrow" />
+            })}
+          </span>
+          <span>A React and Vue component registry</span>
         </p>
         <h1 className="max-w-4xl font-ui text-[clamp(34px,6vw,60px)] leading-[1.04] font-bold tracking-[-0.04em] text-weft">
           Components for interfaces that hold a lot of data.
@@ -73,21 +80,7 @@ export const Home = () => (
             <Button>Browse the components</Button>
           </Link>
         </div>
-        <div className="flex flex-wrap items-center gap-8">
-          <CodeBlock shell code={'npx sley-ui init\nnpx sley-ui add table'} className="max-w-sm" />
-          {/* the marks carry their own colours here, which no other surface on the site does */}
-          <ul className="flex flex-col gap-2">
-            {FRAMEWORKS.map((option) => {
-              const Mark = FRAMEWORK_MARK[option]
-              return (
-                <li key={option} className="flex items-center gap-2.5 text-weft-dim">
-                  <Mark brand size="display" />
-                  <span>{FRAMEWORK_LABEL[option]}</span>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
+        <CodeBlock shell code={'npx sley-ui init\nnpx sley-ui add table'} className="max-w-sm" />
         <p className="text-weft-dim">
           <span>Or try it before you run anything: </span>
           <a

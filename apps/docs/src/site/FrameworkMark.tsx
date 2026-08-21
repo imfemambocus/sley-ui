@@ -1,8 +1,8 @@
 import { cx } from '@/lib/cx'
 import type { Framework } from './settings'
 
-/* beside a control, or beside a line of prose that gives it room */
-export type MarkSize = 'control' | 'display'
+/* inside a control, or beside a line of small capitals */
+export type MarkSize = 'control' | 'eyebrow'
 
 interface MarkProps {
   readonly size?: MarkSize
@@ -17,8 +17,8 @@ interface MarkProps {
  * as tall as it is wide, so a shared box left them 2.3px apart. each pair below is measured
  * to put the same height of ink on screen.
  */
-const REACT_BOX: Record<MarkSize, string> = { control: 'size-[15px]', display: 'size-[18px]' }
-const VUE_BOX: Record<MarkSize, string> = { control: 'size-[17px]', display: 'size-[21px]' }
+const REACT_BOX: Record<MarkSize, string> = { control: 'size-[15px]', eyebrow: 'size-[11px]' }
+const VUE_BOX: Record<MarkSize, string> = { control: 'size-[17px]', eyebrow: 'size-[13px]' }
 
 const ReactMark = ({ size = 'control', brand = false, className }: MarkProps) => (
   <svg
