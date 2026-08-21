@@ -19,7 +19,19 @@ const BASE = 'https://sley-ui.dev/r'
 const SPECIFIER = /\b(?:from|import)\s+'([^']+)'/g
 
 /* the runtime supplies these */
-const PROVIDED = new Set(['react', 'react-dom'])
+const PROVIDED = new Set(['react', 'react-dom', 'vue'])
+
+/*
+ * one source tree serves both frameworks. a `.tsx` file is react's, a `.vue` file is
+ * vue's, and everything beside them, the chart helpers and the token file included,
+ * belongs to both. each framework gets a tree of its own under `dist/r`.
+ */
+const FRAMEWORKS = [
+  { tree: '', extension: '.tsx' },
+  { tree: 'vue', extension: '.vue' },
+]
+
+const FRAMEWORK_EXTENSIONS = FRAMEWORKS.map((framework) => framework.extension)
 
 /*
  * a react server component runs no hook and holds no event handler. ark builds on
@@ -89,7 +101,8 @@ async function readItemFiles(paths, targetOf) {
   for (const path of paths) {
     const content = await readFile(path, 'utf8')
     const target = targetOf(path)
-    files.push({ target, content, type: target.endsWith('.tsx') || target.endsWith('.ts') ? null : 'registry:file' })
+    const source = target.endsWith('.tsx') || target.endsWith('.ts') || target.endsWith('.vue')
+    files.push({ target, content, type: source ? null : 'registry:file' })
   }
   return files
 }
@@ -124,7 +137,7 @@ function title(name) {
     .join(' ')
 }
 
-function buildItem({ name, type, files, fileType, version, ranges, extraRegistry = [] }) {
+function buildItem({ name, type, files, fileType, version, ranges, base = BASE, extraRegistry = [] }) {
   const { npm, registry } = collectDependencies(files, name, ranges)
   const registryDependencies = [...new Set([...registry, ...extraRegistry])].sort(byCodeUnit)
 
@@ -148,7 +161,7 @@ function buildItem({ name, type, files, fileType, version, ranges, extraRegistry
        * the immutable copy of these exact bytes. the lockfile records it, and the three
        * way merge reads its base from there after the flat path has moved on.
        */
-      url: `${BASE}/${version}/${name}.json`,
+      url: `${base}/${version}/${name}.json`,
       files: files.map((file) => ({
         path: file.target,
         hash: hash(file.content),
@@ -192,45 +205,71 @@ async function readRelease(version) {
  * a published version is immutable. a lockfile written against it names files by hash,
  * so replacing the bytes under one would report every file as edited.
  */
-async function guardFrozen(version, items) {
+async function guardFrozen(version, trees) {
   const bundle = await readRelease(version)
-  if (JSON.stringify(bundle.items) === JSON.stringify(items)) return
+  const same = FRAMEWORKS.every(
+    (framework) => JSON.stringify(frozenTree(bundle, framework)) === JSON.stringify(trees[framework.tree]),
+  )
+  if (same) return
   throw new Error(`Version ${version} is frozen and the source has moved. Raise the version in package.json.`)
 }
 
-async function freeze(version, items) {
+/* the first releases carried react alone, so a bundle with no vue key serves no vue tree */
+function frozenTree(bundle, framework) {
+  return framework.tree === '' ? bundle.items : (bundle[framework.tree] ?? [])
+}
+
+async function freeze(version, trees) {
   const path = join(releases, `${version}.json`)
   if (existsSync(path)) {
     console.log(`version ${version} is already frozen`)
     return
   }
   await mkdir(releases, { recursive: true })
-  await writeFile(path, `${JSON.stringify({ version, items }, null, 2)}\n`)
-  console.log(`froze ${items.length} items at version ${version}`)
+  await writeFile(path, `${JSON.stringify({ version, items: trees[''], vue: trees.vue }, null, 2)}\n`)
+  console.log(`froze ${trees[''].length} react and ${trees.vue.length} vue item(s) at version ${version}`)
 }
 
-async function main() {
-  await rm(join(root, 'dist'), { recursive: true, force: true })
-  await mkdir(out, { recursive: true })
+const treeBase = (tree) => (tree === '' ? BASE : `${BASE}/${tree}`)
+const treeDir = (tree) => (tree === '' ? out : join(out, tree))
 
-  const { version, dependencies: ranges } = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
+/* a file belongs to one framework only when its extension names one */
+function filesFor(paths, extension) {
+  const foreign = FRAMEWORK_EXTENSIONS.filter((entry) => entry !== extension)
+  return paths.filter((path) => !foreign.some((entry) => path.endsWith(entry)))
+}
+
+async function buildTree(framework, version, ranges) {
+  const { tree, extension } = framework
+  const base = treeBase(tree)
   const items = []
 
   const styleFiles = await readItemFiles([join(src, 'styles', 'tokens.css')], () => 'styles/tokens.css')
   items.push(
-    buildItem({ name: STYLE_ITEM, type: 'registry:style', files: styleFiles, fileType: 'registry:file', version, ranges }),
+    buildItem({
+      name: STYLE_ITEM,
+      type: 'registry:style',
+      files: styleFiles,
+      fileType: 'registry:file',
+      version,
+      ranges,
+      base,
+    }),
   )
 
   for (const path of await walk(join(src, 'lib'))) {
     const name = path.split('/').pop().replace(/\.ts$/, '')
     const files = await readItemFiles([path], (file) => `lib/${file.split('/').pop()}`)
-    items.push(buildItem({ name, type: 'registry:lib', files, fileType: 'registry:lib', version, ranges }))
+    items.push(buildItem({ name, type: 'registry:lib', files, fileType: 'registry:lib', version, ranges, base }))
   }
 
   const uiRoot = join(src, 'components', 'ui')
   for (const entry of await readdir(uiRoot, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue
-    const paths = await walk(join(uiRoot, entry.name))
+    const paths = filesFor(await walk(join(uiRoot, entry.name)), extension)
+    if (!paths.some((path) => path.endsWith(extension))) {
+      throw new Error(`Item ${entry.name} has no ${extension} file, so it cannot be served to that framework.`)
+    }
     const files = await readItemFiles(paths, (file) => `components/ui/${entry.name}/${file.split('/').pop()}`)
     items.push(
       buildItem({
@@ -240,31 +279,53 @@ async function main() {
         fileType: 'registry:ui',
         version,
         ranges,
+        base,
         extraRegistry: [STYLE_ITEM],
       }),
     )
   }
 
+  return items
+}
+
+async function main() {
+  await rm(join(root, 'dist'), { recursive: true, force: true })
+  await mkdir(out, { recursive: true })
+
+  const { version, dependencies: ranges } = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
+
+  const trees = {}
+  for (const framework of FRAMEWORKS) {
+    trees[framework.tree] = await buildTree(framework, version, ranges)
+  }
+
   const frozen = await frozenVersions()
-  if (frozen.includes(version)) await guardFrozen(version, items)
+  if (frozen.includes(version)) await guardFrozen(version, trees)
 
-  /* the flat path is what a user installs from, and it only ever holds the newest */
-  await writeTree(out, items, version, BASE)
-  await writeTree(join(out, version), items, version, `${BASE}/${version}`)
+  for (const framework of FRAMEWORKS) {
+    const dir = treeDir(framework.tree)
+    const base = treeBase(framework.tree)
+    /* the flat path is what a user installs from, and it only ever holds the newest */
+    await writeTree(dir, trees[framework.tree], version, base)
+    await writeTree(join(dir, version), trees[framework.tree], version, `${base}/${version}`)
 
-  for (const past of frozen) {
-    if (past === version) continue
-    const bundle = await readRelease(past)
-    await writeTree(join(out, past), bundle.items, past, `${BASE}/${past}`)
+    for (const past of frozen) {
+      if (past === version) continue
+      const bundle = await readRelease(past)
+      const items = frozenTree(bundle, framework)
+      if (items.length === 0) continue
+      await writeTree(join(dir, past), items, past, `${base}/${past}`)
+    }
   }
 
   const published = [...new Set([version, ...frozen])].sort((a, b) => compareVersions(b, a))
   await writeFile(join(out, 'versions.json'), `${JSON.stringify({ latest: version, versions: published }, null, 2)}\n`)
 
-  console.log(`wrote ${items.length} registry items at version ${version} to ${out}`)
+  const counts = FRAMEWORKS.map((framework) => `${trees[framework.tree].length} ${framework.tree || 'react'}`)
+  console.log(`wrote ${counts.join(' and ')} registry item(s) at version ${version} to ${out}`)
   console.log(`serving ${published.length} version(s): ${published.join(', ')}`)
 
-  if (process.argv.includes('--freeze')) await freeze(version, items)
+  if (process.argv.includes('--freeze')) await freeze(version, trees)
 }
 
 await main()
