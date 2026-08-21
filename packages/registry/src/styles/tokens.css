@@ -363,6 +363,21 @@
     border-color: var(--color-reed-lit);
   }
 
+  /* an input or a textarea, which draws the control surface across a whole line */
+  .ctl.ctl-entry {
+    display: block;
+    width: 100%;
+  }
+
+  .ctl-entry[data-invalid] {
+    border-color: var(--color-madder);
+  }
+
+  .ctl-entry:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
   /* one tick of the reed stands where a value is absent */
   .reed-mark {
     display: inline-block;

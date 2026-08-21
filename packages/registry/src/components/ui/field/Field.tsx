@@ -19,14 +19,12 @@ export const FieldLabel = ({ children, className }: PartProps) => (
   </ArkField.Label>
 )
 
-const CONTROL = 'ctl block w-full data-invalid:border-madder disabled:cursor-not-allowed disabled:opacity-50'
-
 export const FieldInput = ({ className, ...props }: ComponentPropsWithoutRef<'input'>) => (
-  <ArkField.Input className={cx(CONTROL, 'h-(--ctl-h)', className)} {...props} />
+  <ArkField.Input className={cx('ctl ctl-entry h-(--ctl-h)', className)} {...props} />
 )
 
 export const FieldTextarea = ({ className, ...props }: ComponentPropsWithoutRef<'textarea'>) => (
-  <ArkField.Textarea className={cx(CONTROL, 'min-h-20 resize-y py-(--stack) leading-relaxed', className)} {...props} />
+  <ArkField.Textarea className={cx('ctl ctl-entry min-h-20 resize-y py-(--stack) leading-relaxed', className)} {...props} />
 )
 
 export const FieldHint = ({ children, className }: PartProps) => (
