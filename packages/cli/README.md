@@ -15,7 +15,7 @@ npx sley-ui add table
 
 Install it globally and the command shortens to `sley`.
 
-`init` reads your project. It finds the path alias and the stylesheet that pulls Tailwind in, then writes the token block as a file of its own. Vite and Next are both supported for React, and Vite for Vue.
+`init` reads your project. It finds the path alias and the stylesheet that pulls Tailwind in, then writes the token block as a file of its own. Vite and Next are both supported for React, and Vite and Nuxt for Vue. On Nuxt it edits no config file at all, because Nuxt declares the alias itself.
 
 It also reads which UI framework you are on out of your dependencies, and installs from that tree of the registry. A repository holding both refuses rather than guessing, and `--framework react` or `--framework vue` settles it.
 

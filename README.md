@@ -21,7 +21,7 @@ npx sley-ui add table
 
 Install it globally and the command shortens to `sley`.
 
-`init` reads your project. It finds the path alias and the stylesheet that pulls Tailwind in, then writes the token block as a file of its own. Vite and Next are both supported for React, and Vite for Vue. It also reads which UI framework you are on out of your dependencies and installs from that tree of the registry, so the commands above are the same either way. `add` writes a component and everything it imports. If you have already edited one of those files, it keeps your version and tells you.
+`init` reads your project. It finds the path alias and the stylesheet that pulls Tailwind in, then writes the token block as a file of its own. Vite and Next are both supported for React, and Vite and Nuxt for Vue. On Nuxt it edits no config file at all, because Nuxt declares the alias itself. It also reads which UI framework you are on out of your dependencies and installs from that tree of the registry, so the commands above are the same either way. `add` writes a component and everything it imports. If you have already edited one of those files, it keeps your version and tells you.
 
 ## Why
 
@@ -51,7 +51,7 @@ What each version changed, and why, is written up at [sley-ui.dev/docs/releases]
 
 ## Status
 
-Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state, with a chart beside them. Every one of them is served for React and for Vue. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The switch above its sidebar rewrites every code block for the framework you pick, and every demo with it: a Vue demo is a Vue application mounted inside the React one, loaded only when you ask for it. The registry is served from the same place, at version 0.9.0, and the CLI is on npm at 0.3.0, so every command above runs today on a fresh Vite app, a fresh Next app and a fresh Vue app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
+Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state, with a chart beside them. Every one of them is served for React and for Vue. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The switch above its sidebar rewrites every code block for the framework you pick, and every demo with it: a Vue demo is a Vue application mounted inside the React one, loaded only when you ask for it. The registry is served from the same place, at version 0.9.0, and the CLI is on npm at 0.4.0, so every command above runs today on a fresh Vite app, a fresh Next app, a fresh Vue app and a fresh Nuxt app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
 
 To read the docs locally, clone this repo and run `npm install && npm run dev -w docs`.
 
