@@ -12,12 +12,13 @@ interface MarkProps {
 }
 
 /*
- * the two boxes differ at each size because the ink inside them does. one logo is thin
- * strokes that spill past its viewBox and the other is a solid pair of chevrons two thirds
- * as tall as it is wide, so a shared box left them 2.3px apart. each pair below is measured
- * to put the same height of ink on screen.
+ * one logo is thin strokes that spill past its viewBox and the other is a solid pair of
+ * chevrons two thirds as tall as it is wide, so the same box gives them different ink and
+ * the same ink does not read as the same size: a solid form of a given height looks larger
+ * than an outlined one. the eyebrow pair therefore shares a box, which puts the stroked
+ * mark 12.4px by 13.1px against the solid 13px by 11.3px, and the two read as equals.
  */
-const REACT_BOX: Record<MarkSize, string> = { control: 'size-[15px]', eyebrow: 'size-[11px]' }
+const REACT_BOX: Record<MarkSize, string> = { control: 'size-[15px]', eyebrow: 'size-[13px]' }
 const VUE_BOX: Record<MarkSize, string> = { control: 'size-[17px]', eyebrow: 'size-[13px]' }
 
 const ReactMark = ({ size = 'control', brand = false, className }: MarkProps) => (
