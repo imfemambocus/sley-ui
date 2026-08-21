@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.8.0': {
+    date: '2026-08-21',
+    title: 'The first render of a long table is windowed too',
+    body: "The row window has always cut what the body renders down to what fits on screen, and the one render it missed was the first render of a new batch. The row height comes from an effect that measures a real row, and an effect runs after the commit, which means the render that lands a new batch has no height to divide by, hence the body fell back to drawing every row it was handed. Loading 5000 rows blocked the main thread for about 1.1 seconds while 60,000 cells were laid out and then thrown away for the 25 the window actually wanted. That first commit now renders 40 rows and lets the measurement correct it on the render after. Measured on the built site at 120Hz: The longest blocked frame after the click drops from a median of 1142.4ms to 9.4ms, which is one frame. I checked the diagnosis three ways before I changed anything. Passing the table 25 pre-sliced rows instead of 5000 removed the block while all 5000 were still sitting in state, which means neither building the rows nor holding them was ever the cost. Clamping the spacers so the scroll container was 1080px instead of 200,040px left the block at 1125.1ms, so the tall container wasn't it either. And a second load of a batch in the same page always did cost one frame, because the measured height survived from the first load, so the fix was sitting in that reading before I understood it. 40 rows covers the 520px body cap at the dense row height with the overscan on top, and dense renders 33. The scroll height is still exact at every density, and End still lands on row 5000 at the bottom of the scroll.",
+  },
   '0.7.0': {
     date: '2026-08-20',
     title: 'The table body answers the arrow keys',
