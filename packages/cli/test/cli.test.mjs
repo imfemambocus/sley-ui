@@ -82,6 +82,20 @@ function nextProject() {
   })
 }
 
+const NUXT_TSCONFIG = '{ "files": [], "references": [{ "path": "./.nuxt/tsconfig.app.json" }] }'
+
+/* nuxt 4: srcDir is app/, and the root tsconfig holds references and no compilerOptions of its own */
+function nuxtProject(extra = {}) {
+  return project({
+    'package.json': JSON.stringify({ name: 'trial', dependencies: { nuxt: '^4.0.0', vue: '^3.5.0' } }),
+    'tsconfig.json': NUXT_TSCONFIG,
+    'nuxt.config.ts': "export default defineNuxtConfig({\n  css: ['~/assets/css/main.css'],\n})\n",
+    'app/app.vue': '<template><div /></template>\n',
+    'app/assets/css/main.css': TAILWIND,
+    ...extra,
+  })
+}
+
 test('init writes the alias into both files a vite project resolves through', async () => {
   const cwd = await viteProject()
   sley(cwd, ['init'])
@@ -227,6 +241,77 @@ test('a vue project reads the vue tree and gets no tsx', async () => {
   const lock = JSON.parse(await readFile(join(cwd, 'sley.lock'), 'utf8'))
   assert.equal(lock.library, 'vue')
   assert.ok(lock.items.table.url.includes('/vue/'), `${lock.items.table.url} names no vue tree`)
+})
+
+test('nuxt supplies its own alias, so init writes into no config file', async () => {
+  const cwd = await nuxtProject()
+  const output = sley(cwd, ['init'])
+
+  assert.match(output, /Found a nuxt project on vue/)
+  assert.equal(await readFile(join(cwd, 'tsconfig.json'), 'utf8'), NUXT_TSCONFIG, 'the tsconfig is left alone')
+  assert.equal(existsSync(join(cwd, 'vite.config.ts')), false, 'no bundler config is invented')
+
+  const config = JSON.parse(await readFile(join(cwd, 'components.json'), 'utf8'))
+  assert.equal(config.aliases.ui, '@/components/ui')
+  assert.equal(config.tailwind.css, 'app/assets/css/main.css')
+  assert.equal(config.tsx, false)
+  assert.equal(config.rsc, false)
+})
+
+test('a nuxt item lands under srcDir, which is where nuxt resolves the alias', async () => {
+  const cwd = await nuxtProject()
+  sley(cwd, ['init'])
+  sley(cwd, ['add', 'table'])
+
+  assert.ok(existsSync(join(cwd, 'app/styles/tokens.css')))
+  assert.ok(existsSync(join(cwd, 'app/lib/cx.ts')))
+  assert.ok(existsSync(join(cwd, 'app/components/ui/table/Table.vue')))
+  assert.equal(existsSync(join(cwd, 'components/ui/table/Table.vue')), false, 'nothing lands at the root')
+  assert.equal(existsSync(join(cwd, 'app/components/ui/table/Table.tsx')), false)
+
+  const css = await readFile(join(cwd, 'app/assets/css/main.css'), 'utf8')
+  assert.match(css, /@import '\.\.\/\.\.\/styles\/tokens\.css';/)
+})
+
+test('a nuxt config that declares srcDir is followed rather than guessed at', async () => {
+  const cwd = await nuxtProject({
+    'nuxt.config.ts': "export default defineNuxtConfig({\n  srcDir: 'client/',\n})\n",
+    'client/assets/css/main.css': TAILWIND,
+  })
+  sley(cwd, ['init'])
+  sley(cwd, ['add', 'button'])
+
+  assert.ok(existsSync(join(cwd, 'client/components/ui/button/Button.vue')))
+  assert.equal(existsSync(join(cwd, 'app/components/ui/button/Button.vue')), false)
+})
+
+test('a nuxt 3 layout has no app directory, so the root is the source directory', async () => {
+  const cwd = await project({
+    'package.json': JSON.stringify({ name: 'trial', dependencies: { nuxt: '^3.16.0', vue: '^3.5.0' } }),
+    'tsconfig.json': NUXT_TSCONFIG,
+    'nuxt.config.ts': 'export default defineNuxtConfig({})\n',
+    'assets/css/main.css': TAILWIND,
+  })
+  sley(cwd, ['init'])
+  sley(cwd, ['add', 'button'])
+
+  assert.ok(existsSync(join(cwd, 'components/ui/button/Button.vue')))
+  assert.ok(existsSync(join(cwd, 'styles/tokens.css')))
+})
+
+/* the decoy is written first, or directory order alone keeps it out of the way */
+test('the generated nuxt directory is not read while the stylesheet is looked for', async () => {
+  const cwd = await project({
+    '.nuxt/entry.css': TAILWIND,
+    'package.json': JSON.stringify({ name: 'trial', dependencies: { nuxt: '^4.0.0', vue: '^3.5.0' } }),
+    'tsconfig.json': NUXT_TSCONFIG,
+    'nuxt.config.ts': 'export default defineNuxtConfig({})\n',
+    'app/assets/css/main.css': TAILWIND,
+  })
+  sley(cwd, ['init'])
+
+  const config = JSON.parse(await readFile(join(cwd, 'components.json'), 'utf8'))
+  assert.equal(config.tailwind.css, 'app/assets/css/main.css')
 })
 
 test('the two trees name their own ark package', async () => {

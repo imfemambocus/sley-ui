@@ -2,7 +2,7 @@ import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 import { exists, readJsonc, write } from './files.js'
 
-export type Framework = 'next' | 'vite'
+export type Framework = 'next' | 'nuxt' | 'vite'
 export type Library = 'react' | 'vue'
 export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun'
 
@@ -13,7 +13,8 @@ export interface Project {
   readonly framework: Framework
   /* the registry serves one tree of components for each of these */
   readonly library: Library
-  readonly tsconfigPath: string
+  /* null under nuxt, which declares its aliases in a generated file nobody edits */
+  readonly tsconfigPath: string | null
   readonly aliasPrefix: string
   readonly sourceDir: string
   readonly cssEntry: string
@@ -31,7 +32,7 @@ interface Tsconfig {
   readonly compilerOptions?: { readonly paths?: Record<string, string[]> }
 }
 
-const SKIP = new Set(['node_modules', 'dist', 'build', '.next', '.git', '.turbo'])
+const SKIP = new Set(['node_modules', 'dist', 'build', '.next', '.nuxt', '.output', '.git', '.turbo'])
 
 const LOCKFILES: readonly (readonly [string, PackageManager])[] = [
   ['pnpm-lock.yaml', 'pnpm'],
@@ -48,11 +49,13 @@ async function readDependencies(cwd: string) {
   return { ...pkg.dependencies, ...pkg.devDependencies }
 }
 
+/* nuxt is read before vite, because it holds vite inside itself and some templates list both */
 export async function detectFramework(cwd: string): Promise<Framework> {
   const deps = await readDependencies(cwd)
+  if (deps.nuxt) return 'nuxt'
   if (deps.next) return 'next'
   if (deps.vite) return 'vite'
-  throw new Error('No supported framework found. Sley UI knows Next and Vite.')
+  throw new Error('No supported framework found. Sley UI knows Next, Nuxt and Vite.')
 }
 
 function isLibrary(name: string): name is Library {
@@ -70,7 +73,7 @@ export async function detectLibrary(cwd: string, chosen?: string): Promise<Libra
   if (deps.react && deps.vue) {
     throw new Error('This project holds react and vue. Pass --framework react or --framework vue.')
   }
-  if (deps.vue) return 'vue'
+  if (deps.vue || deps.nuxt) return 'vue'
   if (deps.react) return 'react'
   throw new Error('No supported framework found. Sley UI knows React and Vue.')
 }
@@ -94,9 +97,24 @@ export async function findTsconfig(cwd: string) {
   throw new Error('No tsconfig.json with compilerOptions found.')
 }
 
-interface Alias {
+export interface Alias {
   readonly prefix: string
   readonly dir: string
+}
+
+const NUXT_CONFIGS = ['nuxt.config.ts', 'nuxt.config.js', 'nuxt.config.mjs']
+
+/*
+ * nuxt declares ~ and @ itself, both of them pointing at srcDir, and it writes them
+ * into a generated tsconfig under .nuxt. so there is no alias to add anywhere. srcDir
+ * is app/ from nuxt 4 and the project root before it.
+ */
+export async function nuxtAlias(cwd: string): Promise<Alias> {
+  const config = NUXT_CONFIGS.map((name) => join(cwd, name)).find(exists)
+  const declared = config === undefined ? null : /srcDir\s*:\s*['"`]([^'"`]+)['"`]/.exec(await readFile(config, 'utf8'))
+  if (declared) return { prefix: '@', dir: resolve(cwd, declared[1]) }
+
+  return { prefix: '@', dir: exists(join(cwd, 'app')) ? join(cwd, 'app') : cwd }
 }
 
 export async function readAlias(tsconfigPath: string): Promise<Alias | null> {
@@ -173,13 +191,14 @@ interface ProjectInput {
 }
 
 export async function resolveProject({ cwd, cssEntry, rsc, library }: ProjectInput): Promise<Project> {
-  const tsconfigPath = await findTsconfig(cwd)
-  const alias = await readAlias(tsconfigPath)
+  const framework = await detectFramework(cwd)
+  const tsconfigPath = framework === 'nuxt' ? null : await findTsconfig(cwd)
+  const alias = tsconfigPath === null ? await nuxtAlias(cwd) : await readAlias(tsconfigPath)
   if (!alias) throw new Error(`No path alias in ${tsconfigPath}. Run sley init first.`)
 
   return {
     cwd,
-    framework: await detectFramework(cwd),
+    framework,
     library,
     tsconfigPath,
     aliasPrefix: alias.prefix,

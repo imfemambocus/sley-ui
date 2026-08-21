@@ -10,9 +10,11 @@ import {
   detectPackageManager,
   findCssEntry,
   findTsconfig,
+  nuxtAlias,
   readAlias,
   writeAlias,
   writeViteAlias,
+  type Alias,
   type Project,
 } from '../lib/project.js'
 import { libraryRegistry, loadItem, TOKENS_ITEM } from '../lib/registry.js'
@@ -52,18 +54,26 @@ export async function init(options: InitOptions) {
   const cwd = resolve(options.cwd)
   const framework = await detectFramework(cwd)
   const library = await detectLibrary(cwd, options.framework)
-  const tsconfigPath = await findTsconfig(cwd)
+  const tsconfigPath = framework === 'nuxt' ? null : await findTsconfig(cwd)
   const notes: string[] = []
 
   // every precondition runs before the first write, so a refusal leaves the project alone
   const cssEntry = await findCssEntry(cwd)
 
-  let alias = await readAlias(tsconfigPath)
-  if (!alias) {
-    const sourceDir = exists(join(cwd, 'src')) ? join(cwd, 'src') : cwd
-    await writeAlias(tsconfigPath, sourceDir)
-    alias = { prefix: '@', dir: sourceDir }
-    notes.push(`added the @ alias to ${relative(cwd, tsconfigPath)}`)
+  let alias: Alias
+  if (tsconfigPath === null) {
+    alias = await nuxtAlias(cwd)
+    notes.push(`nuxt resolves ${alias.prefix} to ${relative(cwd, alias.dir) || '.'} itself, so no alias was written`)
+  } else {
+    const found = await readAlias(tsconfigPath)
+    if (found) {
+      alias = found
+    } else {
+      const sourceDir = exists(join(cwd, 'src')) ? join(cwd, 'src') : cwd
+      await writeAlias(tsconfigPath, sourceDir)
+      alias = { prefix: '@', dir: sourceDir }
+      notes.push(`added the @ alias to ${relative(cwd, tsconfigPath)}`)
+    }
   }
 
   if (framework === 'vite') {
