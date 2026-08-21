@@ -111,7 +111,7 @@ const page = `<!doctype html>
       <span>sley</span>
     </div>
     <p class="tagline">Components for interfaces that hold a lot of data.</p>
-    <p class="eyebrow">React today &nbsp;&middot;&nbsp; Vue later</p>
+    <p class="eyebrow">React &nbsp;&middot;&nbsp; Vue</p>
   </div>
   <div class="motif">
     <div class="warp"></div>
