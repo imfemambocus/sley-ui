@@ -1,6 +1,3 @@
-.claude
-CLAUDE.md
-
 # secrets and machine-local config
 .env
 .env.local
