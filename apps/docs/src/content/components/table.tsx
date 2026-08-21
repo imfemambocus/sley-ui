@@ -179,10 +179,10 @@ export const doc: ComponentDoc = {
         'Compact, ten columns: 12,051 cells in the body become 401. A free frame on this 120Hz display is 8.3ms, so without the window the table misses every second one and holds 60fps, which nobody would file a bug about. This pair replaces a published 22.5ms against 19.6ms that did not reproduce: those were taken at 60Hz, where the windowed reading was sitting on the frame floor and measuring the display rather than the table.',
     },
     {
-      value: '1078.2ms',
+      value: '1142.4ms to 9.4ms',
       what: 'The longest blocked frame when the batch above lands',
       detail:
-        'On the built site, never the dev server. Without the window it is 1083.4ms, and at 1000 rows the pair is 216ms with and 183.4ms without. The window renders 48 rows instead of 5017 and the load does not get cheaper, so a row window is a scrolling optimisation and nothing else. There is a note on this at /notes/row-window.',
+        'On the built site, never the dev server. The window used to miss this render entirely: the row height it divides by arrives from an effect, which runs after the commit, so the first render of a batch drew all 5000 rows and settled to 25 on the render after. Windowing that first commit as well takes the median from 1142.4ms to 9.4ms, one frame on this 120Hz display. Without the window it stays at about 1083.4ms. There is a note on this at /notes/row-window.',
     },
     {
       value: '78.1ms to 8.3ms',

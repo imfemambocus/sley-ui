@@ -7,10 +7,41 @@ export const RowWindow = () => (
       <PageTitle>Where a row window starts to pay</PageTitle>
       <Lede>
         The usual advice is to virtualise a table past a few hundred rows. I built a row window for
-        mine, then measured what it bought at 1000 rows and at 5000. It buys scrolling. It does
-        nothing for the load, which is the half nobody publishes.
+        mine, then measured what it bought at 1000 rows and at 5000. It buys scrolling. I published
+        this piece saying it does nothing for the load, and that half was wrong: I was measuring a
+        defect in my own window.
       </Lede>
     </header>
+
+    <Section id="correction" title="Correction: the load was a defect in my window">
+      <P>
+        The row height that the window's arithmetic divides by is measured off a real row by an
+        effect, and an effect runs after the commit. Which means the render that landed a new batch
+        had no height yet, fell back to drawing every row it was handed, and only settled to 25 on
+        the render after. So the windowed table put all 5000 rows in the DOM once, laid out 60,000
+        cells, and threw them away. By the time I inspected the DOM it held 48 rows, hence every
+        reading below looks like a windowed table that is slow to load.
+      </P>
+      <P>
+        With that first commit windowed too, the longest blocked frame at 5000 rows drops from a
+        median of 1142.4ms to 9.4ms, which is one frame on this display. The unwindowed side does not
+        move. The conclusion this piece reached, that a row window buys scrolling and nothing else,
+        was a measurement of my own bug rather than a property of windowing.
+      </P>
+      <P>
+        I separated the bug from the alternatives three ways before I changed anything. Passing the
+        table 25 pre-sliced rows removed the block while all 5000 were still sitting in state, which
+        means neither building the rows nor holding them was ever the cost. Clamping the spacers so
+        the scroll container was 1080px instead of 200,040px left the block at 1125.1ms. And a second
+        load in the same page had always cost one frame, because the measured height survived from
+        the first load, so the fix was sitting in a reading I had already recorded and not understood.
+      </P>
+      <Note>
+        I have left the original measurements and reasoning below as they were published. I have not
+        re-traced the click since the fix, and the object count in the layout section is the part I
+        can no longer square with a render that drew 5000 rows.
+      </Note>
+    </Section>
 
     <Section id="setup" title="What I measured">
       <P>
@@ -42,7 +73,7 @@ export const RowWindow = () => (
       </P>
     </Section>
 
-    <Section id="load" title="The load, which the window does not touch">
+    <Section id="load" title="The load, as I first measured it">
       <P>
         Virtualisation is usually sold as the thing that makes a big list fast. So here is the other
         number: the longest single frame the main thread was blocked for after the click.
@@ -53,10 +84,9 @@ export const RowWindow = () => (
         costs the same, or a little more.
       </P>
       <P>
-        Whatever that second is, it is not the rows, and it is not building the data either: the
-        click handler that makes the batch and sets the state returns in 0.6ms. What I can say is
-        that a row window is a scrolling optimisation, and if your complaint is that the table takes
-        a second to appear, this is not the fix for it.
+        Whatever that second is, it is not building the data: the click handler that makes the
+        batch and sets the state returns in 0.6ms. It was the rows, and I had ruled them out on the
+        strength of a DOM I read after the table had settled. See the correction at the top.
       </P>
     </Section>
 
@@ -75,9 +105,10 @@ export const RowWindow = () => (
         forcing a synchronous full document layout gives 0.2ms, then 0ms, then 0ms.
       </P>
       <P>
-        So it is not the size of the tree and it is not the shape of the DOM the window produces,
-        which is what I expected to find. Something makes one pass over those 726 objects cost 1.25s
-        and the next pass over the same 726 cost a fifth of a millisecond. I still do not know what.
+        I read this as the tree size being innocent, and that reading is what kept me looking in
+        the wrong place. One pass costing 1.25s and the next pass over the same 726 objects costing a
+        fifth of a millisecond is exactly what a render that draws 5000 rows and then settles to 25
+        would produce.
       </P>
       <Note>
         A trace inflates what it measures. The same block is 1078.2ms untraced against a 1600ms task
@@ -138,22 +169,22 @@ export const RowWindow = () => (
               '60,051 cells, with the ninetieth percentile at 81ms and the worst frame at 122.1ms. About thirteen frames a second. With the window it is 8.3ms, the same as at 1000.',
           },
           {
-            value: '1078.2ms',
-            what: 'The longest blocked frame loading 5000 rows, with the window on',
+            value: '1142.4ms to 9.4ms',
+            what: 'The longest blocked frame loading 5000 rows, before and after the fix',
             detail:
-              'Without the window it is 1083.4ms. At 1000 rows the pair is 216ms with and 183.4ms without. The window renders 48 rows instead of 5017 and the load does not get cheaper.',
+              'Both with the window on. The first figure is this piece as published, when the first render of a batch was not windowed at all. Windowing it takes the block to one frame. Without the window it stays at about 1083.4ms, and at 1000 rows the published pair was 216ms with and 183.4ms without.',
           },
           {
             value: '0.6ms',
             what: 'The click handler that builds the batch and sets the state',
             detail:
-              'Four presses, 0.5ms to 0.7ms. So the second the table takes to appear is not the data being made, and it is not the rows being drawn either.',
+              'Four presses, 0.5ms to 0.7ms. So the second the table took to appear was not the data being made. It was the rows being drawn, all 5000 of them.',
           },
           {
             value: '1254.5ms',
             what: 'One Layout event, over 726 layout objects with 19 dirty',
             detail:
-              'Traced from the click. Paint is 31.6ms beside it and style recalculation is 0.0ms. A later full document layout over the same 726 objects takes 0.2ms, so the cost is not the size of the tree.',
+              'Traced from the click, before the fix. Paint is 31.6ms beside it and style recalculation is 0.0ms. A later full document layout over the same 726 objects takes 0.2ms, which I read as the tree size being innocent. The object count was taken after the table had settled to 25 rows.',
           },
         ]}
       />

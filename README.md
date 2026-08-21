@@ -31,7 +31,7 @@ So I started from the dense case. One attribute on the root element moves every 
 
 A narrow screen hides nothing. The table scrolls instead. Which columns matter is your call, not mine.
 
-Past a hundred rows the table renders only what the viewport holds. Because the density scale fixes the row height, the window is arithmetic rather than measurement, so it needs no dependency and nothing to configure. A browser copes with a thousand rows on its own; this is the headroom above that. I measured both sizes with the window on and off, including the part it does not help with, and wrote it up at [where a row window starts to pay](https://sley-ui.dev/notes/row-window).
+Past a hundred rows the table renders only what the viewport holds. Because the density scale fixes the row height, the window is arithmetic rather than measurement, so it needs no dependency and nothing to configure. A browser copes with a thousand rows on its own; this is the headroom above that. I measured both sizes with the window on and off, and one of the conclusions I published was wrong, which I've corrected in [where a row window starts to pay](https://sley-ui.dev/notes/row-window).
 
 A pointer costs the most in a dense table, so everything in one is reachable without it. Sorting, resizing a column, selection, moving from row to row, the command palette and the range on the chart all answer keys, and the docs page for it lists every binding I drove in a browser. How the rows themselves come to hold one tab stop between them, without turning the table into something a screen reader can no longer read as a table, is at [one tab stop for five thousand rows](https://sley-ui.dev/notes/row-cursor).
 
@@ -49,7 +49,7 @@ What each version changed, and why, is written up at [sley-ui.dev/docs/releases]
 
 ## Status
 
-Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state, with a chart beside them. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.7.0, and the CLI is on npm at 0.2.0, so every command above runs today on a fresh Vite app and a fresh Next app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
+Early development. The design language is settled, and the component set is built on it: table, command palette, filter bar, field set, dialog, popover, toast, tabs, tooltip, select, panel and empty state, with a chart beside them. The docs site is live at [sley-ui.dev](https://sley-ui.dev), and it carries a running demo application. The registry is served from the same place, at version 0.8.0, and the CLI is on npm at 0.2.0, so every command above runs today on a fresh Vite app and a fresh Next app. The two version lines move separately: one names a release of the components, the other a release of the tool. Expect breaking changes. If something does not work, open an issue and give both numbers. The form asks for them.
 
 To read the docs locally, clone this repo and run `npm install && npm run dev -w docs`.
 
