@@ -1,5 +1,3 @@
-# claude code files: the real ones live in the claude-config repo and are symlinked in,
-# so what sits here is a link pointing at a private repo plus machine-local permissions
 .claude
 CLAUDE.md
 
