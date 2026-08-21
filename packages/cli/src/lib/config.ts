@@ -1,5 +1,6 @@
 import { join, relative } from 'node:path'
 import { exists, readJsonc, writeJson } from './files.js'
+import type { Library } from './project.js'
 
 export const CONFIG = 'components.json'
 
@@ -34,15 +35,16 @@ interface ConfigInput {
   readonly prefix: string
   readonly cssEntry: string
   readonly rsc: boolean
+  readonly library: Library
 }
 
-export async function writeConfig({ cwd, prefix, cssEntry, rsc }: ConfigInput) {
+export async function writeConfig({ cwd, prefix, cssEntry, rsc, library }: ConfigInput) {
   const config: ComponentsConfig = {
     $schema: 'https://ui.shadcn.com/schema.json',
     /* shadcn's own cli validates this field against its list */
     style: 'new-york',
     rsc,
-    tsx: true,
+    tsx: library === 'react',
     tailwind: {
       config: '',
       css: relative(cwd, cssEntry).split('\\').join('/'),

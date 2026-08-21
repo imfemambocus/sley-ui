@@ -3,8 +3,8 @@ import { applyItem, type AppliedFile } from '../lib/apply.js'
 import { CONFIG, readConfig } from '../lib/config.js'
 import { installPackages } from '../lib/install.js'
 import { readLockfile, writeLockfile } from '../lib/lockfile.js'
-import { resolveProject } from '../lib/project.js'
-import { resolveItems } from '../lib/registry.js'
+import { detectLibrary, resolveProject } from '../lib/project.js'
+import { libraryRegistry, resolveItems } from '../lib/registry.js'
 import { byCodeUnit } from '../lib/sort.js'
 
 export interface AddOptions {
@@ -12,6 +12,7 @@ export interface AddOptions {
   readonly registry: string
   readonly overwrite: boolean
   readonly install: boolean
+  readonly framework?: string
 }
 
 export interface AddedItem {
@@ -26,9 +27,11 @@ export async function add(names: readonly string[], options: AddOptions) {
   const config = await readConfig(cwd)
   if (!config) throw new Error(`No ${CONFIG} here. Run sley init first.`)
 
-  const project = await resolveProject(cwd, join(cwd, config.tailwind.css), config.rsc)
+  const library = await detectLibrary(cwd, options.framework)
+  const project = await resolveProject({ cwd, cssEntry: join(cwd, config.tailwind.css), rsc: config.rsc, library })
   const lock = await readLockfile(cwd, options.registry)
-  const items = await resolveItems(options.registry, names)
+  lock.library = library
+  const items = await resolveItems(libraryRegistry(options.registry, library), names)
 
   const added: AddedItem[] = []
   for (const item of items) {
@@ -39,5 +42,5 @@ export async function add(names: readonly string[], options: AddOptions) {
   const packages = [...new Set(items.flatMap((item) => item.dependencies))].sort(byCodeUnit)
   const installed = options.install && installPackages(cwd, project.packageManager, packages)
 
-  return { added, packages, installed, manager: project.packageManager }
+  return { added, packages, installed, manager: project.packageManager, library }
 }

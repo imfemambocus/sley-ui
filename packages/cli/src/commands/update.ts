@@ -6,8 +6,8 @@ import { exists, hash, write } from '../lib/files.js'
 import { installPackages } from '../lib/install.js'
 import { readLockfile, writeLockfile, type Lockfile, type LockedFile } from '../lib/lockfile.js'
 import { merge } from '../lib/merge.js'
-import { resolveProject, type Project } from '../lib/project.js'
-import { loadItem, resolveItems, type RegistryItem } from '../lib/registry.js'
+import { detectLibrary, resolveProject, type Project } from '../lib/project.js'
+import { libraryRegistry, loadItem, resolveItems, type RegistryItem } from '../lib/registry.js'
 import { byCodeUnit } from '../lib/sort.js'
 
 export type UpdateStatus = 'updated' | 'merged' | 'conflicted' | 'kept' | 'added' | 'missing' | 'dropped'
@@ -31,6 +31,7 @@ export interface UpdateOptions {
   readonly install: boolean
   readonly conflicts: boolean
   readonly dryRun: boolean
+  readonly framework?: string
 }
 
 interface Planned {
@@ -109,6 +110,7 @@ async function updateItem(
   item: RegistryItem,
   lock: Lockfile,
   options: UpdateOptions,
+  registry: string,
 ): Promise<UpdatedItem> {
   const locked = lock.items[item.name]
   if (!locked) {
@@ -122,7 +124,7 @@ async function updateItem(
     }
   }
 
-  const base = await loadItem(versionSource(options.registry, locked.version), item.name)
+  const base = await loadItem(versionSource(registry, locked.version), item.name)
   const planned = await plan(project, item, base, options.conflicts)
   const files = [...planned.map((entry) => entry.file), ...dropped(item, project, lock)]
 
@@ -156,8 +158,11 @@ export async function update(names: readonly string[], options: UpdateOptions) {
   const config = await readConfig(cwd)
   if (!config) throw new Error(`No ${CONFIG} here. Run sley init first.`)
 
-  const project = await resolveProject(cwd, join(cwd, config.tailwind.css), config.rsc)
+  const library = await detectLibrary(cwd, options.framework)
+  const registry = libraryRegistry(options.registry, library)
+  const project = await resolveProject({ cwd, cssEntry: join(cwd, config.tailwind.css), rsc: config.rsc, library })
   const lock = await readLockfile(cwd, options.registry)
+  lock.library = library
 
   const wanted = names.length > 0 ? names : Object.keys(lock.items).sort(byCodeUnit)
   if (wanted.length === 0) throw new Error('Nothing to update. Run sley add first.')
@@ -165,12 +170,12 @@ export async function update(names: readonly string[], options: UpdateOptions) {
   const unknown = names.filter((name) => !(name in lock.items))
   if (unknown.length > 0) throw new Error(`Not installed: ${unknown.join(', ')}.`)
 
-  const items = await resolveItems(options.registry, wanted)
+  const items = await resolveItems(registry, wanted)
   const moved = items.filter((item) => lock.items[item.name]?.version !== item.sley.version)
 
   const updated: UpdatedItem[] = []
   for (const item of moved) {
-    updated.push(await updateItem(project, item, lock, options))
+    updated.push(await updateItem(project, item, lock, options, registry))
   }
   if (!options.dryRun) await writeLockfile(cwd, lock)
 
@@ -178,5 +183,5 @@ export async function update(names: readonly string[], options: UpdateOptions) {
   const packages = [...new Set(moved.filter((item) => done.has(item.name)).flatMap((item) => item.dependencies))].sort(byCodeUnit)
   const installed = options.install && !options.dryRun && packages.length > 0 && installPackages(cwd, project.packageManager, packages)
 
-  return { updated, current: items.length - moved.length, packages, installed }
+  return { updated, current: items.length - moved.length, packages, installed, library }
 }

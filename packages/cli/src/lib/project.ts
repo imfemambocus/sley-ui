@@ -3,11 +3,16 @@ import { dirname, join, relative, resolve } from 'node:path'
 import { exists, readJsonc, write } from './files.js'
 
 export type Framework = 'next' | 'vite'
+export type Library = 'react' | 'vue'
 export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun'
+
+export const LIBRARIES: readonly Library[] = ['react', 'vue']
 
 export interface Project {
   readonly cwd: string
   readonly framework: Framework
+  /* the registry serves one tree of components for each of these */
+  readonly library: Library
   readonly tsconfigPath: string
   readonly aliasPrefix: string
   readonly sourceDir: string
@@ -35,15 +40,39 @@ const LOCKFILES: readonly (readonly [string, PackageManager])[] = [
   ['package-lock.json', 'npm'],
 ]
 
-export async function detectFramework(cwd: string): Promise<Framework> {
+async function readDependencies(cwd: string) {
   const path = join(cwd, 'package.json')
   if (!exists(path)) throw new Error(`No package.json in ${cwd}. Run this in a project directory.`)
 
   const pkg = await readJsonc<PackageJson>(path)
-  const deps = { ...pkg.dependencies, ...pkg.devDependencies }
+  return { ...pkg.dependencies, ...pkg.devDependencies }
+}
+
+export async function detectFramework(cwd: string): Promise<Framework> {
+  const deps = await readDependencies(cwd)
   if (deps.next) return 'next'
   if (deps.vite) return 'vite'
   throw new Error('No supported framework found. Sley UI knows Next and Vite.')
+}
+
+function isLibrary(name: string): name is Library {
+  return name === 'react' || name === 'vue'
+}
+
+/* a project holding both has to say which tree it wants */
+export async function detectLibrary(cwd: string, chosen?: string): Promise<Library> {
+  if (chosen !== undefined) {
+    if (isLibrary(chosen)) return chosen
+    throw new Error(`Unknown framework: ${chosen}. Pass ${LIBRARIES.join(' or ')}.`)
+  }
+
+  const deps = await readDependencies(cwd)
+  if (deps.react && deps.vue) {
+    throw new Error('This project holds react and vue. Pass --framework react or --framework vue.')
+  }
+  if (deps.vue) return 'vue'
+  if (deps.react) return 'react'
+  throw new Error('No supported framework found. Sley UI knows React and Vue.')
 }
 
 export function detectPackageManager(cwd: string): PackageManager {
@@ -136,7 +165,14 @@ async function walkCss(dir: string, depth: number): Promise<string[]> {
   return found
 }
 
-export async function resolveProject(cwd: string, cssEntry: string, rsc: boolean): Promise<Project> {
+interface ProjectInput {
+  readonly cwd: string
+  readonly cssEntry: string
+  readonly rsc: boolean
+  readonly library: Library
+}
+
+export async function resolveProject({ cwd, cssEntry, rsc, library }: ProjectInput): Promise<Project> {
   const tsconfigPath = await findTsconfig(cwd)
   const alias = await readAlias(tsconfigPath)
   if (!alias) throw new Error(`No path alias in ${tsconfigPath}. Run sley init first.`)
@@ -144,6 +180,7 @@ export async function resolveProject(cwd: string, cssEntry: string, rsc: boolean
   return {
     cwd,
     framework: await detectFramework(cwd),
+    library,
     tsconfigPath,
     aliasPrefix: alias.prefix,
     sourceDir: alias.dir,

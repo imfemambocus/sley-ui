@@ -1,5 +1,6 @@
 import { join, resolve } from 'node:path'
 import { exists, parseJsonc, readJsonc } from './files.js'
+import type { Library } from './project.js'
 
 export interface RegistryFile {
   readonly path: string
@@ -23,6 +24,16 @@ export interface RegistryItem {
 }
 
 export const TOKENS_ITEM = 'tokens'
+
+/*
+ * react sits at the registry root and every other framework in a tree under it. a caller
+ * who names the tree themselves gets it back unchanged.
+ */
+export function libraryRegistry(source: string, library: Library) {
+  const trimmed = source.replace(/[\\/]$/, '')
+  if (library === 'react') return trimmed
+  return /[\\/]vue$/.test(trimmed) ? trimmed : `${trimmed}/vue`
+}
 
 function isUrl(source: string) {
   return source.startsWith('http://') || source.startsWith('https://')

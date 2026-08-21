@@ -6,6 +6,7 @@ import { exists, write } from '../lib/files.js'
 import { readLockfile, writeLockfile } from '../lib/lockfile.js'
 import {
   detectFramework,
+  detectLibrary,
   detectPackageManager,
   findCssEntry,
   findTsconfig,
@@ -14,12 +15,13 @@ import {
   writeViteAlias,
   type Project,
 } from '../lib/project.js'
-import { loadItem, TOKENS_ITEM } from '../lib/registry.js'
+import { libraryRegistry, loadItem, TOKENS_ITEM } from '../lib/registry.js'
 
 export interface InitOptions {
   readonly cwd: string
   readonly registry: string
   readonly overwrite: boolean
+  readonly framework?: string
 }
 
 const TOKENS_TARGET = 'styles/tokens.css'
@@ -49,6 +51,7 @@ async function linkTokens(cssEntry: string, tokensPath: string) {
 export async function init(options: InitOptions) {
   const cwd = resolve(options.cwd)
   const framework = await detectFramework(cwd)
+  const library = await detectLibrary(cwd, options.framework)
   const tsconfigPath = await findTsconfig(cwd)
   const notes: string[] = []
 
@@ -73,25 +76,29 @@ export async function init(options: InitOptions) {
     )
   }
 
+  const rsc = framework === 'next' && library === 'react'
+
   const project: Project = {
     cwd,
     framework,
+    library,
     tsconfigPath,
     aliasPrefix: alias.prefix,
     sourceDir: alias.dir,
     cssEntry,
     packageManager: detectPackageManager(cwd),
-    rsc: framework === 'next',
+    rsc,
   }
 
   const lock = await readLockfile(cwd, options.registry)
   lock.registry = options.registry
+  lock.library = library
 
-  const tokens = await loadItem(options.registry, TOKENS_ITEM)
+  const tokens = await loadItem(libraryRegistry(options.registry, library), TOKENS_ITEM)
   const applied = await applyItem(project, tokens, lock, options.overwrite)
   const linked = await linkTokens(cssEntry, join(alias.dir, TOKENS_TARGET))
 
-  const config = await writeConfig({ cwd, prefix: alias.prefix, cssEntry, rsc: framework === 'next' })
+  const config = await writeConfig({ cwd, prefix: alias.prefix, cssEntry, rsc, library })
   await writeLockfile(cwd, lock)
 
   return { project, config, applied, linked, notes }

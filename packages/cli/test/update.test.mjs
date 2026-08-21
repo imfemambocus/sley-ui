@@ -61,7 +61,10 @@ async function project() {
   const cwd = await mkdtemp(join(tmpdir(), 'sley-upd-'))
   made.push(cwd)
   await mkdir(join(cwd, 'src'), { recursive: true })
-  await writeFile(join(cwd, 'package.json'), JSON.stringify({ name: 'trial', devDependencies: { vite: '^8.0.0' } }))
+  await writeFile(
+    join(cwd, 'package.json'),
+    JSON.stringify({ name: 'trial', dependencies: { react: '^19.0.0' }, devDependencies: { vite: '^8.0.0' } }),
+  )
   await writeFile(join(cwd, 'tsconfig.json'), '{ "files": [], "references": [{ "path": "./tsconfig.app.json" }] }')
   await writeFile(join(cwd, 'tsconfig.app.json'), '{ "compilerOptions": { "strict": true } }')
   await writeFile(join(cwd, 'vite.config.ts'), "import { defineConfig } from 'vite'\n\nexport default defineConfig({\n  plugins: [],\n})\n")

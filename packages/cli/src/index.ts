@@ -18,6 +18,7 @@ Usage
 
 Options
   --cwd <dir>          the project directory. the default is the current one
+  --framework <name>   react or vue. the default is read from your dependencies
   --registry <source>  a url or a directory. the default is ${DEFAULT_REGISTRY}
   --overwrite          replace a file that you edited
   --conflicts          on update, write the conflict markers into the file
@@ -88,6 +89,7 @@ async function main() {
     allowPositionals: true,
     options: {
       cwd: { type: 'string' },
+      framework: { type: 'string' },
       registry: { type: 'string' },
       overwrite: { type: 'boolean', default: false },
       conflicts: { type: 'boolean', default: false },
@@ -111,6 +113,7 @@ async function main() {
 
   const options = {
     cwd: values.cwd ?? process.cwd(),
+    framework: values.framework,
     registry: values.registry ?? DEFAULT_REGISTRY,
     overwrite: values.overwrite,
     install: !values['no-install'],
@@ -120,7 +123,7 @@ async function main() {
 
   if (command === 'init') {
     const result = await init(options)
-    console.log(`Found a ${result.project.framework} project.`)
+    console.log(`Found a ${result.project.framework} project on ${result.project.library}.`)
     for (const note of result.notes) {
       console.log(`  ${note}`)
     }
@@ -133,6 +136,7 @@ async function main() {
 
   if (command === 'add') {
     const result = await add(names, options)
+    console.log(`Reading the ${result.library} components.`)
     for (const item of result.added) {
       console.log(item.name)
       report(item.files)

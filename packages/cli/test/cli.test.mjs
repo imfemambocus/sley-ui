@@ -50,7 +50,7 @@ const TOUCHED = ['tsconfig.app.json', 'vite.config.ts', 'src/index.css']
 /* a fresh vite template splits its options out and holds comments in the file */
 function viteProject(prefix = '@') {
   return project({
-    'package.json': JSON.stringify({ name: 'trial', devDependencies: { vite: '^8.0.0' } }),
+    'package.json': JSON.stringify({ name: 'trial', dependencies: { react: '^19.0.0' }, devDependencies: { vite: '^8.0.0' } }),
     'tsconfig.json': '{ "files": [], "references": [{ "path": "./tsconfig.app.json" }] }',
     'tsconfig.app.json': `{
   "compilerOptions": {
@@ -63,9 +63,20 @@ function viteProject(prefix = '@') {
   })
 }
 
+/* a create-vue template ships the alias in both files already */
+function vueProject() {
+  return project({
+    'package.json': JSON.stringify({ name: 'trial', dependencies: { vue: '^3.5.0' }, devDependencies: { vite: '^8.0.0' } }),
+    'tsconfig.json': '{ "files": [], "references": [{ "path": "./tsconfig.app.json" }] }',
+    'tsconfig.app.json': '{ "compilerOptions": { "strict": true } }',
+    'vite.config.ts': "import { defineConfig } from 'vite'\n\nexport default defineConfig({\n  plugins: [],\n})\n",
+    'src/style.css': TAILWIND,
+  })
+}
+
 function nextProject() {
   return project({
-    'package.json': JSON.stringify({ name: 'trial', dependencies: { next: '^16.0.0' } }),
+    'package.json': JSON.stringify({ name: 'trial', dependencies: { next: '^16.0.0', react: '^19.0.0' } }),
     'tsconfig.json': '{ "compilerOptions": { "paths": { "@/*": ["./*"] } } }',
     'app/globals.css': TAILWIND,
   })
@@ -196,6 +207,52 @@ test('an edited file is kept until overwrite is asked for', async () => {
 
   sley(cwd, ['add', 'table', '--overwrite'])
   assert.notEqual(await readFile(path, 'utf8'), mine, 'overwrite replaces it')
+})
+
+test('a vue project reads the vue tree and gets no tsx', async () => {
+  const cwd = await vueProject()
+  sley(cwd, ['init'])
+
+  const config = JSON.parse(await readFile(join(cwd, 'components.json'), 'utf8'))
+  assert.equal(config.tsx, false)
+  assert.equal(config.rsc, false)
+
+  sley(cwd, ['add', 'table'])
+  assert.ok(existsSync(join(cwd, 'src/components/ui/table/Table.vue')))
+  assert.ok(existsSync(join(cwd, 'src/components/ui/table/ColumnGrip.vue')))
+  assert.ok(existsSync(join(cwd, 'src/components/ui/icons/CheckIcon.vue')))
+  assert.equal(existsSync(join(cwd, 'src/components/ui/table/Table.tsx')), false)
+  assert.equal(existsSync(join(cwd, 'src/components/ui/icons/Icons.tsx')), false)
+
+  const lock = JSON.parse(await readFile(join(cwd, 'sley.lock'), 'utf8'))
+  assert.equal(lock.library, 'vue')
+  assert.ok(lock.items.table.url.includes('/vue/'), `${lock.items.table.url} names no vue tree`)
+})
+
+test('the two trees name their own ark package', async () => {
+  const vue = await vueProject()
+  sley(vue, ['init'])
+  assert.match(sley(vue, ['add', 'select']), /@ark-ui\/vue@/)
+
+  const react = await viteProject()
+  sley(react, ['init'])
+  assert.match(sley(react, ['add', 'select']), /@ark-ui\/react@/)
+})
+
+test('a project holding both frameworks waits to be told which one', async () => {
+  const cwd = await project({
+    'package.json': JSON.stringify({ name: 'trial', dependencies: { react: '^19.0.0', vue: '^3.5.0' }, devDependencies: { vite: '^8.0.0' } }),
+    'tsconfig.json': '{ "compilerOptions": { "strict": true } }',
+    'vite.config.ts': "import { defineConfig } from 'vite'\n\nexport default defineConfig({\n  plugins: [],\n})\n",
+    'src/index.css': TAILWIND,
+  })
+
+  assert.throws(() => sley(cwd, ['init']), /--framework/)
+  assert.equal(existsSync(join(cwd, 'components.json')), false)
+
+  sley(cwd, ['init', '--framework', 'vue'])
+  sley(cwd, ['add', 'button', '--framework', 'vue'])
+  assert.ok(existsSync(join(cwd, 'src/components/ui/button/Button.vue')))
 })
 
 test('add refuses to run before init', async () => {

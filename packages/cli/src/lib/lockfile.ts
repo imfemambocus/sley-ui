@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { exists, readJsonc, writeJson } from './files.js'
+import type { Library } from './project.js'
 
 export const LOCKFILE = 'sley.lock'
 
@@ -17,6 +18,8 @@ export interface LockedItem {
 export interface Lockfile {
   version: number
   registry: string
+  /* which tree of the registry these items came from */
+  library?: Library
   items: Record<string, LockedItem>
 }
 
