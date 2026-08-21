@@ -12,7 +12,8 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "npm run dev -w lab",
+    "dev": "npm run dev -w lab-react",
+    "dev:vue": "npm run dev -w lab-vue",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "oxlint --type-aware",

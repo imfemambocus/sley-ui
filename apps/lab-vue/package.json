@@ -1,0 +1,27 @@
+{
+  "name": "lab-vue",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "node ../../packages/registry/vue-tsc.mjs -p tsconfig.json",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ark-ui/vue": "^5.38.2",
+    "@observablehq/plot": "^0.6.17",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0",
+    "vue": "^3.5.41"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.2.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1"
+  }
+}

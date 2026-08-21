@@ -1,5 +1,16 @@
-import type { FilterGroup, FilterValues } from '@/components/ui/filter-bar/FilterBar'
 import { ASSAYS, STATUSES, runs, type Run } from './runs'
+
+/*
+ * the shapes the filter bar takes, declared here so this fixture belongs to no one
+ * framework's copy of the component.
+ */
+export interface FilterGroup {
+  readonly key: string
+  readonly label: string
+  readonly options: readonly string[]
+}
+
+export type FilterValues = Readonly<Record<string, readonly string[]>>
 
 const OWNERS = [...new Set(runs.map((run) => run.owner))].sort((a, b) => a.localeCompare(b))
 

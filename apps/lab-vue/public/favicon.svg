@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- the mark the banner draws, in the indigo of each theme -->
+  <style>
+    :root { color: #3a49c4 }
+    @media (prefers-color-scheme: dark) { :root { color: #5f72ef } }
+  </style>
+  <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none">
+    <line x1="5" y1="4" x2="5" y2="28" />
+    <line x1="12" y1="4" x2="12" y2="28" />
+    <line x1="19" y1="4" x2="19" y2="28" />
+    <line x1="26" y1="4" x2="26" y2="28" />
+    <line x1="3" y1="21.5" x2="29" y2="21.5" />
+  </g>
+</svg>

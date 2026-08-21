@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+@import '../../../../packages/registry/src/styles/tokens.css';
+
+/* the components and the demo sit outside this app; the scanner needs the paths */
+@source '../../../../packages/registry/src';
+@source '../../../../packages/demo/src';
+
+/*
+ * the palette swaps on one attribute, so the whole page changes colour at once. a
+ * transition on every element that reads the palette misses frames where this cross
+ * fade does not, and cutting the property list does not help: the element count is
+ * the cost.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-overlay);
+  animation-timing-function: var(--ease-glide);
+}
