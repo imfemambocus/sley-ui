@@ -55,7 +55,7 @@ interface FrameworkBlockProps {
   readonly className?: string
 }
 
-/* the switch in the header decides which of the two a reader is shown */
+/* the framework the reader chose decides which of the two is shown */
 export const FrameworkBlock = ({ react, vue, shell, className }: FrameworkBlockProps) => {
   const { framework } = useSettings()
   return <CodeBlock code={framework === 'react' ? react : vue} shell={shell} className={className} />

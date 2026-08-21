@@ -10,7 +10,7 @@ interface SidebarProps {
   readonly className?: string
 }
 
-/* every code block on the documentation reads this, so it sits above the pages rather than in the header */
+/* every code block on the documentation reads this, and no page without a sidebar carries one */
 const FrameworkChoice = () => {
   const { framework, setFramework } = useSettings()
 
