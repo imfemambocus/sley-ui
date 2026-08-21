@@ -5,6 +5,8 @@ import { Measured } from '../site/Measured'
 import { Code, Note, PageTitle, Lede, Section } from '../site/Prose'
 import { Link } from '../site/router'
 import { useSettings } from '../site/settings'
+import { VueIsland } from '../site/VueIsland'
+import { VUE_DEMOS } from '../vue/demos'
 
 function fileName(slug: string) {
   return slug
@@ -38,6 +40,7 @@ function vueImport(doc: ComponentDoc) {
 
 export const ComponentPage = ({ doc }: { readonly doc: ComponentDoc }) => {
   const { framework } = useSettings()
+  const vueDemo = framework === 'vue' ? VUE_DEMOS[doc.slug] : undefined
 
   return (
     <article className="flex flex-col gap-14">
@@ -50,7 +53,7 @@ export const ComponentPage = ({ doc }: { readonly doc: ComponentDoc }) => {
         </div>
       </header>
 
-      <doc.Demo />
+      {vueDemo ? <VueIsland load={vueDemo} /> : <doc.Demo />}
 
       {doc.Notes && (
         <Section id="behaviour" title="How it behaves">

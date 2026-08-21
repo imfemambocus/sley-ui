@@ -5,19 +5,21 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "typecheck": "tsc -b",
-    "build": "node releases.mjs && tsc -b && vite build && node sitemap.mjs && node feed.mjs && node prerender.mjs && node bundle-registry.mjs",
+    "typecheck": "tsc -b && node ../../packages/registry/vue-tsc.mjs -p tsconfig.vue.json",
+    "build": "node releases.mjs && npm run typecheck && vite build && node sitemap.mjs && node feed.mjs && node prerender.mjs && node bundle-registry.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "@ark-ui/react": "^5.38.1",
+    "@ark-ui/vue": "^5.38.2",
     "@observablehq/plot": "^0.6.17",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "clsx": "^2.1.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.6.0",
+    "vue": "^3.5.41"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -25,6 +27,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
+    "@vitejs/plugin-vue": "^6.0.8",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.2.1"

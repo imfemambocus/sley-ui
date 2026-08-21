@@ -1,6 +1,12 @@
 import { CodeBlock } from '../site/CodeBlock'
+import { SANDBOX_BLANK_VUE, SANDBOX_VUE } from '../site/Header'
 import { Measured } from '../site/Measured'
 import { Code, Lede, List, Note, P, PageTitle, Section } from '../site/Prose'
+import { VueIsland } from '../site/VueIsland'
+import { VUE_CONSOLE } from '../vue/demos'
+
+const DOC_LINK =
+  'text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft'
 
 const CELL_SLOTS = `<Table
   :rows="runs"
@@ -74,6 +80,17 @@ export const VuePage = () => (
 
     <Section id="commands" title="The commands are the same">
       <CodeBlock shell code={'npx sley-ui init\nnpx sley-ui add table'} />
+      <P>
+        <span>Or open a Vue project that already has them in it, </span>
+        <a href={SANDBOX_VUE} target="_blank" rel="noreferrer" className={DOC_LINK}>
+          in a new tab
+        </a>
+        <span>, and </span>
+        <a href={SANDBOX_BLANK_VUE} target="_blank" rel="noreferrer" className={DOC_LINK}>
+          this one starts empty
+        </a>
+        <span> if you would rather run the two commands yourself and watch the files arrive.</span>
+      </P>
       <P>
         <Code>init</Code> looks for <Code>vue</Code> or <Code>react</Code> in your dependencies and
         reads the matching tree from then on. A repository that holds both refuses rather than
@@ -152,6 +169,21 @@ export const VuePage = () => (
       </P>
     </Section>
 
+    <Section id="running" title="The whole console, running in Vue">
+      <P>
+        This is the demonstration from the overview, rendered by the Vue components rather than the
+        React ones: the same fixture, the same tokens, the same twenty seven runs. Brush the chart to
+        narrow the table, open a run, cancel it, and the toast that follows is the Vue one. Every
+        component page runs its own demo the same way once you have picked Vue.
+      </P>
+      <VueIsland load={VUE_CONSOLE} />
+      <Note>
+        The site is a React application, so a Vue demo is its own application mounted into one node
+        of it. The import is dynamic, which is why a reader who never asks for Vue never downloads
+        it.
+      </Note>
+    </Section>
+
     <Section id="measured" title="Measured on the Vue build">
       <P>
         I drove the Vue set in a browser against the React one, reading the same numbers off both.
@@ -172,6 +204,18 @@ export const VuePage = () => (
               'Exact: a thousand rows at 32px plus the head. At a scroll of 16,000px the first rendered row is 496, against an arithmetic 496, with 29 rows in the body. The window is the same arithmetic in both frameworks because the row height comes from the same token.',
           },
           {
+            value: '25.8ms',
+            what: 'The longest blocked frame when 5000 rows land in the Vue table',
+            detail:
+              'On the built site, three fresh loads: 23.9ms, 25.8ms and 27.1ms, with exactly one frame over 16.7ms in each. That is three frames on a 120Hz display. The React table reads 9.4ms by the same method, so the Vue commit costs two frames more and both are far from the 1.1 seconds the row window used to miss. The window itself is exact in both: aria-rowcount 5001, 25 rows drawn, and a scroll height of 200,040px.',
+          },
+          {
+            value: '73.5kB',
+            what: 'What switching this site to Vue downloads, gzipped',
+            detail:
+              'Read off the network panel on a component page: 22 chunks, of which 41.1kB is the Vue runtime and the rest is the Ark adapter and the demo. A reader who never asks for Vue never fetches any of it, because every demo is behind a dynamic import. The React side of the same page is 298.5kB.',
+          },
+          {
             value: '102 to 110 to 118px',
             what: 'A column width across two arrow presses on the resize grip',
             detail:
@@ -184,16 +228,13 @@ export const VuePage = () => (
     <Section id="left" title="What is not there yet">
       <List>
         <li>
-          The two sandboxes are React projects, so trying it in the browser without installing
-          anything is React only for now.
-        </li>
-        <li>
           Nuxt. The components themselves have no server component story to get wrong, since Vue has
           none, but <Code>init</Code> would not know where to write the alias.
         </li>
         <li>
-          A Vue example in the repository. The Vue instrument panel is there, at{' '}
-          <Code>apps/lab-vue</Code>, and it is the React one component for component.
+          The extra charts further down the chart page. Those illustrate points in the prose and
+          Observable Plot draws the same SVG whichever framework holds it, so the wrapper is the only
+          difference and the top demo on that page is already the Vue one.
         </li>
       </List>
     </Section>

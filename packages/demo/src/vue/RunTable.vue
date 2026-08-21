@@ -12,8 +12,9 @@ const props = withDefaults(
     rows: readonly Run[]
     columns: readonly Column<Run>[]
     loading?: boolean
+    emptyMessage?: string
   }>(),
-  { loading: false },
+  { loading: false, emptyMessage: 'No run matches the filters.' },
 )
 
 const emit = defineEmits<{
@@ -29,7 +30,7 @@ const emit = defineEmits<{
     :row-id="(run: Run) => run.id"
     title="Sequencing runs"
     :noun="['run', 'runs']"
-    empty-message="No run matches the filters."
+    :empty-message="props.emptyMessage"
     :loading="props.loading"
     @selection-change="(selected) => emit('selectionChange', selected)"
   >
