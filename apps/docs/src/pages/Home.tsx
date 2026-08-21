@@ -52,7 +52,7 @@ export const Home = () => (
       <div className="warp-field pointer-events-none absolute inset-x-0 top-0 h-64 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
       <div className="relative mx-auto flex max-w-360 flex-col gap-8 px-4 pt-20 pb-14 sm:px-6">
         <p className="font-data text-[11px] tracking-[0.18em] text-weft-faint uppercase">
-          A React component registry
+          A React and Vue component registry
         </p>
         <h1 className="max-w-4xl font-ui text-[clamp(34px,6vw,60px)] leading-[1.04] font-bold tracking-[-0.04em] text-weft">
           Components for interfaces that hold a lot of data.
@@ -113,7 +113,8 @@ export const Home = () => (
       <Pitch title="You own the code">
         A command copies the source into your project and you keep it. The lockfile records the
         version and the hash of every file it wrote, so an update merges my changes into yours
-        instead of overwriting them.
+        instead of overwriting them. React or Vue: the CLI reads which one out of your dependencies,
+        and one version number covers both.
       </Pitch>
     </section>
   </div>

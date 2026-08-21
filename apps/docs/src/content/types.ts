@@ -8,8 +8,12 @@ export interface ComponentDoc {
   readonly name: string
   readonly summary: string
   readonly exports: readonly string[]
+  /* only where the vue item does not follow one export to one file */
+  readonly vueImports?: readonly string[]
   readonly Demo: FC
   readonly api: readonly ApiRow[]
+  /* only where the vue api is not the mapping the vue page states */
+  readonly vueApi?: readonly ApiRow[]
   readonly measured?: readonly Measurement[]
   readonly Notes?: FC
 }

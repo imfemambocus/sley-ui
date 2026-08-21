@@ -22,6 +22,7 @@ export const NAV: readonly NavGroup[] = [
     items: [
       { href: '/', label: 'Overview' },
       { href: '/docs/installation', label: 'Installation' },
+      { href: '/docs/vue', label: 'Vue' },
       { href: '/docs/updates', label: 'Updates' },
       { href: '/docs/releases', label: 'Releases' },
       { href: '/docs/keyboard', label: 'Keyboard' },

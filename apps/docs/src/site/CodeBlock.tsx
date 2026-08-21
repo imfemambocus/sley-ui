@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSettings } from './settings'
 import { cx } from '@/lib/cx'
 
 interface CodeBlockProps {
@@ -45,4 +46,17 @@ export const CodeBlock = ({ code, shell = false, className }: CodeBlockProps) =>
       </button>
     </div>
   )
+}
+
+interface FrameworkBlockProps {
+  readonly react: string
+  readonly vue: string
+  readonly shell?: boolean
+  readonly className?: string
+}
+
+/* the switch in the header decides which of the two a reader is shown */
+export const FrameworkBlock = ({ react, vue, shell, className }: FrameworkBlockProps) => {
+  const { framework } = useSettings()
+  return <CodeBlock code={framework === 'react' ? react : vue} shell={shell} className={className} />
 }

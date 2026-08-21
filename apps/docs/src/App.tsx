@@ -16,12 +16,14 @@ import { RowWindow } from './pages/RowWindow'
 import { ThemeFade } from './pages/ThemeFade'
 import { TypePage } from './pages/Type'
 import { Updates } from './pages/Updates'
+import { VuePage } from './pages/Vue'
 import { DEFAULT_DESCRIPTION, PAGE_META, usePageMeta } from './site/meta'
 import { Shell } from './site/Shell'
 import { useRoute } from './site/router'
 
 const DOC_PAGES: Record<string, FC> = {
   '/docs/installation': Installation,
+  '/docs/vue': VuePage,
   '/docs/updates': Updates,
   '/docs/releases': Releases,
   '/docs/keyboard': Keyboard,

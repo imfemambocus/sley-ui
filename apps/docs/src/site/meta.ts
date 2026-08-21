@@ -3,9 +3,9 @@ import { useEffect } from 'react'
 const SITE = 'https://sley-ui.dev'
 const NAME = 'Sley UI'
 
-export const DEFAULT_TITLE = 'Sley UI, React components for data-dense interfaces'
+export const DEFAULT_TITLE = 'Sley UI, React and Vue components for data-dense interfaces'
 export const DEFAULT_DESCRIPTION =
-  'A React component registry for interfaces that hold a lot of data. One density knob retunes every component.'
+  'A React and Vue component registry for interfaces that hold a lot of data. One density knob retunes every component.'
 
 /* one sentence for each page that is not a component, because a crawler shows this text, not the prose */
 export const PAGE_META: Record<string, { readonly title: string; readonly description: string }> = {
@@ -37,6 +37,11 @@ export const PAGE_META: Record<string, { readonly title: string; readonly descri
   '/docs/installation': {
     title: 'Installation',
     description: 'Add Sley UI to a Vite or Next project. The CLI writes the source into your repo and you own it.',
+  },
+  '/docs/vue': {
+    title: 'Vue',
+    description:
+      'The same components in Vue: one token file, one version number, and four rules that carry every prop across.',
   },
   '/docs/updates': {
     title: 'Updates',

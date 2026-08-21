@@ -165,6 +165,59 @@ export const doc: ComponentDoc = {
       detail: 'Sorts the model, never the text in the cell. Without it the head draws no control.',
     },
   ],
+  /* the vue table takes its cells from a slot per column, which is the one api that differs */
+  vueApi: [
+    {
+      name: 'rows',
+      type: 'readonly T[]',
+      required: true,
+      detail: 'Your data, in the order you want the third sort click to restore.',
+    },
+    {
+      name: 'columns',
+      type: 'readonly Column<T>[]',
+      required: true,
+      detail: 'Each one declares a key, a label and a character count. The cell comes from a slot.',
+    },
+    { name: 'rowId', type: '(row: T) => string', required: true, detail: 'A stable id. Selection is keyed off it.' },
+    { name: 'title', type: 'string', required: true, detail: 'The heading in the table header.' },
+    {
+      name: 'noun',
+      type: "string | [one, many]",
+      detail: 'What the count calls a row. Give both forms, or one count reads "1 rows". It defaults to "rows".',
+    },
+    { name: 'loading', type: 'boolean', detail: 'Swaps the rows for the unwoven warp and hides the count.' },
+    { name: 'emptyMessage', type: 'string', detail: 'The title of the empty state when no row survives the filters.' },
+    {
+      name: '#cell-<key>',
+      type: '{ row: T }',
+      required: true,
+      detail:
+        'One slot for each column, named after its key. Draw the cell in a template rather than in a render function. A column with no slot draws an empty cell.',
+    },
+    { name: '#actions', type: 'slot', detail: 'Controls in the table header, beside the count.' },
+    {
+      name: '@selection-change',
+      type: '(selected: ReadonlySet<string>) => void',
+      detail: 'Reports only the selected rows that are currently on screen.',
+    },
+    { name: 'key (Column)', type: 'string', required: true, detail: 'Identifies the column, and names its slot.' },
+    { name: 'label (Column)', type: 'string', required: true, detail: 'The head text.' },
+    {
+      name: 'chars (Column)',
+      type: 'number',
+      required: true,
+      detail: 'The widest plausible value in characters. The density turns it into a width, so never give pixels.',
+    },
+    { name: 'unit (Column)', type: 'string', detail: 'Stated once in the head, never repeated in a cell.' },
+    { name: 'hint (Column)', type: 'string', detail: 'A tooltip on the head button that is already there.' },
+    { name: 'numeric (Column)', type: 'boolean', detail: 'Right aligns and sets the data face with tabular figures.' },
+    {
+      name: 'sortValue (Column)',
+      type: '(row: T) => string | number',
+      detail: 'Sorts the model, never the text in the cell. Without it the head draws no control.',
+    },
+  ],
   measured: [
     {
       value: '2232 of 2232',

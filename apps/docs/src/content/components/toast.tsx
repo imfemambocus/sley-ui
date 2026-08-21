@@ -64,6 +64,10 @@ export const doc: ComponentDoc = {
   name: 'Toast',
   summary: 'A status line in the corner, with the dye dot the status column uses.',
   exports: ['Toaster', 'createToaster'],
+  vueImports: [
+    "import Toaster from '@/components/ui/toast/Toaster.vue'",
+    "import { createToaster } from '@ark-ui/vue/toast'",
+  ],
   Demo: ToastDemo,
   api: [
     {

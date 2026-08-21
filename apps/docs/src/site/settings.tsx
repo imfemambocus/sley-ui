@@ -15,20 +15,28 @@ export type Density = (typeof DENSITIES)[number]
 export const THEMES = ['dark', 'light'] as const
 export type Theme = (typeof THEMES)[number]
 
+export const FRAMEWORKS = ['react', 'vue'] as const
+export type Framework = (typeof FRAMEWORKS)[number]
+
 export const DENSITY_TOKENS = ['--row-h', '--cell-x', '--ui-text', '--ctl-h', '--stack', '--reed-pitch'] as const
 
 interface Settings {
   readonly density: Density
   readonly theme: Theme
+  /* every code block on the site reads this one */
+  readonly framework: Framework
   readonly setDensity: (next: Density) => void
   readonly setTheme: (next: Theme) => void
+  readonly setFramework: (next: Framework) => void
 }
 
 const SettingsContext = createContext<Settings>({
   density: 'comfortable',
   theme: 'dark',
+  framework: 'react',
   setDensity: () => {},
   setTheme: () => {},
+  setFramework: () => {},
 })
 
 export const useSettings = () => useContext(SettingsContext)
@@ -36,6 +44,7 @@ export const useSettings = () => useContext(SettingsContext)
 export const SettingsProvider = ({ children }: { readonly children: ReactNode }) => {
   const [density, setDensity] = useState<Density>('comfortable')
   const [theme, setTheme] = useState<Theme>('dark')
+  const [framework, setFramework] = useState<Framework>('react')
 
   useEffect(() => {
     document.documentElement.dataset.density = density
@@ -61,8 +70,8 @@ export const SettingsProvider = ({ children }: { readonly children: ReactNode })
   }, [])
 
   const value = useMemo(
-    () => ({ density, theme, setDensity, setTheme: changeTheme }),
-    [density, theme, changeTheme],
+    () => ({ density, theme, framework, setDensity, setTheme: changeTheme, setFramework }),
+    [density, theme, framework, changeTheme],
   )
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>
 }

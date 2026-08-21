@@ -81,6 +81,13 @@ export const doc: ComponentDoc = {
   name: 'Select',
   summary: 'Single or multiple, with the shed on the cursor and the selvedge on the choice.',
   exports: ['Select', 'SelectTrigger', 'SelectContent', 'SelectOption', 'createListCollection', 'type SelectOptionItem'],
+  vueImports: [
+    "import Select from '@/components/ui/select/Select.vue'",
+    "import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'",
+    "import SelectContent from '@/components/ui/select/SelectContent.vue'",
+    "import SelectOption, { type SelectOptionItem } from '@/components/ui/select/SelectOption.vue'",
+    "import { createListCollection } from '@ark-ui/vue/select'",
+  ],
   Demo: SelectDemo,
   api: [
     {

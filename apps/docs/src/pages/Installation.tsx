@@ -1,8 +1,44 @@
-import { CodeBlock } from '../site/CodeBlock'
+import { CodeBlock, FrameworkBlock } from '../site/CodeBlock'
 import { SANDBOX, SANDBOX_BLANK } from '../site/Header'
 import { Code, Lede, List, Note, P, PageTitle, Section } from '../site/Prose'
+import { Link } from '../site/router'
+import { useSettings } from '../site/settings'
 
-export const Installation = () => (
+const REACT_FILES = `components.json                           init, and shared with shadcn
+sley.lock                                 init, and updated by every add
+styles/tokens.css                         init, imported from your stylesheet
+
+components/ui/table/Table.tsx             add table
+components/ui/checkbox/Checkbox.tsx
+components/ui/empty-state/EmptyState.tsx
+components/ui/icons/Icons.tsx
+components/ui/tooltip/Tooltip.tsx
+lib/cx.ts`
+
+const VUE_FILES = `components.json                           init, and shared with shadcn
+sley.lock                                 init, and updated by every add
+styles/tokens.css                         init, imported from your stylesheet
+
+components/ui/table/Table.vue             add table
+components/ui/table/ColumnHead.vue
+components/ui/table/ColumnGrip.vue
+components/ui/checkbox/Checkbox.vue
+components/ui/empty-state/EmptyState.vue
+components/ui/icons/CheckIcon.vue
+components/ui/icons/ChevronIcon.vue
+components/ui/icons/CloseIcon.vue
+components/ui/icons/SearchIcon.vue
+components/ui/tooltip/Tooltip.vue
+lib/cx.ts`
+
+const DOC_LINK =
+  'text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft'
+
+export const Installation = () => {
+  const { framework } = useSettings()
+  const vue = framework === 'vue'
+
+  return (
   <article className="flex flex-col gap-14">
     <header className="flex flex-col gap-5">
       <PageTitle>Installation</PageTitle>
@@ -49,23 +85,43 @@ export const Installation = () => (
           it installs what the components import.
         </span>
       </P>
+      {vue && <Note>Both sandboxes are React projects. A Vue one is not built yet.</Note>}
     </Section>
 
     <Section id="requirements" title="What you need first">
       <List>
         <li>
-          React 19 and Tailwind CSS v4. The token layer is written in <Code>@theme</Code>, which is a
-          v4 feature.
+          {vue ? 'Vue 3.5' : 'React 19'} and Tailwind CSS v4. The token layer is written in{' '}
+          <Code>@theme</Code>, which is a v4 feature.
         </li>
         <li>
-          A Vite or a Next project. <Code>init</Code> detects which one you have and writes the alias
-          into the files that framework actually resolves through.
+          {vue ? (
+            <span>
+              A Vite project. Nuxt is not supported yet, and the CLI has to be at <Code>0.3.0</Code>{' '}
+              or newer, because earlier versions know only React.
+            </span>
+          ) : (
+            <span>
+              A Vite or a Next project. <Code>init</Code> detects which one you have and writes the
+              alias into the files that framework actually resolves through.
+            </span>
+          )}
         </li>
         <li>
           Archivo and IBM Plex Mono, however you like to load a font. Nothing breaks without them,
           but the type pair is half the identity.
         </li>
       </List>
+      <Note>
+        <span>
+          Both frameworks are one registry at one version, and <Code>init</Code> picks the tree out of
+          your dependencies. The four rules that carry every prop from one to the other are on the{' '}
+        </span>
+        <Link href="/docs/vue" className={DOC_LINK}>
+          Vue page
+        </Link>
+        <span>.</span>
+      </Note>
     </Section>
 
     <Section id="init" title="Run init once">
@@ -77,11 +133,24 @@ export const Installation = () => (
         of mine, so a project that uses both CLIs needs one file and not two.
       </P>
       <P>
-        On a Vite project it inserts the alias into <Code>tsconfig.app.json</Code> and a{' '}
-        <Code>resolve.alias</Code> block into <Code>vite.config.ts</Code>, because the tsconfig alone
-        does not tell Vite anything. If your config already has a <Code>resolve</Code> block it
-        prints the line to add rather than guessing where to put it. Next needs neither, since{' '}
-        <Code>create-next-app</Code> already declares the alias.
+        <span>
+          On a Vite project it inserts the alias into <Code>tsconfig.app.json</Code> and a{' '}
+          <Code>resolve.alias</Code> block into <Code>vite.config.ts</Code>, because the tsconfig
+          alone does not tell Vite anything. If your config already has a <Code>resolve</Code> block
+          it prints the line to add rather than guessing where to put it.
+        </span>
+        {vue ? (
+          <span>
+            {' '}
+            A <Code>create-vue</Code> template ships both already, and <Code>init</Code> then says so
+            and leaves them alone.
+          </span>
+        ) : (
+          <span>
+            {' '}
+            Next needs neither, since <Code>create-next-app</Code> already declares the alias.
+          </span>
+        )}
       </P>
       <Note>
         The whole token file ships at init, not a fragment for each component. A per-component
@@ -97,7 +166,7 @@ export const Installation = () => (
         table gives you <Code>cx</Code>, the icons, the checkbox, the empty state and the tooltip,
         because that is what the table is built out of. No component declares its dependencies by
         hand: the build script reads the imports out of the source, so a header nobody maintains
-        cannot go stale.
+        cannot go stale, and the same reading is what gives each framework its own Ark package.
       </P>
       <P>
         If a file already on disk differs from the version you installed, it is kept and marked with
@@ -112,23 +181,12 @@ export const Installation = () => (
         at, so a Vite project with <Code>@</Code> on <Code>src</Code> gets them under{' '}
         <Code>src</Code>. Running the two commands above leaves this:
       </P>
-      <CodeBlock
-        code={`components.json                           init, and shared with shadcn
-sley.lock                                 init, and updated by every add
-styles/tokens.css                         init, imported from your stylesheet
-
-components/ui/table/Table.tsx             add table
-components/ui/checkbox/Checkbox.tsx
-components/ui/empty-state/EmptyState.tsx
-components/ui/icons/Icons.tsx
-components/ui/tooltip/Tooltip.tsx
-lib/cx.ts`}
-      />
+      <FrameworkBlock react={REACT_FILES} vue={VUE_FILES} />
       <P>
         Three npm packages arrive with that set: <Code>clsx</Code> and <Code>tailwind-merge</Code>{' '}
-        for <Code>cx</Code>, and <Code>@ark-ui/react</Code> for the parts built on a state machine.
-        The table itself declares none. Pass <Code>--no-install</Code> and it writes the files and
-        leaves your package manager alone.
+        for <Code>cx</Code>, and <Code>{vue ? '@ark-ui/vue' : '@ark-ui/react'}</Code> for the parts
+        built on a state machine. The table itself declares none. Pass <Code>--no-install</Code> and
+        it writes the files and leaves your package manager alone.
       </P>
       <P>
         The version in the lockfile is the registry version, not the version of the CLI you ran. It
@@ -144,6 +202,7 @@ lib/cx.ts`}
       </Note>
     </Section>
 
+    {!vue && (
     <Section id="next" title="A note for Next">
       <P>
         A component that uses a hook gets a <Code>&apos;use client&apos;</Code> directive, and only in
@@ -156,10 +215,12 @@ lib/cx.ts`}
         themselves work from a server component.
       </P>
     </Section>
+    )}
 
     <Section id="options" title="Options">
       <CodeBlock
         code={`--cwd <dir>          the project directory
+--framework <name>   react or vue, when your dependencies name both
 --registry <source>  a url, or a local directory
 --overwrite          replace a file you edited
 --conflicts          on update, write the conflict markers into the file
@@ -172,4 +233,5 @@ lib/cx.ts`}
       </P>
     </Section>
   </article>
-)
+  )
+}
