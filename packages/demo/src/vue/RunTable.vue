@@ -33,6 +33,7 @@ const emit = defineEmits<{
     :empty-message="props.emptyMessage"
     :loading="props.loading"
     @selection-change="(selected) => emit('selectionChange', selected)"
+    @row-activate="(row) => emit('open', row)"
   >
     <template #actions>
       <slot name="actions" />

@@ -92,6 +92,7 @@ export const RunConsole = () => {
         emptyMessage="No run is left inside the filters and the brushed range."
         loading={loading}
         onSelectionChange={setSelected}
+        onRowActivate={setDetail}
         actions={
           <>
             {exportable > 0 && (

@@ -281,6 +281,7 @@ export const App = () => {
           emptyMessage="No run matches the filters."
           loading={loading}
           onSelectionChange={setSelected}
+          onRowActivate={setDetail}
           actions={
             <>
               {exportable > 0 && (
