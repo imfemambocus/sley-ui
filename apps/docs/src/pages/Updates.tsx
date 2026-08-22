@@ -92,6 +92,13 @@ npx sley-ui update --dry-run  what would change, writing nothing`}
         project still builds. Passing <Code>--conflicts</Code> writes the usual markers into those
         files instead, which is the escape hatch when you would rather resolve it in your editor.
       </P>
+      <P>
+        <Code>--overwrite</Code> is the other way out, and it points the other way: it drops your
+        edit and takes the release copy of that file. It reaches only the files this release moved,
+        so a file you edited that the release has nothing to say about is still left alone. The run
+        prints the paths it replaced, because losing work should be stated rather than left to a
+        mark in a list.
+      </P>
       <Note>
         With the markers written, the lock moves too. It has to: if the base stayed at the old
         version, the file you resolved by hand would conflict against it again on every later run, and
