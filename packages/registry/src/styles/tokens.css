@@ -560,9 +560,23 @@
     cursor: crosshair;
   }
 
-  /* a brush window is what the reader chose, so it takes the selvedge wash */
+  /*
+   * chrome rings a focusable svg element on a plain :focus, where it rings a button
+   * only on :focus-visible, so a pointer drag would leave its own outline behind.
+   */
+  .reed-brush-field:focus {
+    outline: none;
+  }
+
+  .reed-brush-field:focus-visible {
+    outline: 2px solid var(--color-indigo);
+    outline-offset: 1px;
+  }
+
+  /* a brush window is what the reader chose, so it takes the selvedge wash. it
+   * paints over the marks, so the fill carries an alpha rather than the opaque wash. */
   .reed-brush {
-    fill: var(--color-indigo-wash);
+    fill: color-mix(in srgb, var(--color-indigo) 16%, transparent);
     stroke: var(--color-indigo);
     stroke-width: 1px;
     pointer-events: none;

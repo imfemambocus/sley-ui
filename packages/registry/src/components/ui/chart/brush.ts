@@ -67,8 +67,11 @@ export function attachBrush<T>(
   selection.setAttribute('height', String(height))
   selection.setAttribute('width', '0')
 
-  /* the window tints the data rather than hiding it, so it goes under every mark */
-  svg.insertBefore(selection, svg.firstChild)
+  /*
+   * the window paints over the marks and tints them through its own alpha. under
+   * them it is invisible against a filled mark, which a bar chart is made of.
+   */
+  svg.append(selection)
   svg.append(field)
 
   let anchor = 0
