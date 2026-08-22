@@ -10,7 +10,15 @@ import { detectLibrary, resolveProject, type Project } from '../lib/project.js'
 import { libraryRegistry, loadItem, resolveItems, type RegistryItem } from '../lib/registry.js'
 import { byCodeUnit } from '../lib/sort.js'
 
-export type UpdateStatus = 'updated' | 'merged' | 'conflicted' | 'kept' | 'added' | 'missing' | 'dropped'
+export type UpdateStatus =
+  | 'updated'
+  | 'merged'
+  | 'replaced'
+  | 'conflicted'
+  | 'kept'
+  | 'added'
+  | 'missing'
+  | 'dropped'
 
 export interface UpdatedFile {
   readonly path: string
@@ -30,6 +38,8 @@ export interface UpdateOptions {
   readonly registry: string
   readonly install: boolean
   readonly conflicts: boolean
+  /* take the release's copy of a file you edited rather than merging into it */
+  readonly overwrite: boolean
   readonly dryRun: boolean
   readonly framework?: string
 }
@@ -49,7 +59,12 @@ function versionSource(registry: string, version: string) {
   return `${registry.replace(/\/$/, '')}/${version}`
 }
 
-function plan(project: Project, item: RegistryItem, base: RegistryItem, conflicts: boolean) {
+function plan(
+  project: Project,
+  item: RegistryItem,
+  base: RegistryItem,
+  options: Pick<UpdateOptions, 'conflicts' | 'overwrite'>,
+) {
   const client = new Map(item.sley.files.map((file) => [file.path, file.client === true]))
   const baseOf = new Map(base.files.map((file) => [file.target, file.content]))
   const label = `sley-ui ${item.sley.version}`
@@ -78,6 +93,14 @@ function plan(project: Project, item: RegistryItem, base: RegistryItem, conflict
       if (hash(original) === hash(theirs)) {
         return { file: { path: shortPath, status: 'kept' }, path, content: null, recorded }
       }
+      /*
+       * a release the reader does not want merged into their copy. a file this release
+       * did not move is still kept above, so overwrite discards an edit only where the
+       * release has something of its own to put there.
+       */
+      if (options.overwrite) {
+        return { file: { path: shortPath, status: 'replaced' }, path, content: theirs, recorded }
+      }
 
       const merged = merge(original, mine, theirs, label)
       if (merged.clean) {
@@ -90,8 +113,8 @@ function plan(project: Project, item: RegistryItem, base: RegistryItem, conflict
       return {
         file: { path: shortPath, status: 'conflicted' },
         path,
-        content: conflicts ? merged.content : null,
-        recorded: conflicts ? recorded : null,
+        content: options.conflicts ? merged.content : null,
+        recorded: options.conflicts ? recorded : null,
       }
     }),
   )
@@ -125,7 +148,7 @@ async function updateItem(
   }
 
   const base = await loadItem(versionSource(registry, locked.version), item.name)
-  const planned = await plan(project, item, base, options.conflicts)
+  const planned = await plan(project, item, base, options)
   const files = [...planned.map((entry) => entry.file), ...dropped(item, project, lock)]
 
   /* an item moves whole or not at all: a half written item records a base no file on disk came from */

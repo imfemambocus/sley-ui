@@ -130,6 +130,30 @@ test('an edit to the same line refuses the item and leaves the file alone', asyn
   assert.equal((await lockOf(cwd)).items.widget.version, '0.1.0', 'the lock did not move')
 })
 
+test('--overwrite takes the release copy of a file you edited', async () => {
+  const { cwd, newer, path } = await installed(TWO)
+  await writeFile(path, widget(['<div>mine</div>']))
+
+  const out = sley(cwd, ['update', '--overwrite'], newer)
+  const written = await readFile(path, 'utf8')
+  assert.match(written, /two/, 'the release landed')
+  assert.doesNotMatch(written, /mine/, 'my edit was discarded, which is what the flag asks for')
+  assert.doesNotMatch(written, /<<<<<<</, 'no markers, because nothing was merged')
+  assert.match(out, /file\(s\) you had edited were replaced/)
+  assert.equal((await lockOf(cwd)).items.widget.version, '0.1.1')
+})
+
+/* the flag discards an edit only where the release has something of its own to put there */
+test('--overwrite leaves a file the release did not move alone', async () => {
+  const { cwd, newer } = await installed(TWO)
+  const tokens = join(cwd, 'src', 'styles', 'tokens.css')
+  await writeFile(tokens, `${await readFile(tokens, 'utf8')}\n/* mine */\n`)
+
+  sley(cwd, ['update', '--overwrite'], newer)
+  assert.match(await readFile(tokens, 'utf8'), /\/\* mine \*\//, 'my edit survived')
+  assert.equal((await lockOf(cwd)).items.widget.version, '0.1.1', 'the widget still moved')
+})
+
 test('--conflicts writes the markers and moves the lock with them', async () => {
   const { cwd, newer, path } = await installed(TWO)
   await writeFile(path, widget(['<div>mine</div>']))

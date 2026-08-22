@@ -20,7 +20,7 @@ Options
   --cwd <dir>          the project directory. the default is the current one
   --framework <name>   react or vue. the default is read from your dependencies
   --registry <source>  a url or a directory. the default is ${DEFAULT_REGISTRY}
-  --overwrite          replace a file that you edited
+  --overwrite          replace a file you edited instead of merging into it
   --conflicts          on update, write the conflict markers into the file
   --dry-run            on update, report what would change and write nothing
   --no-install         do not install the npm dependencies
@@ -43,6 +43,7 @@ function report(files: readonly AppliedFile[]) {
 const UPDATE_MARK: Record<UpdateStatus, string> = {
   updated: '  +',
   merged: '  ~',
+  replaced: '  +',
   conflicted: '  !',
   kept: '  =',
   added: '  +',
@@ -70,6 +71,13 @@ function warnConflicted(items: readonly UpdatedItem[]) {
     console.log(`These files need a merge you have to decide: ${undecided.join(', ')}. Run sley update --conflicts to get the markers.`)
   }
   if (missing.length > 0) console.log(`These files are gone from the project: ${missing.join(', ')}.`)
+}
+
+/* an overwrite throws work away, so the run says how much rather than leaving it in the marks */
+function warnReplaced(items: readonly UpdatedItem[]) {
+  const replaced = pathsWhere(items, 'replaced')
+  if (replaced.length === 0) return
+  console.log(`\n${replaced.length} file(s) you had edited were replaced: ${replaced.join(', ')}.`)
 }
 
 function warnEdited(files: readonly AppliedFile[]) {
@@ -163,6 +171,7 @@ async function main() {
       console.log(result.installed ? `\nInstalled ${line}.` : `\nInstall these yourself: ${line}`)
     }
     warnConflicted(result.updated)
+    warnReplaced(result.updated)
     if (options.dryRun) console.log('\nNothing was written, because of --dry-run.')
     return
   }
