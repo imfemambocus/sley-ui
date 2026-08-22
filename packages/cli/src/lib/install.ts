@@ -8,10 +8,17 @@ const ADD: Record<PackageManager, readonly string[]> = {
   bun: ['add'],
 }
 
+/*
+ * windows runs the manager through cmd.exe, npm and pnpm being batch files there,
+ * and cmd reads a bare ^ as its escape character. an unquoted caret range then
+ * reaches the manager as an exact version and installs the floor of the range.
+ * a package spec carries no double quote, so wrapping it is safe.
+ */
 export function installPackages(cwd: string, manager: PackageManager, packages: readonly string[]) {
   if (packages.length === 0) return true
 
-  const args = [...ADD[manager], ...packages]
-  const result = spawnSync(manager, args, { cwd, stdio: 'inherit', shell: process.platform === 'win32' })
+  const shell = process.platform === 'win32'
+  const specs = shell ? packages.map((spec) => `"${spec}"`) : packages
+  const result = spawnSync(manager, [...ADD[manager], ...specs], { cwd, stdio: 'inherit', shell })
   return result.status === 0
 }
