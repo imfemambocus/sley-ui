@@ -85,11 +85,18 @@ function clampWidth(value: number) {
 /*
  * the head counts too, because a label and its unit can run longer than the value
  * under it. the half character covers the rounding a table layout applies.
+ *
+ * the head is drawn in the interface face and the value under it in the data face,
+ * so the head takes whichever of the two advances is wider. `1ch` is the interface
+ * face's own digit advance, read off this cell. where the data face is the wider of
+ * the pair the expression collapses to what it always was.
  */
 function intrinsicWidth<T>(column: Column<T>, sorted: boolean) {
   const unit = column.unit ? column.unit.length + 1 : 0
   const head = column.label.length + unit + (sorted ? SORT_CHARS : 0)
-  return `calc(${Math.max(column.chars, head) + 0.5} * var(--data-adv) + var(--cell-x) * 2)`
+  const value = `${column.chars + 0.5} * var(--data-adv)`
+  const label = `${head + 0.5} * max(var(--data-adv), 1ch)`
+  return `calc(max(${value}, ${label}) + var(--cell-x) * 2)`
 }
 
 interface ColumnGripProps {
@@ -511,7 +518,7 @@ export const Table = <T,>({
         </div>
       </header>
 
-      <div ref={scroller} onScroll={onScroll} className="reed-scroll max-h-130 overflow-auto">
+      <div ref={scroller} onScroll={onScroll} className="reed-scroll max-h-[var(--table-body,32.5rem)] overflow-auto">
         {/* separate borders: a pinned cell paints its background over a collapsed one */}
         <table
           aria-busy={loading}
