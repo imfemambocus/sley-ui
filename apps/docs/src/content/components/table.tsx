@@ -98,6 +98,13 @@ const Notes = () => (
       list. The empty state uses the same field and does not move.
     </P>
     <P>
+      A row does nothing on a click until you pass <Code>onRowActivate</Code>. With it the whole row
+      is the target, Enter works on the row under the cursor, and the pointer changes over the rows.
+      A click that lands on a control inside a cell still belongs to that control. Keep such a
+      control there anyway, usually on the column that names the row: a screen reader announces a
+      button, and a table row that has quietly become clickable it does not.
+    </P>
+    <P>
       Tab reaches the body once. The row the cursor is on holds the only stop inside it. The
       arrows move between rows and Tab leaves the table rather than walking five thousand of them.
       Home and End go to the ends, and Space selects the row under the cursor. A row that is not
@@ -141,6 +148,12 @@ export const doc: ComponentDoc = {
       name: 'onSelectionChange',
       type: '(selected: ReadonlySet<string>) => void',
       detail: 'Reports only the selected rows that are currently on screen.',
+    },
+    {
+      name: 'onRowActivate',
+      type: '(row: T) => void',
+      detail:
+        'The whole row answers a click and Enter, and it draws a pointer. A control inside a cell keeps its own click.',
     },
     { name: 'key (Column)', type: 'string', required: true, detail: 'Identifies the column for sorting and resizing.' },
     { name: 'label (Column)', type: 'string', required: true, detail: 'The head text.' },
@@ -196,6 +209,12 @@ export const doc: ComponentDoc = {
         'One slot for each column, named after its key. Draw the cell in a template rather than in a render function. A column with no slot draws an empty cell.',
     },
     { name: '#actions', type: 'slot', detail: 'Controls in the table header, beside the count.' },
+    {
+      name: '@row-activate',
+      type: 'row: T',
+      detail:
+        'The whole row answers a click and Enter, and it draws a pointer. A control inside a cell keeps its own click.',
+    },
     {
       name: '@selection-change',
       type: '(selected: ReadonlySet<string>) => void',

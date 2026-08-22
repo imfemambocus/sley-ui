@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.11.0': {
+    date: '2026-08-22',
+    title: 'The whole row can be the target',
+    body: "Every row lights up under the pointer, which reads as a promise that clicking it does something, and until now it did not. The demos hid this from me. There has always been a button on the run id in the first column and I stopped there, without asking what the rest of the row was for. It took building a real application on the library to see it. That button is 50 by 21 pixels inside a row of 1390 by 40, which is 1.9% of the area the reader watches light up. Pass onRowActivate and the whole row answers. A click anywhere in it opens that row, Enter opens the row the keyboard cursor is on, and the pointer changes over the body. Vue calls the same thing @row-activate. A click that lands on a control inside a cell still belongs to that control, so the selection box selects the row and opens nothing, and a button you put in a cell keeps its own handler. Keep that button there. A screen reader announces a button and it has no way to announce a row that has become clickable, hence the row click is an addition to a real control rather than a replacement for one. The role of the table does not change either. It is a table and not a grid, which is the call the row cursor was built under a few releases ago. A table with no onRowActivate is exactly what it was, with the pointer it always had and a click that does nothing. The table is the only file that moves, in each framework.",
+  },
   '0.10.0': {
     date: '2026-08-22',
     title: 'Four things an application found',

@@ -39,6 +39,7 @@ const TABLE_KEYS: readonly Binding[] = [
   { keys: 'Arrow down, Arrow up', does: 'On a row, moves the cursor one row and scrolls it into view.' },
   { keys: 'Home, End', does: 'On a row, goes to the first or the last row of the table, however many rows there are.' },
   { keys: 'Space', does: 'On a row, or on its box, selects that row. On the head box, selects and clears every row the filter leaves on screen.' },
+  { keys: 'Enter', does: 'On a row, activates it, where the caller passed onRowActivate. Without that prop the row answers nothing.' },
 ]
 
 const PALETTE_KEYS: readonly Binding[] = [
