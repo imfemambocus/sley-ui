@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
+  type MouseEvent,
   type PointerEvent,
   type ReactNode,
   type UIEvent,
@@ -220,6 +221,9 @@ const EmptyRow = ({ span, message }: EmptyRowProps) => (
 
 const NAV_KEYS: ReadonlySet<string> = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
 
+/* a control in a cell owns its own click, and the checkbox sits inside a label */
+const INTERACTIVE = 'a, button, input, select, textarea, label'
+
 interface RowProps<T> {
   readonly row: T
   readonly id: string
@@ -230,9 +234,27 @@ interface RowProps<T> {
   readonly position: number
   readonly cursor: boolean
   readonly onNavigate: (from: number, key: string) => void
+  readonly onActivate?: (row: T) => void
 }
 
-const Row = <T,>({ row, id, columns, selected, onToggle, rowIndex, position, cursor, onNavigate }: RowProps<T>) => {
+const Row = <T,>({
+  row,
+  id,
+  columns,
+  selected,
+  onToggle,
+  rowIndex,
+  position,
+  cursor,
+  onNavigate,
+  onActivate,
+}: RowProps<T>) => {
+  const onClick = (event: MouseEvent<HTMLTableRowElement>) => {
+    if (onActivate === undefined) return
+    if (event.target instanceof Element && event.target.closest(INTERACTIVE) !== null) return
+    onActivate(row)
+  }
+
   const onKeyDown = (event: KeyboardEvent<HTMLTableRowElement>) => {
     /* a key pressed on the checkbox inside the row belongs to the checkbox */
     if (event.target !== event.currentTarget) return
@@ -240,6 +262,12 @@ const Row = <T,>({ row, id, columns, selected, onToggle, rowIndex, position, cur
     if (event.key === ' ') {
       event.preventDefault()
       onToggle(id)
+      return
+    }
+
+    if (event.key === 'Enter' && onActivate !== undefined) {
+      event.preventDefault()
+      onActivate(row)
       return
     }
 
@@ -253,7 +281,11 @@ const Row = <T,>({ row, id, columns, selected, onToggle, rowIndex, position, cur
       aria-rowindex={rowIndex}
       tabIndex={cursor ? 0 : -1}
       onKeyDown={onKeyDown}
-      className="focus-row bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash"
+      onClick={onClick}
+      className={cx(
+        'focus-row bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash',
+        onActivate !== undefined && 'cursor-pointer',
+      )}
       data-selected={selected ? '' : undefined}
     >
       <td
@@ -291,6 +323,8 @@ interface TableProps<T> {
   readonly loading?: boolean
   readonly actions?: ReactNode
   readonly onSelectionChange?: (selected: ReadonlySet<string>) => void
+  /* the row draws a pointer and answers Enter once this is given */
+  readonly onRowActivate?: (row: T) => void
   readonly className?: string
 }
 
@@ -304,6 +338,7 @@ export const Table = <T,>({
   loading = false,
   actions,
   onSelectionChange,
+  onRowActivate,
   className,
 }: TableProps<T>) => {
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())
@@ -494,6 +529,7 @@ export const Table = <T,>({
               columns={columns}
               selected={selected.has(id)}
               onToggle={toggleRow}
+              onActivate={onRowActivate}
             />
           )
         })}

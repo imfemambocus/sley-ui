@@ -16,7 +16,7 @@ export type RowNoun = string | readonly [one: string, many: string]
 </script>
 
 <script setup lang="ts" generic="T">
-import { computed, ref, shallowRef, watch, watchEffect, type HTMLAttributes } from 'vue'
+import { computed, getCurrentInstance, ref, shallowRef, watch, watchEffect, type HTMLAttributes } from 'vue'
 import Checkbox, { type CheckedState } from '@/components/ui/checkbox/Checkbox.vue'
 import EmptyState from '@/components/ui/empty-state/EmptyState.vue'
 import ColumnGrip from '@/components/ui/table/ColumnGrip.vue'
@@ -38,7 +38,14 @@ const props = withDefaults(
   { noun: () => 'rows', emptyMessage: 'No row matches the filters.', loading: false },
 )
 
-const emit = defineEmits<{ selectionChange: [selected: ReadonlySet<string>] }>()
+const emit = defineEmits<{ selectionChange: [selected: ReadonlySet<string>]; rowActivate: [row: T] }>()
+
+/*
+ * a declared emit is stripped out of $attrs, so the vnode props are the only place left that
+ * says whether the caller listens. the row draws a pointer only when one does.
+ */
+const instance = getCurrentInstance()
+const activates = computed(() => instance?.vnode.props?.onRowActivate !== undefined)
 
 /* a cell draws from the slot named after its column: the caller keeps its markup in a template */
 defineSlots<{
@@ -78,6 +85,9 @@ const PINNED = 'warp-line-end bg-inherit px-(--cell-x) transition-colors duratio
 const SKELETON_IDS: readonly string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((id) => `warp-${id}`)
 
 const NAV_KEYS: ReadonlySet<string> = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
+
+/* a control in a cell owns its own click, and the checkbox sits inside a label */
+const INTERACTIVE = 'a, button, input, select, textarea, label'
 
 function compare(a: string | number, b: string | number) {
   if (typeof a === 'number' && typeof b === 'number') return a - b
@@ -309,13 +319,25 @@ const toggleAll = () => {
   applySelection(next)
 }
 
-const onRowKeyDown = (event: KeyboardEvent, id: string, position: number) => {
+const onRowClick = (event: MouseEvent, row: T) => {
+  if (!activates.value) return
+  if (event.target instanceof Element && event.target.closest(INTERACTIVE) !== null) return
+  emit('rowActivate', row)
+}
+
+const onRowKeyDown = (event: KeyboardEvent, id: string, position: number, row: T) => {
   /* a key pressed on the checkbox inside the row belongs to the checkbox */
   if (event.target !== event.currentTarget) return
 
   if (event.key === ' ') {
     event.preventDefault()
     toggleRow(id)
+    return
+  }
+
+  if (event.key === 'Enter' && activates.value) {
+    event.preventDefault()
+    emit('rowActivate', row)
     return
   }
 
@@ -415,9 +437,15 @@ const onRowKeyDown = (event: KeyboardEvent, id: string, position: number) => {
               :key="entry.id"
               :aria-rowindex="entry.position + 2"
               :tabindex="entry.position === stop ? 0 : -1"
-              class="focus-row bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash"
+              :class="
+                cx(
+                  'focus-row bg-raised transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:bg-shed data-selected:bg-indigo-wash data-selected:hover:bg-indigo-wash',
+                  activates && 'cursor-pointer',
+                )
+              "
               :data-selected="selected.has(entry.id) ? '' : undefined"
-              @keydown="onRowKeyDown($event, entry.id, entry.position)"
+              @keydown="onRowKeyDown($event, entry.id, entry.position, entry.row)"
+              @click="onRowClick($event, entry.row)"
             >
               <td
                 :class="
