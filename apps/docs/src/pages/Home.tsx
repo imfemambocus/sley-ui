@@ -2,11 +2,14 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button/Button'
 import { RunConsole } from '../console/RunConsole'
 import { CodeBlock } from '../site/CodeBlock'
-import { SANDBOX } from '../site/Header'
+import { SANDBOX, SHOWCASE, SHOWCASE_SOURCE } from '../site/Header'
 import { Link } from '../site/router'
 import { FRAMEWORK_MARK } from '../site/FrameworkMark'
 import { Segmented } from '../site/Segmented'
 import { DENSITIES, FRAMEWORKS, useDensityValues, useSettings } from '../site/settings'
+
+const LINK =
+  'text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft'
 
 const DensityStrip = () => {
   const { density, setDensity } = useSettings()
@@ -87,7 +90,7 @@ export const Home = () => (
             href={SANDBOX}
             target="_blank"
             rel="noreferrer"
-            className="text-indigo underline underline-offset-4 transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft"
+            className={LINK}
           >
             open a working app in your browser
           </a>
@@ -124,6 +127,26 @@ export const Home = () => (
         instead of overwriting them. React or Vue: the CLI reads which one out of your dependencies,
         and one version number covers both.
       </Pitch>
+    </section>
+
+    <section className="mx-auto w-full max-w-360 px-4 pb-14 sm:px-6">
+      <p className="text-prose text-weft-dim">
+        <span>Something built with it: </span>
+        <a href={SHOWCASE} target="_blank" rel="noreferrer" className={LINK}>
+          Grayline
+        </a>
+        <span>
+          , a shortwave board that shows every broadcast on air at this minute and how much of the
+          path to each transmitter is in darkness. It runs the table, the chart, the brush and the
+          command palette over 9,319 real rows. I built it from the outside, through the published
+          CLI against the live registry, and four of the fixes in 0.10.0 came out of doing that. The
+          source is on{' '}
+        </span>
+        <a href={SHOWCASE_SOURCE} target="_blank" rel="noreferrer" className={LINK}>
+          GitHub
+        </a>
+        <span>.</span>
+      </p>
     </section>
   </div>
 )
