@@ -1,9 +1,25 @@
 /* written by releases.mjs from the frozen bundles. do not edit. */
 import type { ReleaseEntry } from './types'
 
-export const LATEST = '0.9.0'
+export const LATEST = '0.10.0'
 
 export const RELEASES: readonly ReleaseEntry[] = [
+  {
+    version: '0.10.0',
+    items: 19,
+    files: 76,
+    first: false,
+    added: [],
+    changed: [
+      { item: 'tokens', path: 'styles/tokens.css' },
+      { item: 'chart', path: 'components/ui/chart/brush.ts' },
+      { item: 'table', path: 'components/ui/table/Table.tsx' },
+      { item: 'tokens', path: 'vue/styles/tokens.css' },
+      { item: 'chart', path: 'vue/components/ui/chart/brush.ts' },
+      { item: 'table', path: 'vue/components/ui/table/Table.vue' },
+    ],
+    removed: [],
+  },
   {
     version: '0.9.0',
     items: 19,

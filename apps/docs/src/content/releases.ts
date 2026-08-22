@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.10.0': {
+    date: '2026-08-22',
+    title: 'Four things an application found',
+    body: "None of this came out of the demos. I built an application on the library, a shortwave listening board called Grayline, and every fix here is something that broke on the way. The table body had a fixed cap of 32.5rem, which is right for a page that holds other things and wrong when the table is the page. It reads --table-body now and still defaults to 32.5rem, so no existing table moves unless you set it. A column head is drawn in the interface face and was being measured with the advance of the data face. Archivo advances a digit by 0.574em and IBM Plex Mono by 0.6em, which means the data face was the wider of the pair and every head fitted by luck rather than by rule. Put a narrower data face in, Iosevka at half an em against Iosevka Aile at 0.6em, and two heads truncated at once. A head now takes whichever of the two advances is wider. I read every column of the demo table back afterwards and each renders at the width it always did. Two more on the chart. The brush window was inserted before every mark, which the comment above it described as tinting the data rather than hiding it. That holds for a line and fails completely under a filled mark on a continuous scale, where the window disappears. It paints last now and carries a 16% alpha, so it still tints. The other one is a browser detail I did not know: Chrome rings a focusable SVG element on a plain :focus, where it rings a button only on :focus-visible. The token file styled the second and not the first, so a pointer drag on the plot left Chrome's blue outline behind. The keyboard ring is unchanged. If you have edited your palette this update merges into it.",
+  },
   '0.9.0': {
     date: '2026-08-21',
     title: 'Every component in Vue as well',
