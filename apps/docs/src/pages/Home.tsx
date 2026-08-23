@@ -139,8 +139,7 @@ export const Home = () => (
           , a shortwave board that shows every broadcast on air at this minute and how much of the
           path to each transmitter is in darkness. It runs the table, the chart, the brush and the
           command palette over 9,319 real rows. I built it from the outside, through the published
-          CLI against the live registry, and four of the fixes in 0.10.0 came out of doing that. The
-          source is on{' '}
+          CLI against the live registry. The source is on{' '}
         </span>
         <a href={SHOWCASE_SOURCE} target="_blank" rel="noreferrer" className={LINK}>
           GitHub
