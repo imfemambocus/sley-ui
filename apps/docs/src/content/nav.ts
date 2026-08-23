@@ -46,7 +46,7 @@ export const NAV: readonly NavGroup[] = [
     items: COMPONENT_DOCS.filter((doc) => !CHART_SLUGS.has(doc.slug)).map(linkOf),
   },
   {
-    label: 'Charts',
+    label: 'Visualisation',
     items: COMPONENT_DOCS.filter((doc) => CHART_SLUGS.has(doc.slug)).map(linkOf),
   },
 ]
