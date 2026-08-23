@@ -12,7 +12,7 @@ export interface NavGroup {
 }
 
 /* a chart is its own layer, and it is not one of the twelve controls */
-const CHART_SLUGS: ReadonlySet<string> = new Set(['chart'])
+const CHART_SLUGS: ReadonlySet<string> = new Set(['chart', 'sparkline'])
 
 const linkOf = (doc: (typeof COMPONENT_DOCS)[number]) => ({ href: `/components/${doc.slug}`, label: doc.name })
 

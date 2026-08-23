@@ -17,6 +17,7 @@ export const VUE_DEMOS: Readonly<Record<string, () => Promise<{ readonly default
   panel: () => import('./PanelDemo.vue'),
   popover: () => import('./PopoverDemo.vue'),
   select: () => import('./SelectDemo.vue'),
+  sparkline: () => import('./SparklineDemo.vue'),
   table: () => import('./TableDemo.vue'),
   tabs: () => import('./TabsDemo.vue'),
   toast: () => import('./ToastDemo.vue'),
@@ -25,7 +26,9 @@ export const VUE_DEMOS: Readonly<Record<string, () => Promise<{ readonly default
 
 export const VUE_CONSOLE = () => import('./RunConsole.vue')
 
-/* the chart page runs four demos, and the three under the first are named, not keyed by slug */
+/* the chart page runs six demos, and the five under the first are named, not keyed by slug */
 export const VUE_TRACE = () => import('./TraceDemo.vue')
 export const VUE_RUN_MIX = () => import('./RunMixDemo.vue')
 export const VUE_CHART_STATES = () => import('./ChartStatesDemo.vue')
+export const VUE_INSERT = () => import('./InsertDemo.vue')
+export const VUE_THROUGHPUT = () => import('./ThroughputDemo.vue')

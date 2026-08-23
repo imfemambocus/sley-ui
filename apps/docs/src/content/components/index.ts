@@ -12,6 +12,7 @@ import { doc as icons } from './icons'
 import { doc as panel } from './panel'
 import { doc as popover } from './popover'
 import { doc as select } from './select'
+import { doc as sparkline } from './sparkline'
 import { doc as table } from './table'
 import { doc as tabs } from './tabs'
 import { doc as toast } from './toast'
@@ -31,6 +32,7 @@ export const COMPONENT_DOCS: readonly ComponentDoc[] = [
   panel,
   popover,
   select,
+  sparkline,
   table,
   tabs,
   toast,

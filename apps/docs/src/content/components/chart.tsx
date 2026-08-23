@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { ChartStates } from '@demo/ChartStates'
+import { InsertChart, type BaseRange } from '@demo/InsertChart'
 import { QualityChart, type DayRange } from '@demo/QualityChart'
 import { RunMixChart } from '@demo/RunMixChart'
+import { ThroughputChart } from '@demo/ThroughputChart'
 import { TraceChart } from '@demo/TraceChart'
 import { Demo } from '../../site/Demo'
 import { Code, P } from '../../site/Prose'
 import { useSettings } from '../../site/settings'
 import { FrameworkDemo } from '../../site/VueIsland'
-import { VUE_CHART_STATES, VUE_RUN_MIX, VUE_TRACE } from '../../vue/demos'
+import { VUE_CHART_STATES, VUE_INSERT, VUE_RUN_MIX, VUE_THROUGHPUT, VUE_TRACE } from '../../vue/demos'
 import type { ComponentDoc } from '../types'
 
 const ChartDemo = () => {
@@ -41,6 +43,32 @@ const RunMixDemo = () => (
       caption="The 27 runs the table holds, counted by assay and stacked by status. A band scale has no inverse, so this one takes no brush."
     >
       <RunMixChart />
+    </Demo>
+  </FrameworkDemo>
+)
+
+const InsertDemo = () => {
+  const [range, setRange] = useState<BaseRange | null>(null)
+
+  return (
+    <FrameworkDemo vue={VUE_INSERT}>
+      <Demo
+        bleed
+        caption="Forty thousand fragments from one prep, binned ten bases at a time. Drag across it to brush a window of lengths, or tab to the plot and move an edge with the arrow keys."
+      >
+        <InsertChart range={range} onRangeChange={setRange} />
+      </Demo>
+    </FrameworkDemo>
+  )
+}
+
+const ThroughputDemo = () => (
+  <FrameworkDemo vue={VUE_THROUGHPUT}>
+    <Demo
+      bleed
+      caption="The same thirty days, stacked by assay. The weekends are the floor, and 6 August is the day the methyl run failed."
+    >
+      <ThroughputChart />
     </Demo>
   </FrameworkDemo>
 )
@@ -80,6 +108,20 @@ const Notes = () => {
       asks the x scale for its inverse and, finding none, leaves the chart as a chart.
     </P>
     <RunMixDemo />
+    <P>
+      The third form binned forty thousand fragment lengths into ten base buckets and drew a rect
+      for each. Its x scale is an ordinary linear one. That has an inverse, hence the brush comes
+      back. It is the only chart here that reports numbers rather than dates, and the demo rounds
+      the window out to whole bases before it takes it. The Q30 chart does the same widening to
+      days.
+    </P>
+    <P>
+      This form is also the one I should have built earlier. The brush window used to paint
+      underneath the marks, where it is invisible against a filled rect on a continuous scale.
+      Nothing on this page held that pair. The fault sat there until an application ran into it and{' '}
+      <Code>0.10.0</Code> turned the order round.
+    </P>
+    <InsertDemo />
     <P>
       Plot puts the font and the fill on the root svg as presentation attributes. Any stylesheet rule
       outranks those, which is how the type comes from the tokens instead. Tick labels are machine
@@ -198,6 +240,15 @@ const Notes = () => {
       and 71.4ms and everything had settled by 295.8ms.
     </P>
     <P>
+      An area rises out of the axis the same way, and this one cannot be staggered at all. A stacked
+      band is a single filled path rather than a rect for every value. The bands take the axis as
+      their shared baseline and grow together. Hold one back behind another and the figure tears
+      along its own seams on the way up. Plot names a bar mark <Code>bar</Code>, a binned one{' '}
+      <Code>rect</Code> and a band <Code>area</Code>. That is how the wrapper finds all three
+      without being told what you drew.
+    </P>
+    <ThroughputDemo />
+    <P>
       Five picks is the ceiling of the series scale. A pick is one pass of the weft through the shed,
       and the banner motif carries five. Past five I cannot tell two lines apart in the dark theme.
     </P>
@@ -300,10 +351,10 @@ export const doc: ComponentDoc = {
         'Those labels are 25.2px wide, and they narrow to 23.41px and 21.61px as the knob tightens. Every clearance stays positive at all three densities, and the tightest of them is the 2.56px under the dates above.',
     },
     {
-      value: '1, 1, 0',
-      what: 'Brush fields on the two line charts and on the bars',
+      value: '1, 0, 1, 1, 1',
+      what: 'Brush fields on the five charts this page draws at load',
       detail:
-        'A band scale has no inverse, so the wrapper asks for one, does not get it, and leaves the chart as a chart. Nothing errors and nothing takes focus.',
+        'The zero is the bar chart. A band scale has no inverse, so the wrapper asks for one, does not get it, and leaves the chart as a chart. Nothing errors and nothing takes focus. The histogram, the area and the trace each carry one, as does the chart at the top.',
     },
     {
       value: '0px',
@@ -334,6 +385,36 @@ export const doc: ComponentDoc = {
       what: 'How long six columns of bars take to build',
       detail:
         'They start at 5, 6.8, 21.5, 37.9, 54.4 and 71.4ms, because the sweep across the columns fits inside one --dur-instant however many there are. Sampled once per animation frame from the first frame the bars existed.',
+    },
+    {
+      value: '0 to 51, 0 to 3',
+      what: 'Rects and bands that animate, before the wrapper learned their names',
+      detail:
+        'motion.ts looked for g[aria-label="line"] and g[aria-label="bar"], and Plot labels a binned mark rect and a band area. Both new forms drew flat and nothing errored. With the selector widened the histogram carries 51 built rects and the area three built bands. Read on the same page either way, with the line and bar counts unmoved at 3 and 13.',
+    },
+    {
+      value: '0.000008',
+      what: 'How far the three stacked bands drift apart on the way up',
+      detail:
+        'Each band was sampled once an animation frame and compared with its own final height. Over the 23 frames the rise takes, the widest spread between the three ratios was eight millionths, and all three carry the same --build-base of 180px and a delay of 0s. It settles at 233.2ms. Sampled at a median frame of 8.3ms, which is a 120Hz display.',
+    },
+    {
+      value: '51 bins of 17.815px',
+      what: 'The histogram over a 1088px plot',
+      detail:
+        'Forty thousand fragment lengths binned at an interval of 10 base pairs across a declared domain of 60 to 600. Every rect renders the same width, and the 51 drawn are the bins that hold anything.',
+    },
+    {
+      value: '8px',
+      what: 'The gap between the dimer label and the bar it names',
+      detail:
+        'The rule sits inside the tallest rect on the chart, because it marks that peak, so a label hung off the rule lands on the bar whatever the offset. It reads to the left instead. Scanned off a screenshot at device pixel ratio 2, the label ink ends at 564.5 and the rect begins at 572.5. The bar under the label clears its baseline by 17.4px at comfortable, 18.6 at compact and 19.3 at dense, and by the same margin down to a 421px plot.',
+    },
+    {
+      value: '50bp, 94.07px',
+      what: 'One arrow press on the histogram, which is one x tick',
+      detail:
+        'End took the window to the whole 60 to 600 range at 1016px. Two presses of the left arrow ended it on 550 and then 500, moving 94.07px and 94.08px against a tick gap of 94.074px. Neither press compounded, because the demo rounds to whole bases and the ticks already fall on them. Escape cleared it.',
     },
     {
       value: '0.0001px',
