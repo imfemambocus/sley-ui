@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.12.0': {
+    date: '2026-08-23',
+    title: 'Two more chart forms, and a line at row height',
+    body: "The chart wrapper is generic over Plot marks. A new form is usually your code and nothing of mine, but two of them turned out not to be. A histogram is a filled rect on a continuous scale. That is the exact pair the brush window used to disappear under, fixed in 0.10.0 with no demo on the site that could have caught it. There is one now. Forty thousand fragment lengths in ten base buckets, brushed, and it reports numbers rather than dates, which is the first time anything here has. The other is a stacked area. Neither arrived with an entry animation, because the wrapper looked for a mark named line or bar while Plot names a binned one rect and a band area. It reads all four now. A band rises whole off the axis with no stagger. Delay one behind another and a stacked figure tears along its seams on the way up. Nothing you already draw moves and no prop changed. The third thing is a new item. Sparkline is a trend line at the height of one line of text, for the inside of a table cell, and it carries no dependency at all. Plot is 90.55kB gzipped and a mark that small cannot be worth that, hence it draws its own path. It stands 1.5em tall. That resolves against the cell it sits in, which means it tightens with the density knob instead of holding its size while the row closes up. Pass a domain and a column of them stands on one scale. The svg is hidden from the accessibility tree and the reading goes beside it in words, the way a low value in the table carries its own.",
+  },
   '0.11.0': {
     date: '2026-08-22',
     title: 'The whole row can be the target',

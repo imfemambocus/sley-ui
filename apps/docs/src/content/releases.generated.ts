@@ -1,9 +1,28 @@
 /* written by releases.mjs from the frozen bundles. do not edit. */
 import type { ReleaseEntry } from './types'
 
-export const LATEST = '0.11.0'
+export const LATEST = '0.12.0'
 
 export const RELEASES: readonly ReleaseEntry[] = [
+  {
+    version: '0.12.0',
+    items: 20,
+    files: 80,
+    first: false,
+    added: [
+      { item: 'sparkline', path: 'components/ui/sparkline/Sparkline.tsx' },
+      { item: 'sparkline', path: 'components/ui/sparkline/path.ts' },
+      { item: 'sparkline', path: 'vue/components/ui/sparkline/Sparkline.vue' },
+      { item: 'sparkline', path: 'vue/components/ui/sparkline/path.ts' },
+    ],
+    changed: [
+      { item: 'chart', path: 'components/ui/chart/Chart.tsx' },
+      { item: 'chart', path: 'components/ui/chart/motion.ts' },
+      { item: 'chart', path: 'vue/components/ui/chart/Chart.vue' },
+      { item: 'chart', path: 'vue/components/ui/chart/motion.ts' },
+    ],
+    removed: [],
+  },
   {
     version: '0.11.0',
     items: 19,
