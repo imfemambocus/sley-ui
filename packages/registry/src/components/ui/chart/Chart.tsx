@@ -1,7 +1,7 @@
 import * as Plot from '@observablehq/plot'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { attachBrush } from '@/components/ui/chart/brush'
-import { drawBars, drawLines } from '@/components/ui/chart/motion'
+import { drawAreas, drawBars, drawLines } from '@/components/ui/chart/motion'
 import { EmptyState } from '@/components/ui/empty-state/EmptyState'
 import { cx } from '@/lib/cx'
 
@@ -114,6 +114,7 @@ export function Chart<X = Date>({
       drawn.current = true
       drawLines(svg)
       drawBars(svg)
+      drawAreas(svg)
     }
 
     const scale = plot.scale('x')

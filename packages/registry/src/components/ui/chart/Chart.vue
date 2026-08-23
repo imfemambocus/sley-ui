@@ -6,7 +6,7 @@ export type ChartOptions = Omit<Plot.PlotOptions, 'width' | 'height' | 'classNam
 import * as Plot from '@observablehq/plot'
 import { computed, ref, watch, watchEffect, type HTMLAttributes } from 'vue'
 import { attachBrush } from '@/components/ui/chart/brush'
-import { drawBars, drawLines } from '@/components/ui/chart/motion'
+import { drawAreas, drawBars, drawLines } from '@/components/ui/chart/motion'
 import EmptyState from '@/components/ui/empty-state/EmptyState.vue'
 import { cx } from '@/lib/cx'
 
@@ -108,6 +108,7 @@ watchEffect(
       drawn = true
       drawLines(svg)
       drawBars(svg)
+      drawAreas(svg)
     }
 
     const scale = plot.scale('x')
