@@ -4,6 +4,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import { Router } from './site/router'
+import { ScrollRail } from './site/ScrollRail'
 import { SettingsProvider } from './site/settings'
 import './styles/docs.css'
 
@@ -15,6 +16,7 @@ createRoot(container).render(
     <Router>
       <SettingsProvider>
         <App />
+        <ScrollRail />
         <Analytics />
         <SpeedInsights />
       </SettingsProvider>

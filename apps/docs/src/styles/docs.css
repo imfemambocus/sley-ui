@@ -30,6 +30,12 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 7rem;
+    scrollbar-width: none;
+  }
+
+  /* the standard property above reaches firefox and chrome; this one is safari's handle */
+  html::-webkit-scrollbar {
+    display: none;
   }
 
   /* a scroll to an anchor must not race the reader who asked for no motion */
@@ -58,7 +64,76 @@
   --brand-vue-shade: #34495e;
 }
 
+/*
+ * the rail draws over the sticky header and under every layer that leaves the flow, so it
+ * takes a rank between --z-sticky and --z-panel. it lives here because the token file is
+ * frozen at the registry version.
+ */
+:root {
+  --z-rail: 15;
+  --rail-inset: 24px;
+}
+
 @layer components {
+  /*
+   * the page scrollbar, drawn as the extent marker the table scroller already uses: two
+   * picks of the weft in the lit reed. the hit area is seven times the mark, so it answers
+   * the pointer only while the mark is on screen and never swallows a click near the edge.
+   */
+  .scroll-rail {
+    position: fixed;
+    top: var(--rail-inset);
+    right: 0;
+    bottom: var(--rail-inset);
+    z-index: var(--z-rail);
+    display: flex;
+    width: 14px;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  /* the rail of a container inside the page, which its own sticky wrapper positions */
+  .scroll-rail-inset {
+    position: absolute;
+    z-index: auto;
+  }
+
+  /* a container the rail measures keeps no bar of its own, the way the page keeps none */
+  .scroll-bare {
+    scrollbar-width: none;
+  }
+
+  .scroll-bare::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-mark {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-local) var(--ease-beat);
+  }
+
+  .scroll-rail[data-active] .scroll-mark {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .scroll-mark::after {
+    content: '';
+    width: 2px;
+    height: 100%;
+    background-color: var(--color-reed-lit);
+    transition: background-color var(--dur-instant) var(--ease-beat);
+  }
+
+  .scroll-mark:hover::after,
+  .scroll-rail[data-dragging] .scroll-mark::after {
+    background-color: var(--color-indigo);
+  }
+
   /* the frame every demo sits in, drawn once because two frameworks both draw it */
   .demo-frame {
     display: flex;
