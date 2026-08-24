@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { CommandPalette, type Command } from '@/components/ui/command-palette/CommandPalette'
 import { Panel } from '@/components/ui/panel/Panel'
 import { Toaster } from '@/components/ui/toast/Toast'
@@ -6,6 +6,7 @@ import { toaster } from '@demo/toaster'
 import { NAV, neighbours } from '../content/nav'
 import { GITHUB, Header } from './Header'
 import { Link, useRoute } from './router'
+import { ScrollRail } from './ScrollRail'
 import { Sidebar } from './Sidebar'
 import { DENSITIES, THEMES, useSettings } from './settings'
 
@@ -66,6 +67,7 @@ interface ShellProps {
 }
 
 export const Shell = ({ children, wide = false }: ShellProps) => {
+  const navRef = useRef<HTMLDivElement>(null)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const { setDensity, setTheme } = useSettings()
@@ -117,7 +119,12 @@ export const Shell = ({ children, wide = false }: ShellProps) => {
       ) : (
         <div className="mx-auto flex max-w-360 gap-12 px-4 sm:px-6">
           <div className="hidden w-56 shrink-0 lg:block">
-            <Sidebar className="sticky top-15 max-h-[calc(100dvh-3.75rem)] overflow-y-auto py-10 pr-2" />
+            <div className="sticky top-15">
+              <div ref={navRef} className="scroll-bare max-h-[calc(100dvh-3.75rem)] overflow-y-auto">
+                <Sidebar className="py-10 pr-2" />
+              </div>
+              <ScrollRail scroller={navRef} />
+            </div>
           </div>
           <main className="min-w-0 flex-1 py-12">
             {children}
