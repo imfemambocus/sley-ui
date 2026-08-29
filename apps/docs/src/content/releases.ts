@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.12.1': {
+    date: '2026-08-29',
+    title: 'The empty message stays where it can be read',
+    body: "An empty table has one cell spanning every column, so the message inside it centres on the width of the whole table rather than on the part you can see. At 540px this table is 955px wide inside a 490px box, and the line landed at 425 to 575 with the box ending at 515, so 60 of its 150 pixels sat past the right edge and the rest pressed against it. You had to scroll sideways to find out why the table was empty. It only shows at a width where the table scrolls, which is not a width I had been looking at. The box now publishes the width it can show and the message holds to that, so it centres in what a reader sees and travels with a sideways scroll. Left aligning it would have fixed the same symptom and given up the centring the empty state is drawn around. A table that fits its box looks exactly as it did. The table is the only file that moves, in each framework, plus one rule in the token file.",
+  },
   '0.12.0': {
     date: '2026-08-23',
     title: 'Two more chart forms, and a line at row height',
