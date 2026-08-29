@@ -192,6 +192,19 @@ const scrollTop = ref(0)
 
 const long = computed(() => ordered.value.length > WINDOW_MIN)
 
+/* the empty message holds to the visible width, which only the box itself can report */
+watchEffect((onCleanup) => {
+  const box = scroller.value
+  if (!box || ordered.value.length > 0) return
+
+  const read = () => box.style.setProperty('--table-view', `${box.clientWidth}px`)
+  read()
+
+  const observer = new ResizeObserver(read)
+  observer.observe(box)
+  onCleanup(() => observer.disconnect())
+})
+
 /*
  * the head row carries the same --row-h and keeps its identity for the life of the
  * table, so it is the one element that can be observed. a body row is re-keyed on
@@ -422,7 +435,9 @@ const onRowKeyDown = (event: KeyboardEvent, id: string, position: number, row: T
 
           <tr v-else-if="ordered.length === 0">
             <td :colspan="span" class="border-t border-reed/60 p-0">
-              <EmptyState :title="props.emptyMessage" />
+              <div class="table-empty">
+                <EmptyState :title="props.emptyMessage" />
+              </div>
             </td>
           </tr>
 

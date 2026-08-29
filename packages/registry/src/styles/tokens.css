@@ -445,6 +445,18 @@
   }
 
   /*
+   * an empty cell spans every column, so a message centred in it centres on the width of
+   * the whole table. a table wider than its box then leaves that message off the side, and
+   * a reader has to scroll sideways to find out why the table is empty. the visible width
+   * is published on the scroll container and the message holds to it instead.
+   */
+  .table-empty {
+    position: sticky;
+    left: 0;
+    width: var(--table-view, 100%);
+  }
+
+  /*
    * the cover layer is attached to the content, so it arrives at the edge and hides
    * the reed at the end of the list. a short list needs no cover: the scrollable area
    * is then the padding box and the two layers land together.

@@ -214,7 +214,9 @@ interface EmptyRowProps {
 const EmptyRow = ({ span, message }: EmptyRowProps) => (
   <tr>
     <td colSpan={span} className="border-t border-reed/60 p-0">
-      <EmptyState title={message} />
+      <div className="table-empty">
+        <EmptyState title={message} />
+      </div>
     </td>
   </tr>
 )
@@ -416,6 +418,19 @@ export const Table = <T,>({
     observer.observe(head)
     return () => observer.disconnect()
   }, [long])
+
+  /* the empty message holds to the visible width, which only the box itself can report */
+  useEffect(() => {
+    const box = scroller.current
+    if (!box || ordered.length > 0) return undefined
+
+    const read = () => box.style.setProperty('--table-view', `${box.clientWidth}px`)
+    read()
+
+    const observer = new ResizeObserver(read)
+    observer.observe(box)
+    return () => observer.disconnect()
+  }, [ordered.length])
 
   const view = useMemo(() => {
     if (!long) return { start: 0, end: ordered.length, before: 0, after: 0 }
