@@ -30,6 +30,11 @@ const Notes = () => (
       one you like. Nothing here will fight it.
     </P>
     <P>
+      The four share one construction: a 1.5 stroke, square terminals and mitred corners, which is
+      how the loom mark is drawn. That is the whole system, and it is what keeps a tick in a
+      checkbox from reading heavier than the chevron in the select beside it.
+    </P>
+    <P>
       Each one takes <Code>currentColor</Code> and is marked <Code>aria-hidden</Code>, because in
       every place these are used the accessible name comes from the control around them.
     </P>
