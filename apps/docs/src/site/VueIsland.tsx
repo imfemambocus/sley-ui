@@ -3,7 +3,6 @@ import type { App } from 'vue'
 import { useSettings } from './settings'
 
 interface VueIslandProps {
-  /* the module holding the single file component to mount, loaded on demand */
   readonly load: () => Promise<{ readonly default: unknown }>
 }
 

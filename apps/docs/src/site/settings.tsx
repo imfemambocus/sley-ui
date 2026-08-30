@@ -23,7 +23,6 @@ export const DENSITY_TOKENS = ['--row-h', '--cell-x', '--ui-text', '--ctl-h', '-
 interface Settings {
   readonly density: Density
   readonly theme: Theme
-  /* every code block on the site reads this one */
   readonly framework: Framework
   readonly setDensity: (next: Density) => void
   readonly setTheme: (next: Theme) => void

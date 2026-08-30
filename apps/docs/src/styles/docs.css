@@ -98,7 +98,6 @@
     z-index: auto;
   }
 
-  /* a container the rail measures keeps no bar of its own, the way the page keeps none */
   .scroll-bare {
     scrollbar-width: none;
   }

@@ -6,7 +6,6 @@ const MIN_MARK = 32
 const IDLE = 900
 
 interface ScrollRailProps {
-  /* the container that scrolls, or the page when it is left out */
   readonly scroller?: RefObject<HTMLElement | null>
 }
 
