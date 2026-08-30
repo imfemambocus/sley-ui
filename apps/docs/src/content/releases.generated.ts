@@ -1,9 +1,24 @@
 /* written by releases.mjs from the frozen bundles. do not edit. */
 import type { ReleaseEntry } from './types'
 
-export const LATEST = '0.12.1'
+export const LATEST = '0.12.2'
 
 export const RELEASES: readonly ReleaseEntry[] = [
+  {
+    version: '0.12.2',
+    items: 20,
+    files: 80,
+    first: false,
+    added: [],
+    changed: [
+      { item: 'icons', path: 'components/ui/icons/Icons.tsx' },
+      { item: 'icons', path: 'vue/components/ui/icons/CheckIcon.vue' },
+      { item: 'icons', path: 'vue/components/ui/icons/ChevronIcon.vue' },
+      { item: 'icons', path: 'vue/components/ui/icons/CloseIcon.vue' },
+      { item: 'icons', path: 'vue/components/ui/icons/SearchIcon.vue' },
+    ],
+    removed: [],
+  },
   {
     version: '0.12.1',
     items: 20,

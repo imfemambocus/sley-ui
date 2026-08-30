@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.12.2': {
+    date: '2026-08-30',
+    title: 'The four glyphs are drawn as one set',
+    body: "The tick, the magnifier, the chevron and the cross were not a system. The tick was a 2px stroke with square ends and the other three were 1.5px with round ends, so a checkbox carried a heavier, softer mark than the select beside it. They now share a weight of 1.5, square terminals and mitred corners, which is the construction the loom mark uses. I tried drawing them out of the reed itself first, both as a dashed stroke at the reed's own one in five ratio and as a solid stroke that breaks into ticks at each end. Neither survives the size these are used at. Measured at 16px, the dashed tick arrives as five separate marks holding 26 pixels of ink against 148, and the terminal version reads as one shape at 16 and shatters into four at 24, so it means a different thing at each size. The set stays at four. If you want an icon library, install the one you like.",
+  },
   '0.12.1': {
     date: '2026-08-29',
     title: 'The empty message stays where it can be read',
