@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import Elapsed from '@/components/ui/figure/Elapsed.vue'
 import Figure from '@/components/ui/figure/Figure.vue'
+import Sparkline from '@/components/ui/sparkline/Sparkline.vue'
 import Table, { type Column } from '@/components/ui/table/Table.vue'
 import { stamp } from '../format'
-import type { Run } from '../runs'
+import { q30Cycles, type Run } from '../runs'
 import { STATUS_TONE } from '../status'
 import { Q30_FLOOR } from './columns'
 
@@ -16,6 +17,16 @@ const props = withDefaults(
   }>(),
   { loading: false, emptyMessage: 'No run matches the filters.' },
 )
+
+const trend = (run: Run) => {
+  const cycles = q30Cycles(run)
+  if (cycles.length === 0) return null
+
+  return {
+    values: cycles,
+    label: `Q30 went from ${cycles[0]} to ${cycles[cycles.length - 1]} across ${cycles.length} cycles`,
+  }
+}
 
 const emit = defineEmits<{
   open: [run: Run]
@@ -70,6 +81,11 @@ const emit = defineEmits<{
 
     <template #cell-q30="{ row }">
       <Figure :value="row.q30" :low="row.q30 > 0 && row.q30 < Q30_FLOOR" />
+    </template>
+
+    <template #cell-trend="{ row }">
+      <Sparkline v-if="trend(row)" v-bind="trend(row)!" class="text-indigo" />
+      <span v-else class="reed-mark" aria-hidden="true" />
     </template>
 
     <template #cell-coverage="{ row }">

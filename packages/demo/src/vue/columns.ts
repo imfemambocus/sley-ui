@@ -41,3 +41,12 @@ export const RUN_COLUMNS: readonly Column<Run>[] = [
   { key: 'duration', label: 'Duration', chars: 6, numeric: true, sortValue: (r) => r.duration },
   { key: 'owner', label: 'Owner', chars: 11, sortValue: (r) => r.owner },
 ]
+
+/*
+ * the published table measurements are read off the ten columns above, so the trend is
+ * the lab's alone rather than a column the documented table grew. each mark is scaled to
+ * its own extent: the level is the column beside it.
+ */
+export const LAB_COLUMNS: readonly Column<Run>[] = RUN_COLUMNS.flatMap((column) =>
+  column.key === 'q30' ? [column, { key: 'trend', label: 'Q30, cycles', chars: 14 }] : [column],
+)

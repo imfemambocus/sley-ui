@@ -9,7 +9,7 @@ import ColumnMenu from '@demo/vue/ColumnMenu.vue'
 import QualityChart, { type DayRange } from '@demo/vue/QualityChart.vue'
 import RunPanel from '@demo/vue/RunPanel.vue'
 import RunTable from '@demo/vue/RunTable.vue'
-import { RUN_COLUMNS } from '@demo/vue/columns'
+import { LAB_COLUMNS } from '@demo/vue/columns'
 import { toaster } from '@demo/vue/toaster'
 import { RUN_GROUPS, matchesFilters, type FilterValues } from '@demo/filters'
 import { withinRange } from '@demo/quality'
@@ -99,7 +99,7 @@ const visible = computed(() =>
 
 const exportable = computed(() => visible.value.filter((run) => selected.value.has(run.id)).length)
 
-const columns = computed(() => RUN_COLUMNS.filter((column) => !hidden.value.has(column.key)))
+const columns = computed(() => LAB_COLUMNS.filter((column) => !hidden.value.has(column.key)))
 
 const toggleColumn = (key: string) => {
   const next = new Set(hidden.value)
@@ -239,7 +239,7 @@ const commands = computed<readonly Command[]>(() => [
       >
         <template #actions>
           <Button v-if="exportable > 0" @click="exportRuns">Export</Button>
-          <ColumnMenu :columns="RUN_COLUMNS" :hidden="hidden" @toggle="toggleColumn" />
+          <ColumnMenu :columns="LAB_COLUMNS" :hidden="hidden" @toggle="toggleColumn" />
         </template>
       </RunTable>
     </div>
