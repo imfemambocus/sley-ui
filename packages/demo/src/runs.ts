@@ -67,3 +67,31 @@ export function longRuns(count: number): readonly Run[] {
     }
   })
 }
+
+const CYCLES = 24
+
+/* the same fixed wobble the quality fixture uses, so every render draws one shape */
+function wobble(seed: number) {
+  const x = Math.sin(seed * 12.9898) * 43_758.5453
+  return x - Math.floor(x)
+}
+
+/*
+ * q30 by cycle. quality falls away as a read runs on, a failed run falls off the end of
+ * that curve, and a queued run has called nothing. the series is shifted so its mean is
+ * the q30 the row reports, which is what that column holds.
+ */
+export function q30Cycles(run: Run): readonly number[] {
+  if (run.q30 === 0) return []
+
+  const seed = Number(run.id.slice(2))
+  const called = run.status === 'running' ? 13 : CYCLES
+  const shape = Array.from({ length: called }, (_, cycle) => {
+    const into = cycle / (CYCLES - 1)
+    const collapse = run.status === 'failed' ? -46 * Math.max(0, into - 0.45) ** 2 : 0
+    return -3.4 * into ** 2 + collapse + (wobble(seed + cycle) - 0.5) * 0.5
+  })
+
+  const mean = shape.reduce((total, value) => total + value, 0) / shape.length
+  return shape.map((value) => Math.round((run.q30 + value - mean) * 10) / 10)
+}

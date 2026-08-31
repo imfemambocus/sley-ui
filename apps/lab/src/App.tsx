@@ -9,7 +9,7 @@ import { CancelDialog } from '@demo/CancelDialog'
 import { ColumnMenu } from '@demo/ColumnMenu'
 import { QualityChart, type DayRange } from '@demo/QualityChart'
 import { RunPanel } from '@demo/RunPanel'
-import { runColumns } from '@demo/columns'
+import { labColumns } from '@demo/columns'
 import { RUN_GROUPS, matchesFilters } from '@demo/filters'
 import { withinRange } from '@demo/quality'
 import { longRuns, runs, type Run } from '@demo/runs'
@@ -147,7 +147,7 @@ export const App = () => {
 
   const exportable = useMemo(() => visible.filter((run) => selected.has(run.id)).length, [visible, selected])
 
-  const allColumns = useMemo(() => runColumns(setDetail), [])
+  const allColumns = useMemo(() => labColumns(setDetail), [])
   const columns = useMemo(() => allColumns.filter((column) => !hidden.has(column.key)), [allColumns, hidden])
 
   const toggleColumn = (key: string) => {

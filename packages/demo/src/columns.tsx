@@ -1,6 +1,7 @@
 import { Elapsed, Figure } from '@/components/ui/figure/Figure'
+import { Sparkline } from '@/components/ui/sparkline/Sparkline'
 import type { Column } from '@/components/ui/table/Table'
-import { STATUSES, type Run } from './runs'
+import { STATUSES, q30Cycles, type Run } from './runs'
 import { stamp } from './format'
 import { STATUS_TONE } from './status'
 
@@ -107,4 +108,37 @@ export function runColumns(onOpen: (run: Run) => void): readonly Column<Run>[] {
       render: (r) => r.owner,
     },
   ]
+}
+
+/*
+ * each row is scaled to its own extent rather than to one q30 scale. the level is the
+ * column beside it, and a scale wide enough to hold a failed run flattens every other
+ * one into a straight line at row height.
+ */
+const TREND: Column<Run> = {
+  key: 'trend',
+  label: 'Q30, cycles',
+  chars: 14,
+  render: (r) => {
+    const cycles = q30Cycles(r)
+    if (cycles.length === 0) return <span className="reed-mark" aria-hidden="true" />
+
+    return (
+      <Sparkline
+        values={cycles}
+        label={`Q30 went from ${cycles[0]} to ${cycles[cycles.length - 1]} across ${cycles.length} cycles`}
+        className="text-indigo"
+      />
+    )
+  },
+}
+
+/*
+ * the published table measurements are read off the ten columns above, so the trend is
+ * the lab's alone rather than a column the documented table grew.
+ */
+export function labColumns(onOpen: (run: Run) => void): readonly Column<Run>[] {
+  const base = runColumns(onOpen)
+  const after = base.findIndex((column) => column.key === 'q30') + 1
+  return [...base.slice(0, after), TREND, ...base.slice(after)]
 }
