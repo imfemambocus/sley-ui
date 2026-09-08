@@ -36,6 +36,7 @@ const TABLE_KEYS: readonly Binding[] = [
   { keys: 'Tab', does: 'Moves through the actions, the select all box, then each column head and the grip beside it, then into the body.' },
   { keys: 'Enter, Space', does: 'On a column head, sorts it. Three presses cycle ascending, descending, and back to the order the rows arrived in.' },
   { keys: 'Arrow left, Arrow right', does: 'On a resize grip, moves that column by 8px. The grip is a button, so it needs no pointer.' },
+  { keys: 'Shift with an arrow', does: 'On a resize grip, moves that column one place instead of resizing it. The first data column stays where it is.' },
   { keys: 'Arrow down, Arrow up', does: 'On a row, moves the cursor one row and scrolls it into view.' },
   { keys: 'Home, End', does: 'On a row, goes to the first or the last row of the table, however many rows there are.' },
   { keys: 'Space', does: 'On a row, or on its box, selects that row. On the head box, selects and clears every row the filter leaves on screen.' },
@@ -79,6 +80,12 @@ export const Keyboard = () => (
         handler, which is the whole reason a key press can reach it. The column head holds two
         buttons side by side, the label and the grip, so <Code>Tab</Code> reaches each one on its own
         and neither is nested in the other.
+      </P>
+      <P>
+        The grip carries the column's place as well as its width, because it is the one control every
+        column has: a column the caller left unsortable draws no head button at all, and a pointer
+        moves it by dragging the head instead. Shift is what separates the two on the grip, so the
+        arrows still resize and shift with an arrow moves the column one place.
       </P>
       <P>
         Tab reaches the body once. The row the cursor is on holds the only stop inside it, so leaving

@@ -35,7 +35,7 @@ const TableDemo = () => {
   return (
     <Demo
       bleed
-      caption="Drag a divider to resize. Click a head to sort, three times to get the original order back. At 5000 rows the body holds about 30 of them and the rest is spacer height."
+      caption="Drag a divider to resize a column, or a head to move it. Click a head to sort, three times to get the original order back. At 5000 rows the body holds about 30 of them and the rest is spacer height."
     >
       <Table
         rows={rows}
@@ -71,6 +71,24 @@ const Notes = () => (
       with everything else. Pinning forces the border model, since a pinned cell needs an opaque
       background and an opaque background hides a collapsed border. Every body cell therefore
       carries its own top border instead.
+    </P>
+    <P>
+      A column moves by dragging its head, and the whole column travels with the pointer, values and
+      all. The columns it passes step aside by its width, so the gap that opens is where it will
+      land. The press becomes a drag after eight pixels, and a press that becomes a drag no longer
+      sorts, however the browser routes the click that follows it. Nothing is laid out again while you drag: the cells are
+      translated, and the step the neighbours take is the one place this table animates its own
+      layout, on <Code>--dur-local</Code> and the beat curve. The first data column does not move,
+      because it is pinned to name the row and a column dropped in front of it would take the
+      pinning with it. The grip carries the keyboard path, so the arrows resize a column and shift
+      with the arrows moves it one place.
+    </P>
+    <P>
+      The sort, the widths and the order are the table's own until you pass one with its callback,
+      and then that piece is yours to keep. It is how an application opens on the sort its reader
+      chose last week, or puts one in a url. Selection only reports: the table holds a row a filter
+      has hidden and tells you about the ones on screen, which is a shape a caller cannot keep for
+      it.
     </P>
     <P>
       A narrow screen hides nothing. I built a column drop with width tiers, measured it at 390px,
@@ -119,7 +137,7 @@ export const doc: ComponentDoc = {
   slug: 'table',
   name: 'Table',
   summary: 'Sorting, resizing, selection, pinning, and a loading state made of unwoven warp.',
-  exports: ['Table', 'type Column'],
+  exports: ['Table', 'type Column', 'type Sort'],
   Demo: TableDemo,
   api: [
     {
@@ -144,6 +162,35 @@ export const doc: ComponentDoc = {
     { name: 'loading', type: 'boolean', detail: 'Swaps the rows for the unwoven warp and hides the count.' },
     { name: 'emptyMessage', type: 'string', detail: 'The title of the empty state when no row survives the filters.' },
     { name: 'actions', type: 'ReactNode', detail: 'Controls in the table header, beside the count.' },
+    {
+      name: 'sort',
+      type: 'Sort | null',
+      detail:
+        'The column and the direction, or null for the order the rows arrived in. Pass it with onSortChange to own it, or leave both out and the table holds its own.',
+    },
+    { name: 'onSortChange', type: '(sort: Sort | null) => void', detail: 'Every press reports the next state.' },
+    {
+      name: 'widths',
+      type: 'Record<string, number | undefined>',
+      detail:
+        'The px widths a resize has set, keyed by column. A column nobody dragged holds none and follows the density.',
+    },
+    {
+      name: 'onWidthsChange',
+      type: '(widths: Record<string, number | undefined>) => void',
+      detail: 'Fires on every step of a drag, and once per press on the keyboard.',
+    },
+    {
+      name: 'order',
+      type: 'readonly string[]',
+      detail:
+        'The column keys in the order they are drawn. A key no column names is ignored, and a column the order misses is drawn after the ones it names.',
+    },
+    {
+      name: 'onOrderChange',
+      type: '(order: readonly string[]) => void',
+      detail: 'Reports the whole order after a move.',
+    },
     {
       name: 'onSelectionChange',
       type: '(selected: ReadonlySet<string>) => void',
@@ -209,6 +256,24 @@ export const doc: ComponentDoc = {
         'One slot for each column, named after its key. Draw the cell in a template rather than in a render function. A column with no slot draws an empty cell.',
     },
     { name: '#actions', type: 'slot', detail: 'Controls in the table header, beside the count.' },
+    {
+      name: 'v-model:sort',
+      type: 'Sort | null',
+      detail:
+        'The column and the direction, or null for the order the rows arrived in. Bind it to own the sort, or bind nothing and the table holds its own.',
+    },
+    {
+      name: 'v-model:widths',
+      type: 'Record<string, number | undefined>',
+      detail:
+        'The px widths a resize has set, keyed by column. A column nobody dragged holds none and follows the density.',
+    },
+    {
+      name: 'v-model:order',
+      type: 'readonly string[]',
+      detail:
+        'The column keys in the order they are drawn. A key no column names is ignored, and a column the order misses is drawn after the ones it names.',
+    },
     {
       name: '@row-activate',
       type: 'row: T',
