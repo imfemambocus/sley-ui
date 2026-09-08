@@ -8,9 +8,14 @@ const props = defineProps<{
   direction?: SortDirection
 }>()
 
-const emit = defineEmits<{ sort: [] }>()
+/* a key press reports no click count, and the table sorts on that one whatever a drag did */
+const emit = defineEmits<{ sort: [keyed: boolean] }>()
 
 const sortable = computed(() => props.column.sortValue !== undefined)
+
+const onClick = (event: MouseEvent) => {
+  if (sortable.value) emit('sort', event.detail === 0)
+}
 
 const shell = computed(() =>
   cx(
@@ -26,7 +31,7 @@ const shell = computed(() =>
     :is="sortable ? 'button' : 'div'"
     :type="sortable ? 'button' : undefined"
     :class="shell"
-    @click="sortable && emit('sort')"
+    @click="onClick"
   >
     <!-- the mark sits inside the baseline group, standing on the baseline of the label -->
     <span class="inline-flex min-w-0 items-baseline gap-1.5">

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 const props = defineProps<{ label: string }>()
 
-const emit = defineEmits<{ resize: [next: number] }>()
+const emit = defineEmits<{ resize: [next: number]; nudge: [by: number] }>()
 
 const KEY_STEP = 8
 
@@ -30,8 +30,13 @@ const onPointerMove = (event: PointerEvent) => {
 const onKeyDown = (event: KeyboardEvent) => {
   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
   event.preventDefault()
-  const from = cellWidth()
-  emit('resize', event.key === 'ArrowLeft' ? from - KEY_STEP : from + KEY_STEP)
+  const by = event.key === 'ArrowLeft' ? -1 : 1
+  /* the same pair with shift moves the column instead, one place a press */
+  if (event.shiftKey) {
+    emit('nudge', by)
+    return
+  }
+  emit('resize', cellWidth() + by * KEY_STEP)
 }
 </script>
 
@@ -40,7 +45,8 @@ const onKeyDown = (event: KeyboardEvent) => {
   <button
     ref="grip"
     type="button"
-    :aria-label="`Resize the ${props.label} column`"
+    :aria-label="`Resize or move the ${props.label} column`"
+    data-grip=""
     class="reed-grip"
     :data-dragging="dragging ? '' : undefined"
     @pointerdown="onPointerDown"

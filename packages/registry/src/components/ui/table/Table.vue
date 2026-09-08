@@ -1,6 +1,11 @@
 <script lang="ts">
 export type SortDirection = 'asc' | 'desc'
 
+export interface Sort {
+  readonly key: string
+  readonly direction: SortDirection
+}
+
 export interface Column<T> {
   readonly key: string
   readonly label: string
@@ -33,12 +38,25 @@ const props = withDefaults(
     noun?: RowNoun
     emptyMessage?: string
     loading?: boolean
+    /*
+     * the three pieces of state a reader sets and an application may want to keep. bind a
+     * model to own one, or bind none and the table holds it.
+     */
+    sort?: Sort | null
+    widths?: Readonly<Record<string, number | undefined>>
+    order?: readonly string[]
     class?: HTMLAttributes['class']
   }>(),
   { noun: () => 'rows', emptyMessage: 'No row matches the filters.', loading: false },
 )
 
-const emit = defineEmits<{ selectionChange: [selected: ReadonlySet<string>]; rowActivate: [row: T] }>()
+const emit = defineEmits<{
+  'update:sort': [sort: Sort | null]
+  'update:widths': [widths: Readonly<Record<string, number | undefined>>]
+  'update:order': [order: readonly string[]]
+  selectionChange: [selected: ReadonlySet<string>]
+  rowActivate: [row: T]
+}>()
 
 /*
  * a declared emit is stripped out of $attrs, so the vnode props are the only place left that
@@ -58,6 +76,24 @@ const MAX_WIDTH = 420
 
 /* the 7px mark and its 6px gap: two characters cover both in every density */
 const SORT_CHARS = 2
+
+/*
+ * a press travelling this far is a column being moved rather than a column being sorted. it is
+ * wide enough that the travel in an ordinary click cannot reach it, since a press that arms the
+ * drag is a press that no longer sorts.
+ */
+const MOVE_THRESHOLD = 8
+
+/*
+ * the column the pointer carries travels above its neighbours, so it needs the row's own
+ * background: a transparent cell would let the values underneath read through it. that is the
+ * pinned cell's problem and this is the pinned cell's answer. it takes the leading divider its
+ * own cells draw as well, or the head arrives over its neighbours as a smear with no edge.
+ */
+const CARRIED = 'warp-line relative z-(--z-grip) cursor-grabbing bg-inherit'
+
+/* the columns it passes step aside, which is the one place the table animates its layout */
+const SLIDING = 'transition-[translate] duration-(--dur-local) ease-(--ease-beat)'
 
 /*
  * below this many rows the whole body is rendered. the widest viewport shows about 20
@@ -104,6 +140,39 @@ function clampWidth(value: number) {
   return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, Math.round(value)))
 }
 
+/* one column at a time, and the third press restores the order the rows arrived in */
+function cycleSort(sort: Sort | null, key: string): Sort | null {
+  if (sort?.key !== key) return { key, direction: 'asc' }
+  if (sort.direction === 'asc') return { key, direction: 'desc' }
+  return null
+}
+
+/*
+ * the held order is a preference and not the list itself. a column the caller drops falls
+ * out, a column it adds lands at the end, and a column that comes back returns to the place
+ * it held.
+ */
+function ordering(columns: readonly Column<T>[], order: readonly string[]) {
+  const byKey = new Map(columns.map((column) => [column.key, column]))
+  const held = order.map((key) => byKey.get(key)).filter((column) => column !== undefined)
+  return [...held, ...columns.filter((column) => !order.includes(column.key))]
+}
+
+/*
+ * `to` is an insertion point in the list as it stands, which is how a drop between two
+ * columns is expressed. the first data column names the row and is pinned there, so nothing
+ * lands in front of it, and a move onto either side of where the column already sits is no
+ * move at all.
+ */
+function moveColumn(keys: readonly string[], key: string, to: number): readonly string[] {
+  const from = keys.indexOf(key)
+  const at = Math.min(Math.max(to, 1), keys.length)
+  if (from === -1 || at === from || at === from + 1) return keys
+  const rest = keys.filter((entry) => entry !== key)
+  const landing = at > from ? at - 1 : at
+  return [...rest.slice(0, landing), key, ...rest.slice(landing)]
+}
+
 /*
  * the head counts too, because a label and its unit can run longer than the value
  * under it. the half character covers the rounding a table layout applies.
@@ -113,40 +182,93 @@ function clampWidth(value: number) {
  * face's own digit advance, read off this cell. where the data face is the wider of
  * the pair the expression collapses to what it always was.
  */
-function intrinsicWidth(column: Column<T>, sorted: boolean) {
+function intrinsicWidth(column: Column<T>, reserved: number) {
   const unit = column.unit ? column.unit.length + 1 : 0
-  const head = column.label.length + unit + (sorted ? SORT_CHARS : 0)
+  const head = column.label.length + unit + reserved
   const value = `${column.chars + 0.5} * var(--data-adv)`
   const label = `${head + 0.5} * max(var(--data-adv), 1ch)`
   return `calc(max(${value}, ${label}) + var(--cell-x) * 2)`
+}
+
+/* what the head reserves for its mark, and only while it carries one */
+function headChars(direction: SortDirection | undefined) {
+  return direction === undefined ? 0 : SORT_CHARS
 }
 
 /* a css length needs its unit; vue writes a bare number as it stands */
 const px = (value: string | number) => (typeof value === 'number' ? `${value}px` : value)
 
 const selected = shallowRef<ReadonlySet<string>>(new Set())
-/* only a dragged column holds a px width; the rest follow the density */
-const widths = ref<Record<string, number | undefined>>({})
-const sort = shallowRef<{ key: string; direction: SortDirection } | null>(null)
 const cursor = ref<string | null>(null)
+
+/*
+ * a caller that binds the model owns that piece of state, and one that binds nothing gets
+ * the table's own. either way the setter takes the whole next value, so a caller never has
+ * to read the table back to know what it holds.
+ */
+function model<V>(read: () => V | undefined, report: (next: V) => void, initial: V) {
+  const inner = shallowRef<V>(initial)
+  /* undefined is the only absence: a caller can hold null, which is a sort of nothing */
+  const value = computed(() => {
+    const held = read()
+    return held === undefined ? inner.value : held
+  })
+  const set = (next: V) => {
+    if (read() === undefined) inner.value = next
+    report(next)
+  }
+  return [value, set] as const
+}
+
+/* only a dragged column holds a px width; the rest follow the density */
+const [widths, setWidths] = model<Readonly<Record<string, number | undefined>>>(
+  () => props.widths,
+  (next) => emit('update:widths', next),
+  {},
+)
+const [sort, setSort] = model<Sort | null>(() => props.sort, (next) => emit('update:sort', next), null)
+const [order, setOrder] = model<readonly string[]>(() => props.order, (next) => emit('update:order', next), [])
+
+/*
+ * a column being moved: where it started, the boundary it would land on, its own width, and
+ * how far the pointer has carried it. the width is what every other column steps aside by.
+ */
+const drag = shallowRef<{
+  readonly key: string
+  readonly from: number
+  readonly to: number
+  readonly width: number
+  readonly dx: number
+} | null>(null)
 
 /* raised by a key press, so the focus chase below ignores a scroll the pointer made */
 let chasing = false
 
-const span = computed(() => props.columns.length + 2)
+const drawn = computed(() => ordering(props.columns, order.value))
+const keys = computed(() => drawn.value.map((column) => column.key))
+
+const span = computed(() => drawn.value.length + 2)
 
 const resizeColumn = (key: string, next: number) => {
-  widths.value = { ...widths.value, [key]: clampWidth(next) }
+  setWidths({ ...widths.value, [key]: clampWidth(next) })
 }
 
-/* third click restores the order the rows arrived in */
-const toggleSort = (key: string) => {
-  const current = sort.value
-  if (current?.key !== key) {
-    sort.value = { key, direction: 'asc' }
-    return
-  }
-  sort.value = current.direction === 'asc' ? { key, direction: 'desc' } : null
+/* raised the moment a press becomes a drag, and read by the head it started on */
+let dragged = false
+
+/*
+ * a press that armed the drag is not a sort, however the browser routes the click that follows
+ * it. a key press reports no click count, which is the one click that always is.
+ */
+const sortColumn = (key: string, keyed: boolean) => {
+  if (!keyed && dragged) return
+  setSort(cycleSort(sort.value, key))
+}
+
+/* one place a press, from the grip that also carries the width */
+const nudgeColumn = (key: string, by: number) => {
+  const index = keys.value.indexOf(key)
+  setOrder(moveColumn(keys.value, key, by > 0 ? index + 2 : index - 1))
 }
 
 const ordered = computed(() => {
@@ -159,6 +281,12 @@ const ordered = computed(() => {
 })
 
 const directionOf = (column: Column<T>) => (sort.value?.key === column.key ? sort.value.direction : undefined)
+
+const widthOf = (column: Column<T>) => {
+  const set = widths.value[column.key]
+  if (set !== undefined) return px(set)
+  return intrinsicWidth(column, headChars(directionOf(column)))
+}
 
 const ariaSort = (column: Column<T>) => {
   if (column.sortValue === undefined) return undefined
@@ -332,6 +460,110 @@ const toggleAll = () => {
   applySelection(next)
 }
 
+/* the column the pointer carries, and the whole row of steps its neighbours take */
+const shiftOf = (index: number) => {
+  const moving = drag.value
+  if (moving === null) return 0
+  if (index === moving.from) return moving.dx
+  if (moving.to <= index && index < moving.from) return moving.width
+  if (moving.from < index && index < moving.to) return -moving.width
+  return 0
+}
+
+const move = computed(() => {
+  const moving = drag.value
+  if (moving === null) return null
+  return { index: moving.from, shifts: keys.value.map((_, index) => shiftOf(index)) }
+})
+
+
+const headCells = () => [...(headRow.value?.querySelectorAll<HTMLTableCellElement>('th[data-column]') ?? [])]
+
+/*
+ * the head cells are read on every move rather than once, since a sideways scroll under the
+ * drag would leave a cached geometry naming the wrong boundary. the step each one has taken
+ * comes off its rect again, or a boundary would move as the reader crossed it and the landing
+ * would flicker between two columns. the first data column is pinned where it is, so the
+ * earliest landing is in front of the second.
+ */
+const dropAt = (x: number) => {
+  const cells = headCells()
+  for (const [index, cell] of cells.entries()) {
+    const box = cell.getBoundingClientRect()
+    const left = box.left - shiftOf(index)
+    if (x >= left + box.width) continue
+    return Math.max(1, x < left + box.width / 2 ? index : index + 1)
+  }
+  return cells.length
+}
+
+/*
+ * the column travels inside what the reader can see, so a sideways scrolled table cannot carry
+ * it under the pinned pair, where an opaque cell of a higher rank would swallow it whole.
+ */
+const travelLimits = (cell: HTMLTableCellElement) => {
+  const cells = headCells()
+  const box = cell.getBoundingClientRect()
+  const visible = scroller.value?.getBoundingClientRect()
+  const pinned = cells.at(0)?.getBoundingClientRect()
+  const last = cells.at(-1)?.getBoundingClientRect()
+  if (visible === undefined || pinned === undefined || last === undefined) return { min: 0, max: 0 }
+  return {
+    min: Math.min(0, Math.max(pinned.right, visible.left) - box.left),
+    max: Math.max(0, Math.min(last.right, visible.right) - box.right),
+  }
+}
+
+/*
+ * the capture is taken on the first move past the threshold and not on the press, which
+ * leaves a plain press as a press: chrome dispatches the click to the capturing element,
+ * so a captured head would swallow the sort its own button was waiting for.
+ */
+let origin: number | null = null
+let limits = { min: 0, max: 0 }
+
+/* a press that starts on the grip belongs to the width, and its moves reach this cell too */
+const startMove = (event: PointerEvent) => {
+  const onGrip = event.target instanceof Element && event.target.closest('[data-grip]') !== null
+  dragged = false
+  origin = onGrip || event.button !== 0 ? null : event.clientX
+}
+
+/*
+ * a move arrives whether a button is held or not, so a drag runs only while one is: an origin
+ * a plain press left behind would carry the column off on the next move across the cell.
+ */
+const trackMove = (event: PointerEvent, key: string) => {
+  const cell = event.currentTarget
+  if (!(cell instanceof HTMLTableCellElement)) return
+  if (event.buttons === 0) {
+    if (!cell.hasPointerCapture(event.pointerId)) origin = null
+    return
+  }
+  if (!cell.hasPointerCapture(event.pointerId)) {
+    if (origin === null || Math.abs(event.clientX - origin) < MOVE_THRESHOLD) return
+    cell.setPointerCapture(event.pointerId)
+    dragged = true
+    /* read before the first step is painted, so the room to travel is the layout's own */
+    limits = travelLimits(cell)
+  }
+  if (origin === null) return
+  const dx = Math.min(Math.max(event.clientX - origin, limits.min), limits.max)
+  drag.value = { key, from: keys.value.indexOf(key), to: dropAt(event.clientX), width: cell.offsetWidth, dx }
+}
+
+/* the press that sorted is over, and it leaves nothing behind for a later move to pick up */
+const dropMove = () => {
+  origin = null
+}
+
+/* the release decides, so a move and a release inside one frame cannot land a boundary late */
+const endMove = (event: PointerEvent, key: string) => {
+  setOrder(moveColumn(keys.value, key, dropAt(event.clientX)))
+  origin = null
+  drag.value = null
+}
+
 const onRowClick = (event: MouseEvent, row: T) => {
   if (!activates.value) return
   if (event.target instanceof Element && event.target.closest(INTERACTIVE) !== null) return
@@ -397,24 +629,47 @@ const onRowKeyDown = (event: KeyboardEvent, id: string, position: number, row: T
               />
             </th>
             <th
-              v-for="(column, index) in props.columns"
+              v-for="(column, index) in drawn"
               :key="column.key"
               scope="col"
               :aria-sort="ariaSort(column)"
+              :data-column="column.key"
               :class="
-                cx('reed-edge px-(--cell-x) font-medium', index === 0 && 'warp-line-end sticky z-(--z-pinned) bg-raised')
+                cx(
+                  'reed-edge px-(--cell-x) font-medium',
+                  index === 0 && 'warp-line-end sticky z-(--z-pinned) bg-raised',
+                  move !== null && (move.index === index ? CARRIED : SLIDING),
+                )
               "
               :style="{
                 height: 'var(--row-h)',
                 left: index === 0 ? GUTTER : undefined,
-                width: px(widths[column.key] ?? intrinsicWidth(column, sort?.key === column.key)),
+                width: widthOf(column),
+                translate: move === null ? undefined : `${move.shifts[index]}px`,
               }"
+              @pointerdown="index > 0 && startMove($event)"
+              @pointermove="index > 0 && trackMove($event, column.key)"
+              @pointerup="index > 0 && dropMove()"
+              @lostpointercapture="index > 0 && endMove($event, column.key)"
             >
               <Tooltip v-if="column.hint" :content="column.hint">
-                <ColumnHead :column="column" :direction="directionOf(column)" @sort="toggleSort(column.key)" />
+                <ColumnHead
+                  :column="column"
+                  :direction="directionOf(column)"
+                  @sort="(keyed: boolean) => sortColumn(column.key, keyed)"
+                />
               </Tooltip>
-              <ColumnHead v-else :column="column" :direction="directionOf(column)" @sort="toggleSort(column.key)" />
-              <ColumnGrip :label="column.label" @resize="(next: number) => resizeColumn(column.key, next)" />
+              <ColumnHead
+                v-else
+                :column="column"
+                :direction="directionOf(column)"
+                @sort="(keyed: boolean) => sortColumn(column.key, keyed)"
+              />
+              <ColumnGrip
+                :label="column.label"
+                @resize="(next: number) => resizeColumn(column.key, next)"
+                @nudge="(by: number) => nudgeColumn(column.key, by)"
+              />
             </th>
             <th scope="col" class="reed-edge">
               <span class="sr-only">Spare width</span>
@@ -479,7 +734,7 @@ const onRowKeyDown = (event: KeyboardEvent, id: string, position: number, row: T
                 />
               </td>
               <td
-                v-for="(column, index) in props.columns"
+                v-for="(column, index) in drawn"
                 :key="column.key"
                 :class="
                   cx(
@@ -487,9 +742,14 @@ const onRowKeyDown = (event: KeyboardEvent, id: string, position: number, row: T
                     index === 0 && `sticky z-(--z-pinned) ${PINNED}`,
                     index > 1 && 'warp-line',
                     column.numeric && 'tnum text-right font-data text-weft',
+                    move !== null && (move.index === index ? CARRIED : SLIDING),
                   )
                 "
-                :style="{ height: 'var(--row-h)', left: index === 0 ? GUTTER : undefined }"
+                :style="{
+                  height: 'var(--row-h)',
+                  left: index === 0 ? GUTTER : undefined,
+                  translate: move === null ? undefined : `${move.shifts[index]}px`,
+                }"
               >
                 <slot :name="`cell-${column.key}`" :row="entry.row" />
               </td>

@@ -7,6 +7,7 @@ import {
   type MouseEvent,
   type PointerEvent,
   type ReactNode,
+  type RefObject,
   type UIEvent,
 } from 'react'
 import { Checkbox, type CheckedState } from '@/components/ui/checkbox/Checkbox'
@@ -26,11 +27,11 @@ export interface Column<T> {
   readonly render: (row: T) => ReactNode
 }
 
-type Direction = 'asc' | 'desc'
+export type SortDirection = 'asc' | 'desc'
 
-interface Sort {
+export interface Sort {
   readonly key: string
-  readonly direction: Direction
+  readonly direction: SortDirection
 }
 
 const MIN_WIDTH = 56
@@ -39,6 +40,24 @@ const KEY_STEP = 8
 
 /* the 7px mark and its 6px gap: two characters cover both in every density */
 const SORT_CHARS = 2
+
+/*
+ * a press travelling this far is a column being moved rather than a column being sorted. it is
+ * wide enough that the travel in an ordinary click cannot reach it, since a press that arms the
+ * drag is a press that no longer sorts.
+ */
+const MOVE_THRESHOLD = 8
+
+/*
+ * the column the pointer carries travels above its neighbours, so it needs the row's own
+ * background: a transparent cell would let the values underneath read through it. that is the
+ * pinned cell's problem and this is the pinned cell's answer. it takes the leading divider its
+ * own cells draw as well, or the head arrives over its neighbours as a smear with no edge.
+ */
+const CARRIED = 'warp-line relative z-(--z-grip) cursor-grabbing bg-inherit'
+
+/* the columns it passes step aside, which is the one place the table animates its layout */
+const SLIDING = 'transition-[translate] duration-(--dur-local) ease-(--ease-beat)'
 
 /*
  * below this many rows the whole body is rendered. the widest viewport shows about 20
@@ -73,6 +92,66 @@ function ariaSort<T>(sort: Sort | null, column: Column<T>) {
   return sort.direction === 'asc' ? 'ascending' : 'descending'
 }
 
+/* one column at a time, and the third press restores the order the rows arrived in */
+function cycleSort(sort: Sort | null, key: string): Sort | null {
+  if (sort?.key !== key) return { key, direction: 'asc' }
+  if (sort.direction === 'asc') return { key, direction: 'desc' }
+  return null
+}
+
+/*
+ * the held order is a preference and not the list itself. a column the caller drops falls
+ * out, a column it adds lands at the end, and a column that comes back returns to the place
+ * it held.
+ */
+function ordering<T>(columns: readonly Column<T>[], order: readonly string[]) {
+  const byKey = new Map(columns.map((column) => [column.key, column]))
+  const held = order.map((key) => byKey.get(key)).filter((column) => column !== undefined)
+  return [...held, ...columns.filter((column) => !order.includes(column.key))]
+}
+
+/*
+ * `to` is an insertion point in the list as it stands, which is how a drop between two
+ * columns is expressed. the first data column names the row and is pinned there, so nothing
+ * lands in front of it, and a move onto either side of where the column already sits is no
+ * move at all.
+ */
+function moveColumn(keys: readonly string[], key: string, to: number): readonly string[] {
+  const from = keys.indexOf(key)
+  const at = Math.min(Math.max(to, 1), keys.length)
+  if (from === -1 || at === from || at === from + 1) return keys
+  const rest = keys.filter((entry) => entry !== key)
+  const landing = at > from ? at - 1 : at
+  return [...rest.slice(0, landing), key, ...rest.slice(landing)]
+}
+
+/*
+ * a column being moved: where it started, the boundary it would land on, its own width, and
+ * how far the pointer has carried it. the width is what every other column steps aside by.
+ */
+interface Drag {
+  readonly key: string
+  readonly from: number
+  readonly to: number
+  readonly width: number
+  readonly dx: number
+}
+
+/*
+ * a caller that passes the value and its callback owns that piece of state, and a caller
+ * that passes neither gets the table's own. every setter takes the whole next value, so a
+ * controlled caller never has to read the table back to know what it holds.
+ */
+function useHeld<T>(value: T | undefined, onChange: ((next: T) => void) | undefined, initial: T) {
+  const [inner, setInner] = useState(initial)
+  const set = (next: T) => {
+    if (value === undefined) setInner(next)
+    onChange?.(next)
+  }
+  /* undefined is the only absence: a caller can hold null, which is a sort of nothing */
+  return [value === undefined ? inner : value, set] as const
+}
+
 /* a plural noun alone reads "1 rows" at a count of one, so a caller can give both forms */
 function countNoun(noun: string | readonly [one: string, many: string], count: number) {
   if (typeof noun === 'string') return noun
@@ -92,23 +171,30 @@ function clampWidth(value: number) {
  * face's own digit advance, read off this cell. where the data face is the wider of
  * the pair the expression collapses to what it always was.
  */
-function intrinsicWidth<T>(column: Column<T>, sorted: boolean) {
+function intrinsicWidth<T>(column: Column<T>, reserved: number) {
   const unit = column.unit ? column.unit.length + 1 : 0
-  const head = column.label.length + unit + (sorted ? SORT_CHARS : 0)
+  const head = column.label.length + unit + reserved
   const value = `${column.chars + 0.5} * var(--data-adv)`
   const label = `${head + 0.5} * max(var(--data-adv), 1ch)`
   return `calc(max(${value}, ${label}) + var(--cell-x) * 2)`
 }
 
+/* what the head reserves for its mark, and only while it carries one */
+function headChars(direction: SortDirection | undefined) {
+  return direction === undefined ? 0 : SORT_CHARS
+}
+
 interface ColumnGripProps {
   readonly label: string
   readonly onResize: (next: number) => void
+  /* the grip is the column's handle for both its size and its place */
+  readonly onNudge: (by: number) => void
 }
 
 /* the width on screen. a column that never moved holds no px of its own. */
 const cellWidth = (grip: HTMLButtonElement) => grip.parentElement?.offsetWidth ?? 0
 
-const ColumnGrip = ({ label, onResize }: ColumnGripProps) => {
+const ColumnGrip = ({ label, onResize, onNudge }: ColumnGripProps) => {
   const originX = useRef(0)
   const originWidth = useRef(0)
   const [dragging, setDragging] = useState(false)
@@ -128,14 +214,20 @@ const ColumnGrip = ({ label, onResize }: ColumnGripProps) => {
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
     event.preventDefault()
-    const from = cellWidth(event.currentTarget)
-    onResize(event.key === 'ArrowLeft' ? from - KEY_STEP : from + KEY_STEP)
+    const by = event.key === 'ArrowLeft' ? -1 : 1
+    /* the same pair with shift moves the column instead, one place a press */
+    if (event.shiftKey) {
+      onNudge(by)
+      return
+    }
+    onResize(cellWidth(event.currentTarget) + by * KEY_STEP)
   }
 
   return (
     <button
       type="button"
-      aria-label={`Resize the ${label} column`}
+      aria-label={`Resize or move the ${label} column`}
+      data-grip=""
       className="reed-grip"
       data-dragging={dragging ? '' : undefined}
       onPointerDown={onPointerDown}
@@ -146,31 +238,40 @@ const ColumnGrip = ({ label, onResize }: ColumnGripProps) => {
   )
 }
 
-const SortMark = ({ direction }: { readonly direction: Direction }) => (
+const SortMark = ({ direction }: { readonly direction: SortDirection }) => (
   <span className={cx('reed-sort text-indigo', direction === 'desc' && 'reed-sort-down')} aria-hidden="true" />
 )
 
 interface ColumnHeadProps<T> {
   readonly column: Column<T>
-  readonly sort: Sort | null
+  readonly direction?: SortDirection
+  /* raised while the press on this head is carrying the column somewhere */
+  readonly dragged: RefObject<boolean>
   readonly onSort: () => void
 }
 
-const ColumnHead = <T,>({ column, sort, onSort }: ColumnHeadProps<T>) => {
+const ColumnHead = <T,>({ column, direction, dragged, onSort }: ColumnHeadProps<T>) => {
   const shell = cx('flex h-full w-full items-center gap-1.5 text-weft-dim', column.numeric && 'justify-end')
   /* the mark sits inside the baseline group, standing on the baseline of the label */
   const label = (
     <span className="inline-flex min-w-0 items-baseline gap-1.5">
       <span className="truncate">{column.label}</span>
       {column.unit && <span className="font-data text-weft-faint">{column.unit}</span>}
-      {sort?.key === column.key && <SortMark direction={sort.direction} />}
+      {direction && <SortMark direction={direction} />}
     </span>
   )
 
   const head = column.sortValue ? (
     <button
       type="button"
-      onClick={onSort}
+      /*
+       * a press that armed the drag is not a sort, however the browser routes the click that
+       * follows it. a key press reports no click count, which is the one click that always is.
+       */
+      onClick={(event) => {
+        if (event.detail > 0 && dragged.current) return
+        onSort()
+      }}
       className={cx(shell, 'cursor-pointer transition-colors duration-(--dur-instant) ease-(--ease-beat) hover:text-weft')}
     >
       {label}
@@ -226,10 +327,18 @@ const NAV_KEYS: ReadonlySet<string> = new Set(['ArrowDown', 'ArrowUp', 'Home', '
 /* a control in a cell owns its own click, and the checkbox sits inside a label */
 const INTERACTIVE = 'a, button, input, select, textarea, label'
 
+interface Move {
+  /* the column the pointer carries, by its place in the drawn order */
+  readonly index: number
+  /* one step for each column, in page pixels */
+  readonly shifts: readonly number[]
+}
+
 interface RowProps<T> {
   readonly row: T
   readonly id: string
   readonly columns: readonly Column<T>[]
+  readonly move: Move | null
   readonly selected: boolean
   readonly onToggle: (id: string) => void
   readonly rowIndex: number
@@ -243,6 +352,7 @@ const Row = <T,>({
   row,
   id,
   columns,
+  move,
   selected,
   onToggle,
   rowIndex,
@@ -304,8 +414,13 @@ const Row = <T,>({
             index === 0 && `sticky z-(--z-pinned) ${PINNED}`,
             index > 1 && 'warp-line',
             column.numeric && 'tnum text-right font-data text-weft',
+            move !== null && (move.index === index ? CARRIED : SLIDING),
           )}
-          style={{ height: 'var(--row-h)', left: index === 0 ? GUTTER : undefined }}
+          style={{
+            height: 'var(--row-h)',
+            left: index === 0 ? GUTTER : undefined,
+            translate: move === null ? undefined : `${move.shifts[index]}px`,
+          }}
         >
           {column.render(row)}
         </td>
@@ -324,6 +439,16 @@ interface TableProps<T> {
   readonly emptyMessage?: string
   readonly loading?: boolean
   readonly actions?: ReactNode
+  /*
+   * the three pieces of state a reader sets and an application may want to keep. pass one
+   * with its callback to own it, or leave both out and the table holds it.
+   */
+  readonly sort?: Sort | null
+  readonly onSortChange?: (sort: Sort | null) => void
+  readonly widths?: Readonly<Record<string, number | undefined>>
+  readonly onWidthsChange?: (widths: Readonly<Record<string, number | undefined>>) => void
+  readonly order?: readonly string[]
+  readonly onOrderChange?: (order: readonly string[]) => void
   readonly onSelectionChange?: (selected: ReadonlySet<string>) => void
   /* the row draws a pointer and answers Enter once this is given */
   readonly onRowActivate?: (row: T) => void
@@ -339,32 +464,40 @@ export const Table = <T,>({
   emptyMessage = 'No row matches the filters.',
   loading = false,
   actions,
+  sort: sortProp,
+  onSortChange,
+  widths: widthsProp,
+  onWidthsChange,
+  order: orderProp,
+  onOrderChange,
   onSelectionChange,
   onRowActivate,
   className,
 }: TableProps<T>) => {
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())
   /* only a dragged column holds a px width; the rest follow the density */
-  const [widths, setWidths] = useState<Record<string, number | undefined>>({})
-  const [sort, setSort] = useState<Sort | null>(null)
+  const [widths, setWidths] = useHeld<Readonly<Record<string, number | undefined>>>(widthsProp, onWidthsChange, {})
+  const [sort, setSort] = useHeld<Sort | null>(sortProp, onSortChange, null)
+  const [order, setOrder] = useHeld<readonly string[]>(orderProp, onOrderChange, [])
   const [cursor, setCursor] = useState<string | null>(null)
+  const [drag, setDrag] = useState<Drag | null>(null)
 
   /* raised by a key press, so the focus chase below ignores a scroll the pointer made */
   const chasing = useRef(false)
 
-  const span = columns.length + 2
+  const drawn = useMemo(() => ordering(columns, order), [columns, order])
+  const keys = useMemo(() => drawn.map((column) => column.key), [drawn])
+
+  const span = drawn.length + 2
 
   const resizeColumn = (key: string, next: number) => {
-    setWidths((current) => ({ ...current, [key]: clampWidth(next) }))
+    setWidths({ ...widths, [key]: clampWidth(next) })
   }
 
-  /* third click restores the order the rows arrived in */
-  const toggleSort = (key: string) => {
-    setSort((current) => {
-      if (current?.key !== key) return { key, direction: 'asc' }
-      if (current.direction === 'asc') return { key, direction: 'desc' }
-      return null
-    })
+  /* one place a press, from the grip that also carries the width */
+  const nudgeColumn = (key: string, by: number) => {
+    const index = keys.indexOf(key)
+    setOrder(moveColumn(keys, key, by > 0 ? index + 2 : index - 1))
   }
 
   const ordered = useMemo(() => {
@@ -523,6 +656,107 @@ export const Table = <T,>({
     applySelection(next)
   }
 
+  /* the column the pointer carries, and the whole row of steps its neighbours take */
+  const shiftOf = (index: number) => {
+    if (drag === null) return 0
+    if (index === drag.from) return drag.dx
+    if (drag.to <= index && index < drag.from) return drag.width
+    if (drag.from < index && index < drag.to) return -drag.width
+    return 0
+  }
+
+  const move = drag === null ? null : { index: drag.from, shifts: keys.map((_, index) => shiftOf(index)) }
+
+
+  const headCells = () => [...(headRow.current?.querySelectorAll<HTMLTableCellElement>('th[data-column]') ?? [])]
+
+  /*
+   * the head cells are read on every move rather than once, since a sideways scroll under the
+   * drag would leave a cached geometry naming the wrong boundary. the step each one has taken
+   * comes off its rect again, or a boundary would move as the reader crossed it and the
+   * landing would flicker between two columns. the first data column is pinned where it is,
+   * so the earliest landing is in front of the second.
+   */
+  const dropAt = (x: number) => {
+    const cells = headCells()
+    for (const [index, cell] of cells.entries()) {
+      const box = cell.getBoundingClientRect()
+      const left = box.left - shiftOf(index)
+      if (x >= left + box.width) continue
+      return Math.max(1, x < left + box.width / 2 ? index : index + 1)
+    }
+    return cells.length
+  }
+
+  /*
+   * the column travels inside what the reader can see, so a sideways scrolled table cannot carry
+   * it under the pinned pair, where an opaque cell of a higher rank would swallow it whole.
+   */
+  const travelLimits = (cell: HTMLTableCellElement) => {
+    const cells = headCells()
+    const box = cell.getBoundingClientRect()
+    const visible = scroller.current?.getBoundingClientRect()
+    const pinned = cells.at(0)?.getBoundingClientRect()
+    const last = cells.at(-1)?.getBoundingClientRect()
+    if (visible === undefined || pinned === undefined || last === undefined) return { min: 0, max: 0 }
+    return {
+      min: Math.min(0, Math.max(pinned.right, visible.left) - box.left),
+      max: Math.max(0, Math.min(last.right, visible.right) - box.right),
+    }
+  }
+
+  /*
+   * the capture is taken on the first move past the threshold and not on the press, which
+   * leaves a plain press as a press: chrome dispatches the click to the capturing element,
+   * so a captured head would swallow the sort its own button was waiting for.
+   */
+  const origin = useRef<number | null>(null)
+  const limits = useRef({ min: 0, max: 0 })
+  /* raised the moment a press becomes a drag, and read by the head it started on */
+  const dragged = useRef(false)
+
+  /* a press that starts on the grip belongs to the width, and its moves reach this cell too */
+  const startMove = (event: PointerEvent<HTMLTableCellElement>) => {
+    const onGrip = event.target instanceof Element && event.target.closest('[data-grip]') !== null
+    dragged.current = false
+    origin.current = onGrip || event.button !== 0 ? null : event.clientX
+  }
+
+  /*
+   * a move arrives whether a button is held or not, so a drag runs only while one is: an origin
+   * a plain press left behind would carry the column off on the next move across the cell.
+   */
+  const trackMove = (key: string) => (event: PointerEvent<HTMLTableCellElement>) => {
+    const cell = event.currentTarget
+    const start = origin.current
+    if (event.buttons === 0) {
+      if (!cell.hasPointerCapture(event.pointerId)) origin.current = null
+      return
+    }
+    if (!cell.hasPointerCapture(event.pointerId)) {
+      if (start === null || Math.abs(event.clientX - start) < MOVE_THRESHOLD) return
+      cell.setPointerCapture(event.pointerId)
+      dragged.current = true
+      /* read before the first step is painted, so the room to travel is the layout's own */
+      limits.current = travelLimits(cell)
+    }
+    if (start === null) return
+    const dx = Math.min(Math.max(event.clientX - start, limits.current.min), limits.current.max)
+    setDrag({ key, from: keys.indexOf(key), to: dropAt(event.clientX), width: cell.offsetWidth, dx })
+  }
+
+  /* the press that sorted is over, and it leaves nothing behind for a later move to pick up */
+  const dropMove = () => {
+    origin.current = null
+  }
+
+  /* the release decides, so a move and a release inside one frame cannot land a boundary late */
+  const endMove = (key: string) => (event: PointerEvent<HTMLTableCellElement>) => {
+    setOrder(moveColumn(keys, key, dropAt(event.clientX)))
+    origin.current = null
+    setDrag(null)
+  }
+
   const renderBody = () => {
     if (loading) return <WarpRows span={span} />
     if (ordered.length === 0) return <EmptyRow span={span} message={emptyMessage} />
@@ -541,7 +775,8 @@ export const Table = <T,>({
               onNavigate={navigate}
               row={row}
               id={id}
-              columns={columns}
+              columns={drawn}
+              move={move}
               selected={selected.has(id)}
               onToggle={toggleRow}
               onActivate={onRowActivate}
@@ -585,25 +820,44 @@ export const Table = <T,>({
               >
                 <Checkbox checked={headerState} onCheckedChange={toggleAll} label={`Select all ${countNoun(noun, 2)}`} />
               </th>
-              {columns.map((column, index) => (
-                <th
-                  key={column.key}
-                  scope="col"
-                  aria-sort={ariaSort(sort, column)}
-                  className={cx(
-                    'reed-edge px-(--cell-x) font-medium',
-                    index === 0 && 'warp-line-end sticky z-(--z-pinned) bg-raised',
-                  )}
-                  style={{
-                    height: 'var(--row-h)',
-                    left: index === 0 ? GUTTER : undefined,
-                    width: widths[column.key] ?? intrinsicWidth(column, sort?.key === column.key),
-                  }}
-                >
-                  <ColumnHead column={column} sort={sort} onSort={() => toggleSort(column.key)} />
-                  <ColumnGrip label={column.label} onResize={(next) => resizeColumn(column.key, next)} />
-                </th>
-              ))}
+              {drawn.map((column, index) => {
+                const sorted = sort?.key === column.key ? sort.direction : undefined
+                return (
+                  <th
+                    key={column.key}
+                    scope="col"
+                    aria-sort={ariaSort(sort, column)}
+                    data-column={column.key}
+                    onPointerDown={index === 0 ? undefined : startMove}
+                    onPointerMove={index === 0 ? undefined : trackMove(column.key)}
+                    onPointerUp={index === 0 ? undefined : dropMove}
+                    onLostPointerCapture={index === 0 ? undefined : endMove(column.key)}
+                    className={cx(
+                      'reed-edge px-(--cell-x) font-medium',
+                      index === 0 && 'warp-line-end sticky z-(--z-pinned) bg-raised',
+                      move !== null && (move.index === index ? CARRIED : SLIDING),
+                    )}
+                    style={{
+                      height: 'var(--row-h)',
+                      left: index === 0 ? GUTTER : undefined,
+                      width: widths[column.key] ?? intrinsicWidth(column, headChars(sorted)),
+                      translate: move === null ? undefined : `${move.shifts[index]}px`,
+                    }}
+                  >
+                    <ColumnHead
+                      column={column}
+                      direction={sorted}
+                      dragged={dragged}
+                      onSort={() => setSort(cycleSort(sort, column.key))}
+                    />
+                    <ColumnGrip
+                      label={column.label}
+                      onResize={(next) => resizeColumn(column.key, next)}
+                      onNudge={(by) => nudgeColumn(column.key, by)}
+                    />
+                  </th>
+                )
+              })}
               <th scope="col" className="reed-edge">
                 <span className="sr-only">Spare width</span>
               </th>
