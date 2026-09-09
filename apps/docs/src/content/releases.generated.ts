@@ -1,9 +1,37 @@
 /* written by releases.mjs from the frozen bundles. do not edit. */
 import type { ReleaseEntry } from './types'
 
-export const LATEST = '0.12.2'
+export const LATEST = '0.13.1'
 
 export const RELEASES: readonly ReleaseEntry[] = [
+  {
+    version: '0.13.1',
+    items: 20,
+    files: 80,
+    first: false,
+    added: [],
+    changed: [
+      { item: 'tokens', path: 'styles/tokens.css' },
+      { item: 'checkbox', path: 'components/ui/checkbox/Checkbox.tsx' },
+      { item: 'tokens', path: 'vue/styles/tokens.css' },
+      { item: 'checkbox', path: 'vue/components/ui/checkbox/Checkbox.vue' },
+    ],
+    removed: [],
+  },
+  {
+    version: '0.13.0',
+    items: 20,
+    files: 80,
+    first: false,
+    added: [],
+    changed: [
+      { item: 'table', path: 'components/ui/table/Table.tsx' },
+      { item: 'table', path: 'vue/components/ui/table/ColumnGrip.vue' },
+      { item: 'table', path: 'vue/components/ui/table/ColumnHead.vue' },
+      { item: 'table', path: 'vue/components/ui/table/Table.vue' },
+    ],
+    removed: [],
+  },
   {
     version: '0.12.2',
     items: 20,
