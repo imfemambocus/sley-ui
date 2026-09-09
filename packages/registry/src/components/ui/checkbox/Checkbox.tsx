@@ -22,7 +22,7 @@ export const Checkbox = ({ checked, onCheckedChange, children, label, className 
   <ArkCheckbox.Root
     checked={checked}
     onCheckedChange={(details) => onCheckedChange(details.checked)}
-    className={cx('ctl-align inline-flex cursor-pointer items-center gap-2', className)}
+    className={cx('focus-ring ctl-align inline-flex cursor-pointer items-center gap-2', className)}
   >
     <ArkCheckbox.Control className={CONTROL}>
       <ArkCheckbox.Indicator>

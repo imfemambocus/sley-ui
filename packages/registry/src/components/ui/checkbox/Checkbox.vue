@@ -26,7 +26,7 @@ const CONTROL =
 <template>
   <ArkCheckbox.Root
     v-model:checked="checked"
-    :class="cx('ctl-align inline-flex cursor-pointer items-center gap-2', props.class)"
+    :class="cx('focus-ring ctl-align inline-flex cursor-pointer items-center gap-2', props.class)"
   >
     <ArkCheckbox.Control :class="CONTROL">
       <ArkCheckbox.Indicator>
