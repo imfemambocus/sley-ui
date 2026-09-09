@@ -5,6 +5,11 @@ import type { ReleaseNote } from './types'
  * a version the registry serves and this file does not name stops the build.
  */
 export const RELEASE_NOTES: Record<string, ReleaseNote> = {
+  '0.13.1': {
+    date: '2026-09-09',
+    title: 'Two focus rings you could not see',
+    body: "The head row of a table sits flush with the top edge of the scroll container it lives in, and that edge clips. A focus ring here is a 2px outline at 1px offset, so the three pixels it wants above a control that fills the row height were being cut off, and a keyboard user got a ring on three sides. The resize grip is where you notice it, since that ring is 14 pixels wide and the missing side is most of what there is to look at, but the sort button in every head had it too and I had not seen it on either. I found it in a video of the keyboard path rather than in the browser. The head cell now keeps three pixels for it, inside its own row height rather than around it, which means nothing moves. The row is the same height at every density, the label sits exactly where it sat, and the reed the grip draws still runs the full height of the row. What is smaller is the grip's own box, by six pixels, so the strip a pointer has to hit is 26 of a 32 pixel row at compact and 19 of 25 at dense. The second one is worse and it is everywhere: a checkbox drew no focus ring at all. Ark's hidden input carries clip: rect(0, 0, 0, 0) on a one pixel box, and clip takes an outline with it, so the ring was painting where nothing could ever see it. I measured zero indigo pixels around a focused control of 13. The root of a checkbox is a label element and it is what a press actually hits, so it takes the ring on the input's behalf now, which is the pattern a field with an icon in it has always used here. A checkbox with text rings its text as well, because the text toggles the box. A pointer click still rings nothing, which is :focus-visible doing its job. Three rules in the token file and the checkbox in each framework. If you have edited your palette this update merges into it.",
+  },
   '0.13.0': {
     date: '2026-09-08',
     title: 'Columns that move, and a table that hands back its state',
