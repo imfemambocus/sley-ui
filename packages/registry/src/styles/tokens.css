@@ -213,6 +213,15 @@
   }
 
   /*
+   * the head row sits flush with the scroll container's top edge, which is a clip edge, so a
+   * ring at the standard offset loses its top band there. the cell keeps three pixels for it,
+   * inside the row height rather than around it, so no control and no label moves.
+   */
+  th.reed-edge {
+    padding-block: 3px;
+  }
+
+  /*
    * the same pitch turned a quarter. a cell takes the leading line and a pinned cell
    * takes the trailing one: the next cell's leading line travels away under it.
    */
@@ -401,7 +410,8 @@
    */
   .reed-grip {
     position: absolute;
-    inset-block: 0;
+    /* absolute against the padding box, so the ring takes the room the head cell keeps */
+    inset-block: 3px;
     right: -4px;
     z-index: var(--z-grip);
     width: 8px;
@@ -414,7 +424,8 @@
   .reed-grip::before {
     content: '';
     position: absolute;
-    inset-block: 0;
+    /* the line the reader grabs by is the row's, whatever height the button holding it takes */
+    inset-block: -3px;
     left: 4px;
     width: 1px;
     background-image: repeating-linear-gradient(
